@@ -7,7 +7,7 @@ export const SubjectProvider = ({ children }) => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(20);
   const [loading, setLoading] = useState(false);
 
   //Función para obtener materias
@@ -15,17 +15,18 @@ export const SubjectProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get("/materias", { params });
+      console.log(data)
       setSubjects(data.subjects || []);
       setTotal(data.total || 0);
       setPage(data.currentPage || 1);
-      setLimit(data.limit || 10);
+      setLimit(data.limit );
       setTotalPages(data.totalPages || 0);
     } catch (error) {
       console.error("Error obteniendo materias:", error);
       setSubjects([]);
       setTotal(0);
       setPage(1);
-      setLimit(10);
+      setLimit(20);
       setTotalPages(0);
     } finally {
       setLoading(false);

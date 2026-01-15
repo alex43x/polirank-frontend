@@ -3,6 +3,7 @@ import Login from "../pages/auth/Login";
 import Dashboard from "../pages/dashboard/Dashboard";
 import AdminPanel from "../pages/admin/AdminPanel";
 import ProtectedRoute from "./ProtectedRoute";
+import PrivateLayout from "../layouts/PrivateLoyout";
 import { ROLES } from "../constants/roles";
 
 const AppRouter = () => {
@@ -12,25 +13,23 @@ const AppRouter = () => {
         {/* Pública */}
         <Route path="/" element={<Login />} />
 
-        {/* Cualquier logueado */}
+        {/* Rutas protegidas */}
         <Route
-          path="/dashboard"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <PrivateLayout />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route path="/dashboard" element={<Dashboard />} />
 
-        {/* Solo ADMIN */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
-              <AdminPanel />
-            </ProtectedRoute>
-          }
-        />
+          {/* Solo ADMIN */}
+          <Route
+            element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]} />}
+          >
+            <Route path="/admin" element={<AdminPanel />} />
+          </Route>
+        </Route>
 
         <Route path="/unauthorized" element={<h1>No autorizado</h1>} />
       </Routes>
