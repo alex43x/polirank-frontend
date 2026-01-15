@@ -1,13 +1,37 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
 import Login from "../pages/auth/Login";
+import Dashboard from "../pages/dashboard/Dashboard";
+import AdminPanel from "../pages/admin/AdminPanel";
+import ProtectedRoute from "./ProtectedRoute";
+import PrivateLayout from "../layouts/PrivateLoyout";
+import { ROLES } from "../constants/roles";
 
 const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Rutas públicas */}
+        {/* Pública */}
         <Route path="/" element={<Login />} />
+
+        {/* Rutas protegidas */}
+        <Route
+          element={
+            <ProtectedRoute>
+              <PrivateLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/dashboard" element={<Dashboard />} />
+
+          {/* Solo ADMIN */}
+          <Route
+            element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]} />}
+          >
+            <Route path="/admin" element={<AdminPanel />} />
+          </Route>
+        </Route>
+
+        <Route path="/unauthorized" element={<h1>No autorizado</h1>} />
       </Routes>
     </BrowserRouter>
   );
