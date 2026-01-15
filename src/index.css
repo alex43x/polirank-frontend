@@ -9,6 +9,7 @@
 @theme {
   --font-family-sans: 'Inter', sans-serif;
   --color-navy: #36507D;
+  --color-greige: #E0E0E0
 }
 
 * {
@@ -19,7 +20,9 @@ body {
   background-color: #ededef;
   font-family: 'Inter', sans-serif;
 }
-
+.custom-dropdown-panel {
+  background-color: #000;
+}
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -27,3 +30,4 @@ input[type="number"],
 input[type="tel"] {
   @apply border rounded-md py-2 px-4 border-[#e0e0e0] font-medium bg-neutral-50;
 }
+
