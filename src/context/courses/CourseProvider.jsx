@@ -139,6 +139,36 @@ export const CourseProvider = ({ children }) => {
     }
   };
 
+  const fetchLastSemesterData = async (courseId,params={}) => {
+    setLoading(true);
+    console.log("Fetching last semester data with params:", params,courseId);
+    try {
+      const { data } = await api.get(`/cursos/${courseId}/reviews/last`, {params});
+      console.log(data)
+      return data;
+    }catch (error) {
+      console.error("Error obteniendo datos del último semestre:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const fetchHistoricalData=async(courseId,params={})=>{
+    setLoading(true);
+    console.log("Fetching all semesters data with params:", params,courseId);
+    try {
+      const { data } = await api.get(`/cursos/${courseId}/reviews/history`, {params});
+      console.log(data)
+      return data;
+    }catch (error) {
+      console.error("Error obteniendo datos historicos:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <CourseContext.Provider
       value={{
@@ -157,6 +187,8 @@ export const CourseProvider = ({ children }) => {
         fetchReviewById,
         updateReviewById,
         deleteReviewById,
+        fetchLastSemesterData,
+        fetchHistoricalData
       }}
     >
       {children}

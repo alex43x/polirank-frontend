@@ -9,7 +9,8 @@
 @theme {
   --font-family-sans: 'Inter', sans-serif;
   --color-navy: #36507D;
-  --color-greige: #E0E0E0
+  --color-greige: #E0E0E0;
+  --color-dark-navy: #132647
 }
 
 * {
