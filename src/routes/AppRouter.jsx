@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "../pages/auth/Login";
 import Dashboard from "../pages/dashboard/Dashboard";
 import AdminPanel from "../pages/admin/AdminPanel";
+import Reviews from "../pages/reviews/Reviews";
 import ProtectedRoute from "./ProtectedRoute";
 import PrivateLayout from "../layouts/PrivateLoyout";
 import { ROLES } from "../constants/roles";
@@ -22,6 +23,7 @@ const AppRouter = () => {
           }
         >
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/reviews/:subjectId" element={<Reviews />} />
 
           {/* Solo ADMIN */}
           <Route
