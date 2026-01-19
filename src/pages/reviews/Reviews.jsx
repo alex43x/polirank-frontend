@@ -1,5 +1,5 @@
 // Reviews.jsx
-import React, { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useSubject } from "../../hooks/useSubject";
 import { useAuth } from "../../hooks/useAuth";
@@ -19,31 +19,12 @@ export default function Reviews() {
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lastSemesterData, setLastSemesterData] = useState({});
-  const [selectedSectionId, setSelectedSectionId] = useState(null);
-  const [selectedTeacherId, setSelectedTeacherId] = useState(null);
-  const [teacherName, setTeacherName] = useState(null);
+  const [selectedSection, setSelectedSection] = useState(null); // Consolidated state
   const [historicalData, setHistoricalData] = useState({});
 
   const subjectName = location.state?.subjectName || "Materia";
 
-  useEffect(() => {
-    const loadHistoricalData = async () => {
-      if (!selectedTeacherId || !subjectId) return;
-
-      try {
-        const data = await fetchHistoricalData(selectedSectionId, {
-          teacherId: selectedTeacherId,
-          subjectId: subjectId,
-        });
-        setHistoricalData(data || {});
-      } catch (error) {
-        console.error("Error al cargar datos históricos:", error);
-      }
-    };
-
-    loadHistoricalData();
-  }, [selectedTeacherId, subjectId]);
-
+  // Cargar secciones al montar el componente
   useEffect(() => {
     const loadSections = async () => {
       if (subjectId && user) {
@@ -61,36 +42,45 @@ export default function Reviews() {
     };
 
     loadSections();
-  }, []);
+  }, [subjectId, user]);
 
+  // Cargar datos (último semestre e histórico) cuando se selecciona una sección
   useEffect(() => {
-    const loadLastSemesterData = async () => {
+    const loadSectionData = async () => {
+      if (!selectedSection) {
+        setLastSemesterData({});
+        setHistoricalData({});
+        return;
+      }
+
       try {
         setLoading(true);
-        const data = await fetchLastSemesterData(selectedSectionId, {
-          teacherId: selectedTeacherId,
-          subjectId: subjectId,
-        });
-        // Los datos vienen directamente como array
-        setLastSemesterData(data || {});
+        // Cargar últimos datos
+        const lastData = await fetchLastSemesterData(selectedSection.id);
+        setLastSemesterData(lastData || {});
+
+        // Cargar histórico
+        const historyData = await fetchHistoricalData(selectedSection.id);
+        setHistoricalData(historyData || {});
+
       } catch (error) {
-        console.error("Error al cargar las reviews:", error);
+        console.error("Error al cargar datos de la sección:", error);
       } finally {
         setLoading(false);
       }
     };
-    loadLastSemesterData();
-    console.log(
-      "Selected Section ID:",
-      selectedSectionId,
-      " Subject ID:",
-      subjectId,
-      " Teacher ID:",
-      selectedTeacherId
-    );
-  }, [selectedSectionId]);
 
-  if (loading) {
+    loadSectionData();
+  }, [selectedSection]);
+
+  // Handler para seleccionar una sección
+  const handleSectionSelect = (sectionData) => {
+    // sectionData structure: { section: { id, Docente... }, totalReviews... }
+    // We store the inner section object for easier access to ID and Docente
+    setSelectedSection(sectionData.section);
+  };
+
+  if (loading && sections.length === 0) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="text-xl text-navy">Cargando secciones...</div>
@@ -132,19 +122,17 @@ export default function Reviews() {
           lg:grid lg:grid-cols-1 lg:overflow-visible
         "
             >
-              {sections.map((section) => (
+              {sections.map((sectionData) => (
                 <div
-                  key={section.id}
-                  onClick={() => {
-                    setSelectedSectionId(section.id);
-                    setSelectedTeacherId(section.Docente.id);
-                    setTeacherName(section.Docente.nombre);
-                  }}
+                  key={sectionData.section.id}
+                  onClick={() => handleSectionSelect(sectionData)}
                   className="min-w-[260px] lg:min-w-0"
                 >
                   <TeacherCard
-                    teacher={section.Docente}
-                    selected={selectedTeacherId === section.Docente.id}
+                    teacher={sectionData.section.Docente}
+                    selected={selectedSection?.id === sectionData.section.id}
+                    totalReviews={sectionData.totalReviews}
+                    promedioGeneral={sectionData.promedioGeneral}
                   />
                 </div>
               ))}
@@ -157,7 +145,7 @@ export default function Reviews() {
           <section className="bg-white border border-greige rounded-lg shadow-md ">
             <LastSemesterData
               lastSemesterData={lastSemesterData}
-              teacherName={teacherName}
+              teacherName={selectedSection?.Docente?.nombre}
             />
           </section>
           <section className="bg-white border border-greige rounded-lg shadow-md mt-2">
