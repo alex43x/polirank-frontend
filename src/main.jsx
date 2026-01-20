@@ -7,6 +7,7 @@ import { AuthProvider } from "./context/auth/AuthProvider";
 import { StudentProvider } from "./context/students/StudentProvider";
 import { CourseProvider } from "./context/courses/CourseProvider";
 import { SubjectProvider } from "./context/subjects/SubjectProvider";
+import { ReviewProvider } from "./context/reviews/ReviewProvider";
 import { PrimeReactProvider, PrimeReactContext } from "primereact/api";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -16,11 +17,13 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <StudentProvider>
           <SubjectProvider>
             <CourseProvider>
-              <AppRouter />
+              <ReviewProvider>
+                <AppRouter />
+              </ReviewProvider>
             </CourseProvider>
           </SubjectProvider>
         </StudentProvider>
       </AuthProvider>
     </PrimeReactProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
