@@ -4,9 +4,12 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useSubject } from "../../hooks/useSubject";
 import { useAuth } from "../../hooks/useAuth";
 import { useCourse } from "../../hooks/useCourse";
+
 import TeacherCard from "../../components/reviews.jsx/TeacherCard";
 import LastSemesterData from "../../components/reviews.jsx/LastSemesterData";
 import HistoricalData from "../../components/reviews.jsx/HistoricalData";
+import ReviewForm from "./ReviewForm";
+import { Dialog } from "primereact/dialog";
 
 export default function Reviews() {
   const { subjectId } = useParams();
@@ -19,8 +22,9 @@ export default function Reviews() {
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lastSemesterData, setLastSemesterData] = useState({});
-  const [selectedSection, setSelectedSection] = useState(null); // Consolidated state
+  const [selectedSection, setSelectedSection] = useState(null);
   const [historicalData, setHistoricalData] = useState({});
+  const [visible, setVisible] = useState(false);
 
   const subjectName = location.state?.subjectName || "Materia";
 
@@ -31,7 +35,6 @@ export default function Reviews() {
         try {
           setLoading(true);
           const data = await fetchSectionsBySubjectId(subjectId);
-          // Los datos vienen directamente como array
           setSections(Array.isArray(data) ? data : []);
         } catch (error) {
           console.error("Error al cargar las secciones:", error);
@@ -55,14 +58,11 @@ export default function Reviews() {
 
       try {
         setLoading(true);
-        // Cargar últimos datos
         const lastData = await fetchLastSemesterData(selectedSection.id);
         setLastSemesterData(lastData || {});
 
-        // Cargar histórico
         const historyData = await fetchHistoricalData(selectedSection.id);
         setHistoricalData(historyData || {});
-
       } catch (error) {
         console.error("Error al cargar datos de la sección:", error);
       } finally {
@@ -73,11 +73,16 @@ export default function Reviews() {
     loadSectionData();
   }, [selectedSection]);
 
-  // Handler para seleccionar una sección
   const handleSectionSelect = (sectionData) => {
-    // sectionData structure: { section: { id, Docente... }, totalReviews... }
-    // We store the inner section object for easier access to ID and Docente
     setSelectedSection(sectionData.section);
+  };
+
+  const handleOpenDialog = () => {
+    if (!selectedSection) {
+      alert("Por favor selecciona una sección primero");
+      return;
+    }
+    setVisible(true);
   };
 
   if (loading && sections.length === 0) {
@@ -91,20 +96,48 @@ export default function Reviews() {
   return (
     <div className="px-6">
       {/* Header */}
-      <div className="mb-6">
-        <button
-          onClick={() => navigate(-1)}
-          className="text-navy hover:text-blue-900 mb-4 flex items-center gap-2 font-medium"
-        >
-          ← Volver
-        </button>
+      <div className="mb-6 flex flex-wrap justify-between items-end">
+        <div>
+          <button
+            onClick={() => navigate(-1)}
+            className="text-navy hover:text-blue-900 mb-4 flex items-center gap-2 font-medium"
+          >
+            ← Volver
+          </button>
 
-        <h1 className="text-4xl font-extrabold text-navy mb-2">
-          {subjectName}
-        </h1>
-        <h2 className="text-2xl font-bold text-neutral-700">
-          Secciones Disponibles
-        </h2>
+          <h1 className="text-4xl font-extrabold text-navy mb-2">
+            {subjectName}
+          </h1>
+          <h2 className="text-2xl font-bold text-neutral-700">
+            Secciones Disponibles
+          </h2>
+        </div>
+        <div>
+          <button
+            className="bg-navy text-white px-4 py-2 rounded-lg hover:bg-dark-navy transition-colors"
+            onClick={handleOpenDialog}
+            type="button"
+          >
+            Agregar Reseña +
+          </button>
+          <Dialog
+            visible={visible}
+            style={{ width: "95vw", maxWidth: "900px" }}
+            onHide={() => setVisible(false)}
+            dismissableMask={true}
+            modal={true}
+            showHeader={false}
+            contentClassName="p-0"
+            maskStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
+          >
+            <ReviewForm
+              subjectName={subjectName}
+              teacherName={selectedSection?.Docente?.nombre || "Docente"}
+              sectionId={selectedSection?.id}
+              onSuccess={() => setVisible(false)}
+            />
+          </Dialog>
+        </div>
       </div>
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Teachers */}
