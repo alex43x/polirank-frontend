@@ -30,10 +30,19 @@ export const AuthProvider = ({ children }) => {
      LOGIN
      =========================== */
   const login = async (credentials) => {
-    const { data } = await api.post("/auth/login", credentials);
-
+    const response = await api.post("/auth/login", credentials);
+    
+    // La respuesta puede venir en response.data directamente
+    const data = response.data;
+    
+    console.log("Login response:", data); // Para debug
+    
     const jwt = data.token;
     const student = data.data.student;
+
+    if (!jwt || !student) {
+      throw new Error("Respuesta inválida del servidor");
+    }
 
     localStorage.setItem("token", jwt);
     localStorage.setItem("user", JSON.stringify(student));
@@ -41,6 +50,9 @@ export const AuthProvider = ({ children }) => {
     setAuthHeader(jwt);
     setToken(jwt);
     setUser(student);
+
+    // Retornar el usuario para verificar su rol/estado
+    return student;
   };
 
   /* ===========================
@@ -52,6 +64,69 @@ export const AuthProvider = ({ children }) => {
     setAuthHeader(null);
     setUser(null);
     setToken(null);
+  };
+
+  /* ===========================
+     GET PROFILE
+     =========================== */
+  const getProfile = async () => {
+    try {
+      const { data } = await api.get("/auth/profile");
+      
+      // Actualizar usuario con la información más reciente
+      const updatedUser = data.student;
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      
+      return {
+        student: data.student,
+        reviews: data.reviews,
+      };
+    } catch (error) {
+      console.error("Error al obtener perfil:", error);
+      throw error;
+    }
+  };
+
+  /* ===========================
+     CREATE PASSWORD (Primer Login)
+     =========================== */
+  const createPassword = async (correo, newPassword) => {
+    try {
+      const { data } = await api.post("/auth/create-password", {
+        correo,
+        newPassword,
+      });
+
+      // Después de crear la contraseña, actualizar el perfil
+      if (token) {
+        await getProfile();
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error al crear contraseña:", error);
+      throw error;
+    }
+  };
+
+  /* ===========================
+     CHANGE PASSWORD (Usuario activo)
+     =========================== */
+  const changePassword = async (currentPassword, newPassword) => {
+    try {
+      // Nota: Este endpoint no está en la documentación proporcionada,
+      // pero es común tenerlo. Ajusta según tu API.
+      const { data } = await api.post("/auth/change-password", {
+        currentPassword,
+        newPassword,
+      });
+
+      return data;
+    } catch (error) {
+      console.error("Error al cambiar contraseña:", error);
+      throw error;
+    }
   };
 
   /* ===========================
@@ -83,6 +158,9 @@ export const AuthProvider = ({ children }) => {
         token,
         login,
         logout,
+        getProfile,
+        createPassword,
+        changePassword,
         isAuthenticated: !!token,
         loading,
       }}

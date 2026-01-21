@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"; 
 import Login from "../pages/auth/Login";
+import ChangePassword from "../pages/auth/ChangePassword";
 import Dashboard from "../pages/dashboard/Dashboard";
 import AdminPanel from "../pages/admin/AdminPanel";
 import Reviews from "../pages/reviews/Reviews";
@@ -16,8 +17,9 @@ const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Pública */}
+        {/* Públicas */}
         <Route path="/" element={<Login />} />
+        <Route path="/change-password" element={<ChangePassword />} />
 
         {/* Rutas protegidas */}
         <Route
