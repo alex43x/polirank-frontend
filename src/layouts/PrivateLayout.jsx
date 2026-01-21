@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 export default function PrivateLayout() {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">

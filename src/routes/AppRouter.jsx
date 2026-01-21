@@ -1,11 +1,16 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom"; 
 import Login from "../pages/auth/Login";
 import Dashboard from "../pages/dashboard/Dashboard";
 import AdminPanel from "../pages/admin/AdminPanel";
 import Reviews from "../pages/reviews/Reviews";
 import ProtectedRoute from "./ProtectedRoute";
-import PrivateLayout from "../layouts/PrivateLoyout";
+import PrivateLayout from "../layouts/PrivateLayout";
 import { ROLES } from "../constants/roles";
+
+import { StudentProvider } from "../context/students/StudentProvider";
+import { CourseProvider } from "../context/courses/CourseProvider";
+import { SubjectProvider } from "../context/subjects/SubjectProvider";
+import { ReviewProvider } from "../context/reviews/ReviewProvider";
 
 const AppRouter = () => {
   return (
@@ -22,8 +27,31 @@ const AppRouter = () => {
             </ProtectedRoute>
           }
         >
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/reviews/:subjectId" element={<Reviews />} />
+          {/* Dashboard: solo SubjectProvider */}
+          <Route
+            path="/dashboard"
+            element={
+              <SubjectProvider>
+                <Dashboard />
+              </SubjectProvider>
+            }
+          />
+
+          {/* Reviews: Student + Subject + Course + Review */}
+          <Route
+            path="/reviews/:subjectId"
+            element={
+              <StudentProvider>
+                <SubjectProvider>
+                  <CourseProvider>
+                    <ReviewProvider>
+                      <Reviews />
+                    </ReviewProvider>
+                  </CourseProvider>
+                </SubjectProvider>
+              </StudentProvider>
+            }
+          />
 
           {/* Solo ADMIN */}
           <Route
@@ -33,6 +61,7 @@ const AppRouter = () => {
           </Route>
         </Route>
 
+        {/* No autorizado */}
         <Route path="/unauthorized" element={<h1>No autorizado</h1>} />
       </Routes>
     </BrowserRouter>
