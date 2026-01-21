@@ -8,6 +8,14 @@ export default function Dashboard() {
   const { fetchSubjects, subjects, limit } = useSubject();
   const { user, loading } = useAuth();
 
+  // Estados locales para los filtros (sin debounce)
+  const [localFilters, setLocalFilters] = useState({
+    search: "",
+    dpto_id: null,
+    semester: null,
+  });
+
+  // Estados que realmente disparan la búsqueda (con debounce)
   const [searchParams, setSearchParams] = useState({
     search: "",
     dpto_id: null,
@@ -21,7 +29,16 @@ export default function Dashboard() {
     { id: 4, nombre: "Departamento de Electricidad y Electrónica" },
   ];
 
-  // Solo llama a fetchSubjects cuando cambien los searchParams
+  // Debouncing para todos los filtros
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchParams(localFilters);
+    }, 500); // 500ms de delay
+
+    return () => clearTimeout(timer);
+  }, [localFilters]);
+
+  // Llama a fetchSubjects cuando cambien los searchParams (después del debounce)
   useEffect(() => {
     if (user) {
       console.log({ ...searchParams, limit });
@@ -31,15 +48,29 @@ export default function Dashboard() {
 
   // Manejador para el input de búsqueda por nombre
   const handleSearchChange = (e) => {
-    setSearchParams({ ...searchParams, search: e.target.value });
+    setLocalFilters({ ...localFilters, search: e.target.value });
   };
 
   // Manejador para el dropdown de departamento
   const handleDeptoChange = (e) => {
-    setSearchParams({
-      ...searchParams,
+    setLocalFilters({
+      ...localFilters,
       dpto_id: e.value ? e.value.id : null,
     });
+  };
+
+  // Manejador para los botones de semestre
+  const handleSemesterChange = (semester) => {
+    setLocalFilters({ ...localFilters, semester });
+  };
+
+  // Función para distribuir las materias en columnas (izquierda a derecha)
+  const distributeInColumns = (items, numColumns) => {
+    const columns = Array.from({ length: numColumns }, () => []);
+    items.forEach((item, index) => {
+      columns[index % numColumns].push(item);
+    });
+    return columns;
   };
 
   if (loading) {
@@ -73,13 +104,13 @@ export default function Dashboard() {
         <input
           type="text"
           placeholder="Buscar asignatura por nombre..."
-          value={searchParams.search}
+          value={localFilters.search}
           onChange={handleSearchChange}
           className="w-72 shadow-md"
         />
 
         <Dropdown
-          value={deptos.find((d) => d.id === searchParams.dpto_id) || null}
+          value={deptos.find((d) => d.id === localFilters.dpto_id) || null}
           options={deptos}
           optionLabel="nombre"
           placeholder="Buscar por departamento"
@@ -104,11 +135,9 @@ export default function Dashboard() {
           <div className="flex gap-1 overflow-x-auto whitespace-nowrap py-2">
             <button
               className={` flex-shrink-0 py-2 px-4 text-neutral-100 rounded-lg ${
-                searchParams.semester === null ? "bg-blue-950" : "bg-navy"
+                localFilters.semester === null ? "bg-blue-950" : "bg-navy"
               }`}
-              onClick={() =>
-                setSearchParams({ ...searchParams, semester: null })
-              }
+              onClick={() => handleSemesterChange(null)}
             >
               Todos los semestres
             </button>
@@ -116,14 +145,12 @@ export default function Dashboard() {
             {Array.from({ length: user?.Carrera?.semestres || 0 }, (_, i) => (
               <button
                 key={i}
-                className={` flex-shrink-0 w-10 py-2 text-neutral-100 rounded-lg ${
-                  searchParams.semester === i + 1
+                className={` shrink-0 w-10 py-2 text-neutral-100 rounded-lg ${
+                  localFilters.semester === i + 1
                     ? "bg-blue-950"
                     : "bg-navy hover:bg-blue-900"
                 }`}
-                onClick={() =>
-                  setSearchParams({ ...searchParams, semester: i + 1 })
-                }
+                onClick={() => handleSemesterChange(i + 1)}
               >
                 {i + 1}
               </button>
@@ -132,13 +159,40 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Lista de asignaturas */}
-      <div className="lg:columns-3 lg:gap-5 md:gap-4 lg:space-y-5 md:space-y-3.5 md:columns-2">
+      {/* Lista de asignaturas - Masonry horizontal */}
+      {/* Mobile: lista simple sin columnas */}
+      <div className="flex flex-col gap-4 min-[425px]:hidden">
         {subjects.map((subject) => (
-          <div key={subject.id} className="break-inside-avoid mb-4">
-            <SubjectCard subject={subject} />
-          </div>
+          <SubjectCard key={subject.id} subject={subject} />
         ))}
+      </div>
+
+      {/* Tablet y Desktop: grid con columnas */}
+      <div className="hidden min-[425px]:grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+        {/* Columna 1 */}
+        <div className="flex flex-col gap-2 lg:gap-5">
+          {distributeInColumns(subjects, 
+            window.innerWidth >= 1024 ? 3 : 2
+          )[0]?.map((subject) => (
+            <SubjectCard key={subject.id} subject={subject} />
+          ))}
+        </div>
+
+        {/* Columna 2 */}
+        <div className="flex flex-col gap-4 lg:gap-5">
+          {distributeInColumns(subjects, 
+            window.innerWidth >= 1024 ? 3 : 2
+          )[1]?.map((subject) => (
+            <SubjectCard key={subject.id} subject={subject} />
+          ))}
+        </div>
+
+        {/* Columna 3 (solo desktop) */}
+        <div className="hidden lg:flex flex-col gap-4 lg:gap-5">
+          {distributeInColumns(subjects, 3)[2]?.map((subject) => (
+            <SubjectCard key={subject.id} subject={subject} />
+          ))}
+        </div>
       </div>
     </div>
   );
