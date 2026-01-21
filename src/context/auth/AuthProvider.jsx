@@ -2,36 +2,51 @@ import { useEffect, useState } from "react";
 import AuthContext from "./AuthContext";
 import api, { setAuthHeader } from "../../api/api";
 
+/* ===========================
+   JWT EXP CHECK
+   =========================== */
+const isTokenExpired = (token) => {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    // Recupera el usuario del localStorage al iniciar
     const savedUser = localStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
-  
-  const [token, setToken] = useState(
-    localStorage.getItem("token")
-  );
-  
+
+  const [token, setToken] = useState(() => {
+    return localStorage.getItem("token");
+  });
+
   const [loading, setLoading] = useState(true);
 
+  /* ===========================
+     LOGIN
+     =========================== */
   const login = async (credentials) => {
     const { data } = await api.post("/auth/login", credentials);
 
     const jwt = data.token;
     const student = data.data.student;
 
-    // Guarda TANTO el token como el usuario
     localStorage.setItem("token", jwt);
     localStorage.setItem("user", JSON.stringify(student));
-    
-    setToken(jwt);
+
     setAuthHeader(jwt);
+    setToken(jwt);
     setUser(student);
   };
 
+  /* ===========================
+     LOGOUT
+     =========================== */
   const logout = () => {
-    // Elimina TANTO el token como el usuario
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setAuthHeader(null);
@@ -39,12 +54,27 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
   };
 
+  /* ===========================
+     INIT + EXP CHECK
+     =========================== */
   useEffect(() => {
-    if (token) {
-      setAuthHeader(token);
+    const storedToken = localStorage.getItem("token");
+
+    if (!storedToken) {
+      setLoading(false);
+      return;
     }
+
+    if (isTokenExpired(storedToken)) {
+      logout();
+      setLoading(false);
+      return;
+    }
+
+    setAuthHeader(storedToken);
+    setToken(storedToken);
     setLoading(false);
-  }, [token]);
+  }, []);
 
   return (
     <AuthContext.Provider
