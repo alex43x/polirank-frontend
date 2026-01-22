@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useReview } from "../../hooks/useReview";
 import { useCourse } from "../../hooks/useCourse";
+import { useAuth } from "../../hooks/useAuth";
 import { Dropdown } from "primereact/dropdown";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 
@@ -23,16 +24,19 @@ const ReviewForm = ({
     disponibilidad: null,
     material: null,
   });
-  const { createReview } = useReview();
+  const { createReview, updateReview, deleteReview } = useReview();
   const { getCoursesBySection } = useCourse();
+  const { profileData } = useAuth();
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const [availableCourses, setAvailableCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+  const [existingReview, setExistingReview] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+
   useEffect(() => {
     console.log(sectionId);
   }, []);
-  
+
   // Cargar cursos disponibles cuando se abre el formulario
   useEffect(() => {
     const loadCourses = async () => {
@@ -56,6 +60,77 @@ const ReviewForm = ({
 
     loadCourses();
   }, [sectionId]);
+
+  // Verificar si existe una reseña cuando se selecciona año y período
+  useEffect(() => {
+    const checkExistingReview = () => {
+      if (!formData.selectedCourseId || !profileData?.reviews?.rows) {
+        setExistingReview(null);
+        setIsEditMode(false);
+        return;
+      }
+
+      // Buscar si existe una reseña para el curso seleccionado
+      const review = profileData.reviews.rows.find(
+        (r) => r.curso === formData.selectedCourseId
+      );
+
+      if (review) {
+        setExistingReview(review);
+        setIsEditMode(true);
+        // Cargar los valores de la reseña existente en el formulario
+        loadReviewData(review);
+      } else {
+        setExistingReview(null);
+        setIsEditMode(false);
+        // Limpiar las calificaciones si no hay reseña existente
+        clearRatings();
+      }
+    };
+
+    checkExistingReview();
+  }, [formData.selectedCourseId, profileData]);
+
+  // Cargar datos de una reseña existente
+  const loadReviewData = (review) => {
+    const aspectoMap = {
+      1: "dominio",
+      2: "claridad",
+      3: "exigencia",
+      4: "evaluacion",
+      5: "puntualidad",
+      6: "trato",
+      7: "disponibilidad",
+      8: "material",
+    };
+
+    const newFormData = { ...formData };
+
+    // Los aspectos están en ReviewConts
+    review.ReviewConts.forEach((aspecto) => {
+      const key = aspectoMap[aspecto.aspecto];
+      if (key) {
+        newFormData[key] = aspecto.valor;
+      }
+    });
+
+    setFormData(newFormData);
+  };
+
+  // Limpiar calificaciones
+  const clearRatings = () => {
+    setFormData((prev) => ({
+      ...prev,
+      dominio: null,
+      claridad: null,
+      exigencia: null,
+      evaluacion: null,
+      puntualidad: null,
+      trato: null,
+      disponibilidad: null,
+      material: null,
+    }));
+  };
 
   // Filtrar años disponibles basado en los cursos
   const availableYears = [
@@ -138,7 +213,7 @@ const ReviewForm = ({
     // Encontrar el curso correspondiente al año y período seleccionado
     const course = availableCourses.find(
       (c) =>
-        c.year.toString() === formData.year && c.periodo.toString() === period,
+        c.year.toString() === formData.year && c.periodo.toString() === period
     );
 
     if (course) {
@@ -151,7 +226,7 @@ const ReviewForm = ({
   };
 
   const submitReview = async () => {
-    // Mapear las categorías a IDs de aspectos (ajusta estos IDs según tu backend)
+    // Mapear las categorías a IDs de aspectos
     const aspectoMap = {
       dominio: 1,
       claridad: 2,
@@ -176,8 +251,15 @@ const ReviewForm = ({
     };
 
     try {
-      await createReview(reviewData);
-      alert("Reseña enviada correctamente");
+      if (isEditMode && existingReview) {
+        // Actualizar reseña existente
+        await updateReview(existingReview.id, reviewData);
+        alert("Reseña actualizada correctamente");
+      } else {
+        // Crear nueva reseña
+        await createReview(reviewData);
+        alert("Reseña enviada correctamente");
+      }
 
       // Limpiar el formulario después de enviar
       setFormData({
@@ -194,14 +276,61 @@ const ReviewForm = ({
         material: null,
       });
 
-      // Llamar a onSuccess para cerrar el diálogo
+      // Llamar a onSuccess para cerrar el diálogo y recargar datos
       if (onSuccess) {
         onSuccess();
       }
     } catch (error) {
       console.error("Error al enviar la reseña:", error);
-      alert("Error al enviar la reseña. Por favor intenta de nuevo.");
+      alert(
+        `Error al ${isEditMode ? "actualizar" : "enviar"} la reseña. Por favor intenta de nuevo.`
+      );
     }
+  };
+
+  const handleDelete = () => {
+    if (!existingReview) return;
+
+    confirmDialog({
+      message: "¿Estás seguro de que deseas eliminar esta reseña?",
+      header: "Confirmar Eliminación",
+      icon: "pi pi-exclamation-triangle",
+      acceptLabel: "Sí, eliminar",
+      rejectLabel: "Cancelar",
+      acceptClassName: "p-button-danger",
+      accept: async () => {
+        try {
+          await deleteReview(existingReview.id);
+          alert("Reseña eliminada correctamente");
+
+          // Limpiar el formulario
+          setFormData({
+            year: "",
+            period: "",
+            selectedCourseId: null,
+            dominio: null,
+            claridad: null,
+            exigencia: null,
+            evaluacion: null,
+            puntualidad: null,
+            trato: null,
+            disponibilidad: null,
+            material: null,
+          });
+
+          setExistingReview(null);
+          setIsEditMode(false);
+
+          // Cerrar el diálogo y recargar datos
+          if (onSuccess) {
+            onSuccess();
+          }
+        } catch (error) {
+          console.error("Error al eliminar la reseña:", error);
+          alert("Error al eliminar la reseña. Por favor intenta de nuevo.");
+        }
+      },
+    });
   };
 
   const handleSubmit = () => {
@@ -220,11 +349,17 @@ const ReviewForm = ({
       return;
     }
 
+    const message = isEditMode
+      ? "¿Estás seguro de que deseas actualizar esta reseña?"
+      : "¿Estás seguro de que deseas enviar esta reseña?";
+
+    const header = isEditMode ? "Confirmar Actualización" : "Confirmar Envío";
+
     confirmDialog({
-      message: "¿Estás seguro de que deseas enviar esta reseña?",
-      header: "Confirmar Envío",
+      message: message,
+      header: header,
       icon: "pi pi-exclamation-triangle",
-      acceptLabel: "Sí, enviar",
+      acceptLabel: isEditMode ? "Sí, actualizar" : "Sí, enviar",
       rejectLabel: "Cancelar",
       accept: submitReview,
     });
@@ -250,22 +385,31 @@ const ReviewForm = ({
 
   return (
     <div className="bg-greige rounded-lg w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto relative">
-      <ConfirmDialog 
+      <ConfirmDialog
         pt={{
-          root: { className: "bg-white rounded-lg shadow-xl border border-gray-200" },
-          header: { className: "bg-navy text-white px-6 py-4 rounded-t-lg" },
+          root: {
+            className: "bg-white rounded-lg shadow-xl border border-gray-200",
+          },
+          header: {
+            className: "bg-navy text-white px-6 py-4 rounded-t-lg",
+          },
           content: { className: "px-6 py-4 text-gray-700" },
-          footer: { className: "px-6 py-4 bg-gray-50 rounded-b-lg flex gap-3 justify-end" },
-          acceptButton: { 
-            className: "bg-navy hover:bg-dark-navy text-white px-6 py-2 rounded-md transition-colors font-medium shadow-md" 
+          footer: {
+            className:
+              "px-6 py-4 bg-gray-50 rounded-b-lg flex gap-3 justify-end",
           },
-          rejectButton: { 
-            className: "bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md transition-colors font-medium" 
+          acceptButton: {
+            className:
+              "bg-navy hover:bg-dark-navy text-white px-6 py-2 rounded-md transition-colors font-medium shadow-md",
           },
-          icon: { className: "text-navy text-3xl mr-3" }
+          rejectButton: {
+            className:
+              "bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md transition-colors font-medium",
+          },
+          icon: { className: "text-navy text-3xl mr-3" },
         }}
       />
-      
+
       {/* Botón de cerrar */}
       <button
         onClick={onSuccess}
@@ -290,11 +434,20 @@ const ReviewForm = ({
 
       {/* Título */}
       <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2 pr-8">
-        Reseñar Docente
+        {isEditMode ? "Editar Reseña" : "Reseñar Docente"}
       </h2>
       <h3 className="text-lg sm:text-xl text-navy font-semibold mb-4 sm:mb-6">
         {subjectName} - {teacherName}
       </h3>
+
+      {/* Mensaje de modo edición */}
+      {isEditMode && (
+        <div className="mb-4 p-3 bg-blue-50 border border-greige rounded-md">
+          <p className="text-navy font-medium">
+            Estás editando una reseña existente
+          </p>
+        </div>
+      )}
 
       <div>
         {/* Datos del Año-Período */}
@@ -353,7 +506,9 @@ const ReviewForm = ({
                 <div className="flex gap-2">
                   <button
                     onClick={() => handlePeriodClick("1")}
-                    disabled={!formData.year || !availablePeriods.includes("1")}
+                    disabled={
+                      !formData.year || !availablePeriods.includes("1")
+                    }
                     className={`w-10 h-10 rounded-md font-medium transition-all ${
                       formData.period === "1"
                         ? "bg-dark-navy text-white"
@@ -366,7 +521,9 @@ const ReviewForm = ({
                   </button>
                   <button
                     onClick={() => handlePeriodClick("2")}
-                    disabled={!formData.year || !availablePeriods.includes("2")}
+                    disabled={
+                      !formData.year || !availablePeriods.includes("2")
+                    }
                     className={`w-10 h-10 rounded-md font-medium transition-all ${
                       formData.period === "2"
                         ? "bg-dark-navy text-white"
@@ -385,7 +542,9 @@ const ReviewForm = ({
 
         {/* Calificaciones */}
         <div>
-          <h4 className="font-semibold text-neutral-800 mb-3 text-xl">Calificaciones</h4>
+          <h4 className="font-semibold text-neutral-800 mb-3 text-xl">
+            Calificaciones
+          </h4>
 
           {/* Contenedor con tooltip */}
           <div className="flex flex-col lg:flex-row  gap-4 bg-white p-4 rounded border border-greige shadow-md">
@@ -435,14 +594,22 @@ const ReviewForm = ({
           </div>
         </div>
 
-        {/* Botón Enviar */}
-        <div className="flex justify-center mt-4">
+        {/* Botones de acción */}
+        <div className="flex justify-center gap-3 mt-4">
           <button
             onClick={handleSubmit}
-            className="w-full sm:w-auto bg-navy text-white px-4 py-2 rounded-md  hover:bg-dark-navy transition-colors shadow-md"
-          >
-            Enviar Reseña
+            className="w-full sm:w-auto bg-navy text-white px-4 py-2 rounded-md hover:bg-dark-navy transition-colors shadow-md"
+            >
+            {isEditMode ? "Actualizar Reseña" : "Enviar Reseña"}
           </button>
+            {isEditMode && (
+              <button
+                onClick={handleDelete}
+                className="w-full sm:w-auto bg-white text-dark-navy px-4 py-2 rounded-md hover:bg-dark-navy hover:text-white transition-colors shadow-md"
+              >
+                Eliminar Reseña
+              </button>
+            )}
         </div>
       </div>
     </div>

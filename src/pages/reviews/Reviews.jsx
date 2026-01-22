@@ -15,7 +15,7 @@ export default function Reviews() {
   const { subjectId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user,getProfile } = useAuth();
   const { fetchSectionsBySubjectId } = useSubject();
   const { fetchLastSemesterData, fetchHistoricalData } = useCourse();
 
@@ -48,28 +48,27 @@ export default function Reviews() {
   }, [subjectId, user]);
 
   // Cargar datos (último semestre e histórico) cuando se selecciona una sección
+  const loadSectionData = async () => {
+    if (!selectedSection) {
+      setLastSemesterData({});
+      setHistoricalData({});
+      return;
+    }
+    try {
+      setLoading(true);
+      const lastData = await fetchLastSemesterData(selectedSection.id);
+      setLastSemesterData(lastData || {});
+
+      const historyData = await fetchHistoricalData(selectedSection.id);
+      setHistoricalData(historyData || {});
+      
+    } catch (error) {
+      console.error("Error al cargar datos de la sección:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const loadSectionData = async () => {
-      if (!selectedSection) {
-        setLastSemesterData({});
-        setHistoricalData({});
-        return;
-      }
-
-      try {
-        setLoading(true);
-        const lastData = await fetchLastSemesterData(selectedSection.id);
-        setLastSemesterData(lastData || {});
-
-        const historyData = await fetchHistoricalData(selectedSection.id);
-        setHistoricalData(historyData || {});
-      } catch (error) {
-        console.error("Error al cargar datos de la sección:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadSectionData();
   }, [selectedSection]);
 
@@ -94,7 +93,7 @@ export default function Reviews() {
   }
 
   return (
-    <div className="px-6">
+    <div >
       {/* Header */}
       <div className="mb-6 flex flex-wrap justify-between items-end">
         <div>
@@ -134,14 +133,14 @@ export default function Reviews() {
               subjectName={subjectName}
               teacherName={selectedSection?.Docente?.nombre || "Docente"}
               sectionId={selectedSection?.id}
-              onSuccess={() => setVisible(false)}
+              onSuccess={() => {setVisible(false);loadSectionData(), getProfile()}}
             />
           </Dialog>
         </div>
       </div>
-      <div className="flex flex-col lg:flex-row gap-4">
+      <div className="flex flex-col md:flex-row gap-4">
         {/* Teachers */}
-        <div className="lg:w-1/3">
+        <div className="md:w-1/3">
           {sections.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-xl text-neutral-500">
@@ -152,20 +151,21 @@ export default function Reviews() {
             <div
               className="
           flex gap-3 overflow-x-auto pb-2
-          lg:grid lg:grid-cols-1 lg:overflow-visible
+          md:grid md:grid-cols-1 md:overflow-visible
         "
             >
-              {sections.map((sectionData) => (
+              {sections.map((sectionData,index) => (
                 <div
                   key={sectionData.section.id}
                   onClick={() => handleSectionSelect(sectionData)}
-                  className="min-w-[260px] lg:min-w-0"
+                  className="min-w-[260px] md:min-w-0"
                 >
                   <TeacherCard
                     teacher={sectionData.section.Docente}
                     selected={selectedSection?.id === sectionData.section.id}
-                    totalReviews={sectionData.totalReviews}
-                    promedioGeneral={sectionData.promedioGeneral}
+                    reviews={sectionData.totalReviews}
+                    score={sectionData.promedioGeneral}
+                    position={index+1}
                   />
                 </div>
               ))}
@@ -174,7 +174,7 @@ export default function Reviews() {
         </div>
 
         {/* Datos */}
-        <div className="lg:w-2/3">
+        <div className="md:w-2/3">
           <section className="bg-white border border-greige rounded-lg shadow-md ">
             <LastSemesterData
               lastSemesterData={lastSemesterData}
