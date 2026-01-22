@@ -254,11 +254,9 @@ const ReviewForm = ({
       if (isEditMode && existingReview) {
         // Actualizar reseña existente
         await updateReview(existingReview.id, reviewData);
-        alert("Reseña actualizada correctamente");
       } else {
         // Crear nueva reseña
         await createReview(reviewData);
-        alert("Reseña enviada correctamente");
       }
 
       // Limpiar el formulario después de enviar
@@ -276,10 +274,13 @@ const ReviewForm = ({
         material: null,
       });
 
-      // Llamar a onSuccess para cerrar el diálogo y recargar datos
+      // IMPORTANTE: Llamar a onSuccess para cerrar el diálogo e invalidar cache
       if (onSuccess) {
-        onSuccess();
+        await onSuccess();
       }
+
+      // Mostrar mensaje de éxito después de que se invalide el cache
+      alert(isEditMode ? "Reseña actualizada correctamente" : "Reseña enviada correctamente");
     } catch (error) {
       console.error("Error al enviar la reseña:", error);
       alert(
@@ -301,7 +302,6 @@ const ReviewForm = ({
       accept: async () => {
         try {
           await deleteReview(existingReview.id);
-          alert("Reseña eliminada correctamente");
 
           // Limpiar el formulario
           setFormData({
@@ -321,10 +321,13 @@ const ReviewForm = ({
           setExistingReview(null);
           setIsEditMode(false);
 
-          // Cerrar el diálogo y recargar datos
+          // IMPORTANTE: Cerrar el diálogo e invalidar cache
           if (onSuccess) {
-            onSuccess();
+            await onSuccess();
           }
+
+          // Mostrar mensaje después de invalidar cache
+          alert("Reseña eliminada correctamente");
         } catch (error) {
           console.error("Error al eliminar la reseña:", error);
           alert("Error al eliminar la reseña. Por favor intenta de nuevo.");
@@ -599,17 +602,17 @@ const ReviewForm = ({
           <button
             onClick={handleSubmit}
             className="w-full sm:w-auto bg-navy text-white px-4 py-2 rounded-md hover:bg-dark-navy transition-colors shadow-md"
-            >
+          >
             {isEditMode ? "Actualizar Reseña" : "Enviar Reseña"}
           </button>
-            {isEditMode && (
-              <button
-                onClick={handleDelete}
-                className="w-full sm:w-auto bg-white text-dark-navy px-4 py-2 rounded-md hover:bg-dark-navy hover:text-white transition-colors shadow-md"
-              >
-                Eliminar Reseña
-              </button>
-            )}
+          {isEditMode && (
+            <button
+              onClick={handleDelete}
+              className="w-full sm:w-auto bg-white text-dark-navy px-4 py-2 rounded-md hover:bg-dark-navy hover:text-white transition-colors shadow-md"
+            >
+              Eliminar Reseña
+            </button>
+          )}
         </div>
       </div>
     </div>

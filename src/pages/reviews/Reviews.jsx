@@ -1,6 +1,6 @@
-// Reviews.jsx
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSubject } from "../../hooks/useSubject";
 import { useAuth } from "../../hooks/useAuth";
 import { useCourse } from "../../hooks/useCourse";
@@ -15,62 +15,58 @@ export default function Reviews() {
   const { subjectId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { user,getProfile } = useAuth();
+  const { user, getProfile } = useAuth();
   const { fetchSectionsBySubjectId } = useSubject();
   const { fetchLastSemesterData, fetchHistoricalData } = useCourse();
+  const queryClient = useQueryClient();
 
-  const [sections, setSections] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [lastSemesterData, setLastSemesterData] = useState({});
   const [selectedSection, setSelectedSection] = useState(null);
-  const [historicalData, setHistoricalData] = useState({});
   const [visible, setVisible] = useState(false);
 
   const subjectName = location.state?.subjectName || "Materia";
 
-  // Cargar secciones al montar el componente
-  useEffect(() => {
-    const loadSections = async () => {
-      if (subjectId && user) {
-        try {
-          setLoading(true);
-          const data = await fetchSectionsBySubjectId(subjectId);
-          setSections(Array.isArray(data) ? data : []);
-        } catch (error) {
-          console.error("Error al cargar las secciones:", error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
+  // Query para obtener las secciones
+  const {
+    data: sections = [],
+    isLoading: sectionsLoading,
+    error: sectionsError,
+  } = useQuery({
+    queryKey: ["sections", subjectId],
+    queryFn: async () => {
+      const data = await fetchSectionsBySubjectId(subjectId);
+      return Array.isArray(data) ? data : [];
+    },
+    enabled: !!subjectId && !!user,
+    staleTime: 1000 * 60 * 10, // 10 minutos para secciones (cambian poco)
+  });
 
-    loadSections();
-  }, [subjectId, user]);
+  // Query para datos del último semestre
+  const {
+    data: lastSemesterData = {},
+    isLoading: lastSemesterLoading,
+  } = useQuery({
+    queryKey: ["lastSemester", selectedSection?.id],
+    queryFn: async () => {
+      const data = await fetchLastSemesterData(selectedSection.id);
+      return data || {};
+    },
+    enabled: !!selectedSection?.id,
+    staleTime: 1000 * 60 * 5, // 5 minutos
+  });
 
-  // Cargar datos (último semestre e histórico) cuando se selecciona una sección
-  const loadSectionData = async () => {
-    if (!selectedSection) {
-      setLastSemesterData({});
-      setHistoricalData({});
-      return;
-    }
-    try {
-      setLoading(true);
-      const lastData = await fetchLastSemesterData(selectedSection.id);
-      setLastSemesterData(lastData || {});
-
-      const historyData = await fetchHistoricalData(selectedSection.id);
-      setHistoricalData(historyData || {});
-      
-    } catch (error) {
-      console.error("Error al cargar datos de la sección:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  useEffect(() => {
-    loadSectionData();
-  }, [selectedSection]);
+  // Query para datos históricos
+  const {
+    data: historicalData = {},
+    isLoading: historicalLoading,
+  } = useQuery({
+    queryKey: ["historical", selectedSection?.id],
+    queryFn: async () => {
+      const data = await fetchHistoricalData(selectedSection.id);
+      return data || {};
+    },
+    enabled: !!selectedSection?.id,
+    staleTime: 1000 * 60 * 5, // 5 minutos
+  });
 
   const handleSectionSelect = (sectionData) => {
     setSelectedSection(sectionData.section);
@@ -84,7 +80,26 @@ export default function Reviews() {
     setVisible(true);
   };
 
-  if (loading && sections.length === 0) {
+  const handleReviewSuccess = async () => {
+    setVisible(false);
+    
+    // Invalidar queries para refrescar los datos
+    await queryClient.invalidateQueries({
+      queryKey: ["sections", subjectId],
+    });
+    await queryClient.invalidateQueries({
+      queryKey: ["lastSemester", selectedSection?.id],
+    });
+    await queryClient.invalidateQueries({
+      queryKey: ["historical", selectedSection?.id],
+    });
+    
+    getProfile();
+  };
+
+  const isLoading = sectionsLoading || lastSemesterLoading || historicalLoading;
+
+  if (sectionsLoading && sections.length === 0) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="text-xl text-navy">Cargando secciones...</div>
@@ -92,8 +107,18 @@ export default function Reviews() {
     );
   }
 
+  if (sectionsError) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-xl text-red-600">
+          Error al cargar las secciones. Por favor intenta de nuevo.
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div >
+    <div>
       {/* Header */}
       <div className="mb-6 flex flex-wrap justify-between items-end">
         <div>
@@ -127,17 +152,18 @@ export default function Reviews() {
             modal={true}
             showHeader={false}
             contentClassName="p-0"
-            maskStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
+            maskStyle={{ backgroundColor: "rgba(0, 0, 0, 0.6)" }}
           >
             <ReviewForm
               subjectName={subjectName}
               teacherName={selectedSection?.Docente?.nombre || "Docente"}
               sectionId={selectedSection?.id}
-              onSuccess={() => {setVisible(false);loadSectionData(), getProfile()}}
+              onSuccess={handleReviewSuccess}
             />
           </Dialog>
         </div>
       </div>
+
       <div className="flex flex-col md:flex-row gap-4">
         {/* Teachers */}
         <div className="md:w-1/3">
@@ -150,11 +176,11 @@ export default function Reviews() {
           ) : (
             <div
               className="
-          flex gap-3 overflow-x-auto pb-2
-          md:grid md:grid-cols-1 md:overflow-visible
-        "
+                flex gap-3 overflow-x-auto pb-2
+                md:grid md:grid-cols-1 md:overflow-visible
+              "
             >
-              {sections.map((sectionData,index) => (
+              {sections.map((sectionData, index) => (
                 <div
                   key={sectionData.section.id}
                   onClick={() => handleSectionSelect(sectionData)}
@@ -165,7 +191,7 @@ export default function Reviews() {
                     selected={selectedSection?.id === sectionData.section.id}
                     reviews={sectionData.totalReviews}
                     score={sectionData.promedioGeneral}
-                    position={index+1}
+                    position={index + 1}
                   />
                 </div>
               ))}
@@ -175,14 +201,26 @@ export default function Reviews() {
 
         {/* Datos */}
         <div className="md:w-2/3">
-          <section className="bg-white border border-greige rounded-lg shadow-md ">
-            <LastSemesterData
-              lastSemesterData={lastSemesterData}
-              teacherName={selectedSection?.Docente?.nombre}
-            />
+          <section className="bg-white border border-greige rounded-lg shadow-md">
+            {lastSemesterLoading ? (
+              <div className="p-6 text-center text-neutral-500">
+                Cargando datos del último semestre...
+              </div>
+            ) : (
+              <LastSemesterData
+                lastSemesterData={lastSemesterData}
+                teacherName={selectedSection?.Docente?.nombre}
+              />
+            )}
           </section>
           <section className="bg-white border border-greige rounded-lg shadow-md mt-2">
-            <HistoricalData historicalData={historicalData} />
+            {historicalLoading ? (
+              <div className="p-6 text-center text-neutral-500">
+                Cargando datos históricos...
+              </div>
+            ) : (
+              <HistoricalData historicalData={historicalData} />
+            )}
           </section>
         </div>
       </div>
