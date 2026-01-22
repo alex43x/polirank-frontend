@@ -193,7 +193,7 @@ export const CourseProvider = ({ children }) => {
     try {
       // Endpoint correcto: /sections/:id/history
       const { data } = await api.get(`/sections/${sectionId}/history`, { params });
-
+      console.log("Historico:",data)
       // Mapear los datos al formato que espera el UI
       const mappedHistory = {
         history: []

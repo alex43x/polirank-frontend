@@ -24,48 +24,53 @@ export const AuthProvider = ({ children }) => {
     return localStorage.getItem("token");
   });
 
-  // Estado para almacenar el perfil completo (student + reviews)
   const [profileData, setProfileData] = useState(() => {
     const savedProfile = localStorage.getItem("profileData");
     return savedProfile ? JSON.parse(savedProfile) : null;
   });
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Loading inicial
+  const [actionLoading, setActionLoading] = useState(false); // Loading para acciones
 
   /* ===========================
      LOGIN
      =========================== */
   const login = async (credentials) => {
-    const response = await api.post("/auth/login", credentials);
-    
-    const data = response.data;
-    
-    console.log("Login response:", data);
-    
-    const jwt = data.token;
-    const student = data.data.student;
-
-    if (!jwt || !student) {
-      throw new Error("Respuesta inválida del servidor");
-    }
-
-    localStorage.setItem("token", jwt);
-    localStorage.setItem("user", JSON.stringify(student));
-
-    setAuthHeader(jwt);
-    setToken(jwt);
-    setUser(student);
-
-    //Obtener el perfil completo después del login
+    setActionLoading(true); // Inicia el loading
     try {
-      const profile = await fetchProfile(jwt);
-      setProfileData(profile);
-      localStorage.setItem("profileData", JSON.stringify(profile));
-    } catch (error) {
-      console.error("Error al cargar perfil después del login:", error);
-    }
+      const response = await api.post("/auth/login", credentials);
+      
+      const data = response.data;
+      
+      console.log("Login response:", data);
+      
+      const jwt = data.token;
+      const student = data.data.student;
 
-    return student;
+      if (!jwt || !student) {
+        throw new Error("Respuesta inválida del servidor");
+      }
+
+      localStorage.setItem("token", jwt);
+      localStorage.setItem("user", JSON.stringify(student));
+
+      setAuthHeader(jwt);
+      setToken(jwt);
+      setUser(student);
+
+      //Obtener el perfil completo después del login
+      try {
+        const profile = await fetchProfile(jwt);
+        setProfileData(profile);
+        localStorage.setItem("profileData", JSON.stringify(profile));
+      } catch (error) {
+        console.error("Error al cargar perfil después del login:", error);
+      }
+
+      return student;
+    } finally {
+      setActionLoading(false); // Termina el loading siempre
+    }
   };
 
   /* ===========================
@@ -74,7 +79,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    localStorage.removeItem("profileData"); // Limpia profileData
+    localStorage.removeItem("profileData");
     setAuthHeader(null);
     setUser(null);
     setToken(null);
@@ -85,7 +90,6 @@ export const AuthProvider = ({ children }) => {
      FETCH PROFILE (función auxiliar)
      =========================== */
   const fetchProfile = async (authToken = null) => {
-    // Si se proporciona un token, usarlo temporalmente
     if (authToken) {
       setAuthHeader(authToken);
     }
@@ -104,12 +108,10 @@ export const AuthProvider = ({ children }) => {
     try {
       const profile = await fetchProfile();
       
-      // Actualizar usuario con la información más reciente
       const updatedUser = profile.student;
       localStorage.setItem("user", JSON.stringify(updatedUser));
       setUser(updatedUser);
       
-      // Actualizar profileData
       setProfileData(profile);
       localStorage.setItem("profileData", JSON.stringify(profile));
       
@@ -124,21 +126,20 @@ export const AuthProvider = ({ children }) => {
      CREATE PASSWORD (Primer Login)
      =========================== */
   const createPassword = async (correo, newPassword) => {
+    setActionLoading(true);
     try {
       const { data } = await api.post("/auth/create-password", {
         correo,
         newPassword,
       });
 
-      // Después de crear la contraseña, actualizar el perfil
       if (token) {
         await getProfile();
       }
 
       return data;
-    } catch (error) {
-      console.error("Error al crear contraseña:", error);
-      throw error;
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -146,6 +147,7 @@ export const AuthProvider = ({ children }) => {
      CHANGE PASSWORD (Usuario activo)
      =========================== */
   const changePassword = async (currentPassword, newPassword) => {
+    setActionLoading(true);
     try {
       const { data } = await api.post("/auth/change-password", {
         currentPassword,
@@ -153,9 +155,8 @@ export const AuthProvider = ({ children }) => {
       });
 
       return data;
-    } catch (error) {
-      console.error("Error al cambiar contraseña:", error);
-      throw error;
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -193,7 +194,7 @@ export const AuthProvider = ({ children }) => {
         createPassword,
         changePassword,
         isAuthenticated: !!token,
-        loading,
+        loading: actionLoading, // Exportar actionLoading como loading
       }}
     >
       {children}
