@@ -21,9 +21,16 @@ export default function Login() {
 
   const handleSubmit = async () => {
     try {
-      await login(form);
+      const student = await login(form);
 
-      // Redirección post-login (en teoria se puede hacer por rol pero por ahora dejo asi)
+      // Verificar si el rol es INACTIVE - necesita cambiar contraseña
+      if (student.Rol?.nombre === "INACTIVE") {
+        // Redirigir a la página de cambio de contraseña
+        navigate("/change-password");
+        return;
+      }
+
+      // Si el usuario está activo, redirigir al dashboard
       navigate("/dashboard");
     } catch (error) {
       console.error(error);
