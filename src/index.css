@@ -29,6 +29,6 @@ input[type="email"],
 input[type="password"],
 input[type="number"],
 input[type="tel"] {
-  @apply border rounded-md py-2 px-4 border-[#e0e0e0] font-medium bg-neutral-50;
+  @apply border rounded-md py-2 px-3 border-[#e0e0e0] font-medium bg-neutral-50;
 }
 

@@ -12,6 +12,21 @@ export const CourseProvider = ({ children }) => {
   const [limit, setLimit] = useState(10);
   const [reviews, setReviews] = useState([]);
 
+
+  const getCoursesBySection =async(id)=>{
+    setLoading(true);
+    try {
+      const { data } = await api.get(`/sections/${id}/cursos`);
+      console.log(data)
+      return data;
+    } catch (error) {
+      console.error("Error obteniendo curso por seccion:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }
+
   //Función para obtener cursos
   const fetchCourses = async (params = {}) => {
     setLoading(true);
@@ -139,29 +154,73 @@ export const CourseProvider = ({ children }) => {
     }
   };
 
-  const fetchLastSemesterData = async (courseId,params={}) => {
+  // Función para obtener los datos del último semestre de una sección
+  const fetchLastSemesterData = async (sectionId, params = {}) => {
     setLoading(true);
-    console.log("Fetching last semester data with params:", params,courseId);
+    console.log("Fetching last semester data for section:", sectionId);
     try {
-      const { data } = await api.get(`/cursos/${courseId}/reviews/last`, {params});
-      console.log(data)
-      return data;
-    }catch (error) {
+      // Endpoint correcto: /sections/:id/last
+      const { data } = await api.get(`/sections/${sectionId}/last`, { params });
+
+      // Mapear los datos al formato que espera el UI
+      const mappedData = {
+        totalAverage: data.promedioGeneral || 0,
+        totalReviews: data.totalReviews || 0,
+        averageRatings: {}
+      };
+
+      if (data.stats?.rows && Array.isArray(data.stats.rows)) {
+        data.stats.rows.forEach(row => {
+          if (row.Aspecto && row.Aspecto.nombre) {
+            mappedData.averageRatings[row.Aspecto.nombre] = parseFloat(row.promedio);
+          }
+        });
+      }
+
+      return mappedData;
+    } catch (error) {
       console.error("Error obteniendo datos del último semestre:", error);
       throw error;
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  const fetchHistoricalData=async(courseId,params={})=>{
+  // Función para obtener los datos históricos de una sección
+  const fetchHistoricalData = async (sectionId, params = {}) => {
     setLoading(true);
-    console.log("Fetching all semesters data with params:", params,courseId);
+    console.log("Fetching historical data for section:", sectionId);
     try {
-      const { data } = await api.get(`/cursos/${courseId}/reviews/history`, {params});
-      console.log(data)
-      return data;
-    }catch (error) {
+      // Endpoint correcto: /sections/:id/history
+      const { data } = await api.get(`/sections/${sectionId}/history`, { params });
+      console.log("Historico:",data)
+      // Mapear los datos al formato que espera el UI
+      const mappedHistory = {
+        history: []
+      };
+
+      if (data.courseStats && Array.isArray(data.courseStats)) {
+        mappedHistory.history = data.courseStats.map(stat => {
+          const averageRatings = {};
+
+          if (stat.stats?.rows && Array.isArray(stat.stats.rows)) {
+            stat.stats.rows.forEach(row => {
+              if (row.Aspecto && row.Aspecto.nombre) {
+                averageRatings[row.Aspecto.nombre] = parseFloat(row.promedio);
+              }
+            });
+          }
+
+          return {
+            year: stat.curso.year,
+            periodo: stat.curso.periodo,
+            averageRatings
+          };
+        });
+      }
+
+      return mappedHistory;
+    } catch (error) {
       console.error("Error obteniendo datos historicos:", error);
       throw error;
     } finally {
@@ -179,6 +238,7 @@ export const CourseProvider = ({ children }) => {
         totalPages,
         limit,
         reviews,
+        getCoursesBySection,
         fetchCourses,
         fetchCourseById,
         createCourse,

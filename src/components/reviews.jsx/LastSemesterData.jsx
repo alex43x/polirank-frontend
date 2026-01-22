@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import { ProgressBar } from "primereact/progressbar";
 import { Chart } from "primereact/chart";
 
@@ -6,10 +6,6 @@ export default function LastSemesterData({
   lastSemesterData,
   teacherName = "Profesor/a",
 }) {
-  const [data, setData] = useState(lastSemesterData);
-  const [chartData, setChartData] = useState({});
-  const [chartOptions, setChartOptions] = useState({});
-
   // Función para obtener las iniciales
   const getInitials = (text) => {
     return text
@@ -19,84 +15,85 @@ export default function LastSemesterData({
   };
 
   // Convertir el objeto averageRatings a un array de entries
-  const ratingsArray = data?.averageRatings
-    ? Object.entries(data.averageRatings)
-    : [];
+  const ratingsArray = useMemo(() => {
+    return lastSemesterData?.averageRatings
+      ? Object.entries(lastSemesterData.averageRatings)
+      : [];
+  }, [lastSemesterData]);
 
-  useEffect(() => {
-    if (ratingsArray.length > 0) {
-      const labels = ratingsArray.map(([criterio]) => getInitials(criterio));
-      const values = ratingsArray.map(([, valor]) => valor);
+  const { chartData, chartOptions } = useMemo(() => {
+    if (ratingsArray.length === 0) return { chartData: {}, chartOptions: {} };
 
-      const chartDataConfig = {
-        labels: labels,
-        datasets: [
-          {
-            label: "Calificación",
-            data: values,
-            backgroundColor: "rgba(25, 50, 100, 0.2)",
-            borderColor: "rgb(25, 50, 100)",
-            borderWidth: 2,
-            pointBackgroundColor: "rgb(25, 50, 100)",
-            pointBorderColor: "#fff",
-            pointHoverBackgroundColor: "#fff",
-            pointHoverBorderColor: "rgb(25, 50, 100)",
+    const labels = ratingsArray.map(([criterio]) => getInitials(criterio));
+    const values = ratingsArray.map(([, valor]) => valor);
+
+    const data = {
+      labels: labels,
+      datasets: [
+        {
+          label: "Calificación",
+          data: values,
+          backgroundColor: "rgba(25, 50, 100, 0.2)",
+          borderColor: "rgb(25, 50, 100)",
+          borderWidth: 2,
+          pointBackgroundColor: "rgb(25, 50, 100)",
+          pointBorderColor: "#fff",
+          pointHoverBackgroundColor: "#fff",
+          pointHoverBorderColor: "rgb(25, 50, 100)",
+        },
+      ],
+    };
+
+    const options = {
+      scales: {
+        r: {
+          min: 0,
+          max: 5,
+          ticks: {
+            stepSize: 1,
+            display: true,
           },
-        ],
-      };
-
-      const options = {
-        scales: {
-          r: {
-            min: 0,
-            max: 5,
-            ticks: {
-              stepSize: 1,
-              display: true,
+          grid: {
+            color: "rgba(0, 0, 0, 0.1)",
+            circular: false,
+          },
+          angleLines: {
+            color: "rgba(0, 0, 0, 0.1)",
+          },
+          pointLabels: {
+            font: {
+              size: 14,
+              weight: "bold",
             },
-            grid: {
-              color: "rgba(0, 0, 0, 0.1)",
-              circular: false,
-            },
-            angleLines: {
-              color: "rgba(0, 0, 0, 0.1)",
-            },
-            pointLabels: {
-              font: {
-                size: 14,
-                weight: "bold",
-              },
-              color: "rgb(25, 50, 100)",
+            color: "rgb(25, 50, 100)",
+          },
+        },
+      },
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              const fullLabels = ratingsArray.map(([criterio]) => criterio);
+              return (
+                fullLabels[context.dataIndex] +
+                ": " +
+                context.parsed.r.toFixed(2)
+              );
             },
           },
         },
-        plugins: {
-          legend: {
-            display: false,
-          },
-          tooltip: {
-            callbacks: {
-              label: function (context) {
-                const fullLabels = ratingsArray.map(([criterio]) => criterio);
-                return (
-                  fullLabels[context.dataIndex] +
-                  ": " +
-                  context.parsed.r.toFixed(2)
-                );
-              },
-            },
-          },
-        },
-      };
+      },
+    };
 
-      setChartData(chartDataConfig);
-      setChartOptions(options);
-    }
-  }, [data]);
+    return { chartData: data, chartOptions: options };
+  }, [ratingsArray]);
 
   return (
-    <div className="space-y-4 p-6">
-      {data && Object.keys(data).length > 0 ? (
+    <div className="space-y-4 lg:p-6 p-3">
+      {lastSemesterData && Object.keys(lastSemesterData).length > 0 ? (
         <>
           {/* Header con información general */}
           <div className="mb-6">
@@ -107,12 +104,12 @@ export default function LastSemesterData({
             <p className="text-neutral-600">
               Puntuacion General:{" "}
               <span className="font-semibold">
-                {data.totalAverage || "No data"}
+                {lastSemesterData.totalAverage || "No data"}
               </span>
             </p>
             <p className="text-neutral-600">
               Total de reseñas:{" "}
-              <span className="font-semibold">{data.totalReviews || 0}</span>
+              <span className="font-semibold">{lastSemesterData.totalReviews || 0}</span>
             </p>
           </div>
 
