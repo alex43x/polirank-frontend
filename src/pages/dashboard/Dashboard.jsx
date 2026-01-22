@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import SubjectCard from "../../components/dashboard/subjectCard";
+import SubjectCard from "../../components/dashboard/SubjectCard";
 import { useAuth } from "../../hooks/useAuth";
 import { useSubject } from "../../hooks/useSubject";
 import { Dropdown } from "primereact/dropdown";
