@@ -41,17 +41,17 @@ export default function Login() {
   return (
     <div className="flex w-screen h-screen justify-center lg:justify-between">
       {/* Formulario */}
-      <div className="w-full max-w-md lg:max-w-none lg:w-4/12 flex flex-col items-center justify-center gap-4">
-        <h1 className="text-6xl font-extrabold text-navy mb-16">
+      <div className="w-full max-w-md md:max-w-none md:w-4/12 flex flex-col items-center justify-center gap-4">
+        <h1 className="text-6xl md:text-5xl font-extrabold text-navy mb-16">
           Poli<span className="text-neutral-900">Rank</span>
         </h1>
 
         <div className="w-full flex flex-col items-center gap-3 px-8">
-          <h3 className="text-4xl font-medium text-navy">
+          <h3 className="md:text-2xl text-4xl font-medium text-navy">
             Iniciar Sesión
           </h3>
 
-          <p className="text-center text-neutral-600">
+          <p className="text-center md:text-sm text-neutral-600">
             Ingresa tu correo electrónico y tu contraseña
           </p>
 
@@ -84,7 +84,7 @@ export default function Login() {
       </div>
 
       {/* Imagen (solo aparece en version desktop) */}
-      <div className="hidden lg:block w-8/12 h-screen overflow-hidden">
+      <div className="hidden md:block w-8/12 h-screen overflow-hidden">
         <img
           src={loginImg}
           alt="Login"
