@@ -24,6 +24,12 @@ export const AuthProvider = ({ children }) => {
     return localStorage.getItem("token");
   });
 
+  // Estado para almacenar el perfil completo (student + reviews)
+  const [profileData, setProfileData] = useState(() => {
+    const savedProfile = localStorage.getItem("profileData");
+    return savedProfile ? JSON.parse(savedProfile) : null;
+  });
+
   const [loading, setLoading] = useState(true);
 
   /* ===========================
@@ -32,10 +38,9 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     const response = await api.post("/auth/login", credentials);
     
-    // La respuesta puede venir en response.data directamente
     const data = response.data;
     
-    console.log("Login response:", data); // Para debug
+    console.log("Login response:", data);
     
     const jwt = data.token;
     const student = data.data.student;
@@ -51,7 +56,15 @@ export const AuthProvider = ({ children }) => {
     setToken(jwt);
     setUser(student);
 
-    // Retornar el usuario para verificar su rol/estado
+    //Obtener el perfil completo después del login
+    try {
+      const profile = await fetchProfile(jwt);
+      setProfileData(profile);
+      localStorage.setItem("profileData", JSON.stringify(profile));
+    } catch (error) {
+      console.error("Error al cargar perfil después del login:", error);
+    }
+
     return student;
   };
 
@@ -61,9 +74,27 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("profileData"); // Limpia profileData
     setAuthHeader(null);
     setUser(null);
     setToken(null);
+    setProfileData(null); 
+  };
+
+  /* ===========================
+     FETCH PROFILE (función auxiliar)
+     =========================== */
+  const fetchProfile = async (authToken = null) => {
+    // Si se proporciona un token, usarlo temporalmente
+    if (authToken) {
+      setAuthHeader(authToken);
+    }
+    
+    const { data } = await api.get("/auth/profile");
+    return {
+      student: data.student,
+      reviews: data.reviews,
+    };
   };
 
   /* ===========================
@@ -71,17 +102,18 @@ export const AuthProvider = ({ children }) => {
      =========================== */
   const getProfile = async () => {
     try {
-      const { data } = await api.get("/auth/profile");
+      const profile = await fetchProfile();
       
       // Actualizar usuario con la información más reciente
-      const updatedUser = data.student;
+      const updatedUser = profile.student;
       localStorage.setItem("user", JSON.stringify(updatedUser));
       setUser(updatedUser);
       
-      return {
-        student: data.student,
-        reviews: data.reviews,
-      };
+      // Actualizar profileData
+      setProfileData(profile);
+      localStorage.setItem("profileData", JSON.stringify(profile));
+      
+      return profile;
     } catch (error) {
       console.error("Error al obtener perfil:", error);
       throw error;
@@ -115,8 +147,6 @@ export const AuthProvider = ({ children }) => {
      =========================== */
   const changePassword = async (currentPassword, newPassword) => {
     try {
-      // Nota: Este endpoint no está en la documentación proporcionada,
-      // pero es común tenerlo. Ajusta según tu API.
       const { data } = await api.post("/auth/change-password", {
         currentPassword,
         newPassword,
@@ -156,6 +186,7 @@ export const AuthProvider = ({ children }) => {
       value={{
         user,
         token,
+        profileData, 
         login,
         logout,
         getProfile,

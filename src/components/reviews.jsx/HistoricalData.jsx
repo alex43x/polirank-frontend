@@ -30,7 +30,7 @@ export default function HistoricalData({ historicalData }) {
   };
 
   return (
-    <div className="space-y-4 p-6">
+    <div className="space-y-4 lg:p-6 p-3">
       {sortedHistory.length > 0 ? (
         <>
           <div className="mb-4">

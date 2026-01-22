@@ -92,7 +92,7 @@ export default function LastSemesterData({
   }, [ratingsArray]);
 
   return (
-    <div className="space-y-4 p-6">
+    <div className="space-y-4 lg:p-6 p-3">
       {lastSemesterData && Object.keys(lastSemesterData).length > 0 ? (
         <>
           {/* Header con información general */}

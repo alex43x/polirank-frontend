@@ -109,7 +109,7 @@ const ChangePasswordForm = ({
       // Mostrar mensaje de éxito
       alert(
         isFirstLogin
-          ? "Contraseña creada exitosamente"
+          ? "Contraseña creada exitosamente, por favor inicia sesión nuevamente"
           : "Contraseña cambiada exitosamente"
       );
 
