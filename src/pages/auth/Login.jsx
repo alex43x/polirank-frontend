@@ -45,9 +45,10 @@ export default function Login() {
     <div className="flex w-screen h-screen justify-center lg:justify-between">
       {/* Formulario */}
       <div className="w-full max-w-md md:max-w-none md:w-4/12 flex flex-col items-center justify-center gap-4">
-        <h1 className="text-6xl md:text-5xl font-extrabold text-navy mb-16">
+        <h1 className="text-6xl md:text-5xl font-extrabold text-navy">
           Poli<span className="text-neutral-900">Rank</span>
         </h1>
+        <h2 className="italic text-neutral-700 mb-16 font-bold text-2xl">BETA</h2>
 
         <div className="w-full flex flex-col items-center gap-3 px-8">
           <h3 className="md:text-2xl text-4xl font-medium text-navy">
