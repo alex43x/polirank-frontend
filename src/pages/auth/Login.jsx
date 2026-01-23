@@ -4,16 +4,17 @@ import loginImg from "../../assets/images/login.png";
 import { useAuth } from "../../hooks/useAuth";
 
 export default function Login() {
-  const { login, loading } = useAuth();
+  const { login, actionLoading } = useAuth(); // Cambiado de 'loading' a 'actionLoading'
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
     correo: "",
     password: "",
   });
-  useEffect(()=>{
-    console.log(loading,"Estado de carga")
-  })
+
+  useEffect(() => {
+    console.log(actionLoading, "Estado de carga");
+  }, [actionLoading]); // Añadida dependencia
 
   const handleChange = (e) => {
     setForm({
@@ -79,10 +80,10 @@ export default function Login() {
 
           <button
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={actionLoading}
             className="bg-navy text-white rounded-lg px-4 py-2 w-10/12 hover:bg-blue-900 active:bg-blue-950 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {loading ? (
+            {actionLoading ? (
               <>
                 <svg
                   className="animate-spin h-5 w-5 text-white"
