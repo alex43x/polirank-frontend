@@ -33,7 +33,6 @@ const ReviewForm = ({
   const [existingReview, setExistingReview] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
-
   // Cargar cursos disponibles cuando se abre el formulario
   useEffect(() => {
     const loadCourses = async () => {
@@ -250,9 +249,11 @@ const ReviewForm = ({
       if (isEditMode && existingReview) {
         // Actualizar reseña existente
         await updateReview(existingReview.id, reviewData);
+        alert("Reseña actualizada correctamente");
       } else {
         // Crear nueva reseña
         await createReview(reviewData);
+        alert("Reseña enviada correctamente");
       }
 
       // Limpiar el formulario después de enviar
@@ -270,13 +271,13 @@ const ReviewForm = ({
         material: null,
       });
 
+      setExistingReview(null);
+      setIsEditMode(false);
+
       // IMPORTANTE: Llamar a onSuccess para cerrar el diálogo e invalidar cache
       if (onSuccess) {
-        await onSuccess();
+        onSuccess();
       }
-
-      // Mostrar mensaje de éxito después de que se invalide el cache
-      alert(isEditMode ? "Reseña actualizada correctamente" : "Reseña enviada correctamente");
     } catch (error) {
       console.error("Error al enviar la reseña:", error);
       alert(
@@ -298,6 +299,7 @@ const ReviewForm = ({
       accept: async () => {
         try {
           await deleteReview(existingReview.id);
+          alert("Reseña eliminada correctamente");
 
           // Limpiar el formulario
           setFormData({
@@ -319,11 +321,8 @@ const ReviewForm = ({
 
           // IMPORTANTE: Cerrar el diálogo e invalidar cache
           if (onSuccess) {
-            await onSuccess();
+            onSuccess();
           }
-
-          // Mostrar mensaje después de invalidar cache
-          alert("Reseña eliminada correctamente");
         } catch (error) {
           console.error("Error al eliminar la reseña:", error);
           alert("Error al eliminar la reseña. Por favor intenta de nuevo.");

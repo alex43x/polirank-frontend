@@ -11,8 +11,8 @@ import { PrimeReactProvider } from "primereact/api";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // Los datos son frescos por 5 minutos
-      cacheTime: 1000 * 60 * 10, // El cache persiste 10 minutos
+      staleTime: 1000 * 60 * 2, // Los datos son frescos por 2 minutos
+      cacheTime: 1000 * 60 * 5, // El cache persiste 5 minutos
       refetchOnWindowFocus: false, // No refetch al cambiar de pestaña
       refetchOnMount: false, // No refetch al montar si hay datos en cache
       retry: 1, // Reintentar solo 1 vez si falla
