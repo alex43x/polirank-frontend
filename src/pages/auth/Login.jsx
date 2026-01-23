@@ -13,7 +13,6 @@ export default function Login() {
   });
 
   useEffect(() => {
-    console.log(actionLoading, "Estado de carga");
   }, [actionLoading]); // Añadida dependencia
 
   const handleChange = (e) => {

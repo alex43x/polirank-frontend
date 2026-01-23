@@ -42,7 +42,6 @@ export const AuthProvider = ({ children }) => {
       
       const data = response.data;
       
-      console.log("Login response:", data);
       
       const jwt = data.token;
       const student = data.data.student;

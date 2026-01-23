@@ -15,7 +15,6 @@ export const SubjectProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get("/materias", { params });
-      console.log(data)
       setSubjects(data.subjects || []);
       setTotal(data.total || 0);
       setPage(data.currentPage || 1);
@@ -52,7 +51,6 @@ export const SubjectProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get(`/materias/${id}/secciones`);
-      console.log(data)
       return data || [];
     } catch (error) {
       console.error("Error obteniendo secciones por ID de materia:", error);

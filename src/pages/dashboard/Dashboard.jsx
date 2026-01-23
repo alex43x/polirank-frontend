@@ -45,7 +45,6 @@ export default function Dashboard() {
   // Llama a fetchSubjects cuando cambien los searchParams o la página
   useEffect(() => {
     if (user) {
-      console.log({ ...searchParams, limit, page: currentPage });
       fetchSubjects({ ...searchParams, limit, page: currentPage });
     }
   }, [searchParams, currentPage, user]);

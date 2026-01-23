@@ -33,9 +33,6 @@ const ReviewForm = ({
   const [existingReview, setExistingReview] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  useEffect(() => {
-    console.log(sectionId);
-  }, []);
 
   // Cargar cursos disponibles cuando se abre el formulario
   useEffect(() => {
@@ -44,7 +41,6 @@ const ReviewForm = ({
         setLoading(false);
         return;
       }
-      console.log("GetCourses:", sectionId);
       try {
         setLoading(true);
         const response = await getCoursesBySection(sectionId);

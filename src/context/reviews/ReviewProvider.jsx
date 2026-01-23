@@ -49,10 +49,8 @@ export const ReviewProvider = ({ children }) => {
   // Crear nueva review
   const createReview = async (reviewData) => {
     setLoading(true);
-    console.log(reviewData)
     try {
       const { data } = await api.post("/reviews/", reviewData);
-      console.log(reviewData,data)
       return data;
     } catch (error) {
       console.error("Error creando review:", error);
