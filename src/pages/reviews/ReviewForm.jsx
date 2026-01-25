@@ -24,7 +24,6 @@ const ReviewForm = ({
     trato: null,
     disponibilidad: null,
     material: null,
-    facilidad: null,
   });
   const { createReview, updateReview, deleteReview } = useReview();
   const { getCoursesBySection } = useCourse();
@@ -129,7 +128,6 @@ const ReviewForm = ({
       trato: null,
       disponibilidad: null,
       material: null,
-      facilidad: null,
     }));
   };
 
@@ -202,12 +200,6 @@ const ReviewForm = ({
       label: "Material Didáctico",
       description:
         "Valora la calidad y utilidad del material proporcionado por el docente.",
-    },
-    {
-      key: "facilidad",
-      label: "Facilidad",
-      description:
-        "Evalúa que tan facil es pasar la materia con este profesor.",
     },
   ];
 
