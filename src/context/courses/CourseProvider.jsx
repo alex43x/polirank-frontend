@@ -167,10 +167,10 @@ export const CourseProvider = ({ children }) => {
         averageRatings: {}
       };
 
-      if (data.stats?.rows && Array.isArray(data.stats.rows)) {
-        data.stats.rows.forEach(row => {
-          if (row.Aspecto && row.Aspecto.nombre) {
-            mappedData.averageRatings[row.Aspecto.nombre] = parseFloat(row.promedio);
+      if (data.stats && Array.isArray(data.stats)) {
+        data.stats.forEach(row => {
+          if (row.aspect && row.aspect.nombre) {
+            mappedData.averageRatings[row.aspect.nombre] = parseFloat(row.promedio);
           }
         });
       }
