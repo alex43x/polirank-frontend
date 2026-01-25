@@ -23,6 +23,7 @@ const ReviewForm = ({
     trato: null,
     disponibilidad: null,
     material: null,
+    facilidad: null,
   });
   const { createReview, updateReview, deleteReview } = useReview();
   const { getCoursesBySection } = useCourse();
@@ -97,6 +98,7 @@ const ReviewForm = ({
       6: "trato",
       7: "disponibilidad",
       8: "material",
+      9: "facilidad",
     };
 
     const newFormData = { ...formData };
@@ -124,6 +126,7 @@ const ReviewForm = ({
       trato: null,
       disponibilidad: null,
       material: null,
+      facilidad: null,
     }));
   };
 
@@ -137,8 +140,8 @@ const ReviewForm = ({
   // Filtrar períodos disponibles basado en el año seleccionado
   const availablePeriods = formData.year
     ? availableCourses
-        .filter((c) => c.year.toString() === formData.year)
-        .map((c) => c.periodo.toString())
+      .filter((c) => c.year.toString() === formData.year)
+      .map((c) => c.periodo.toString())
     : [];
 
   const categories = [
@@ -190,6 +193,12 @@ const ReviewForm = ({
       description:
         "Valora la calidad y utilidad del material proporcionado por el docente.",
     },
+    {
+      key: "facilidad",
+      label: "Facilidad",
+      description:
+        "Evalúa que tan facil es pasar la materia con este profesor.",
+    },
   ];
 
   const handleRatingClick = (category, value) => {
@@ -231,6 +240,7 @@ const ReviewForm = ({
       trato: 6,
       disponibilidad: 7,
       material: 8,
+      facilidad: 9,
     };
 
     // Construir el array de aspectos
@@ -369,11 +379,10 @@ const ReviewForm = ({
         <button
           key={rating}
           onClick={() => handleRatingClick(category, rating)}
-          className={`w-10 h-10 rounded-md font-medium transition-all ${
-            value === rating
+          className={`w-10 h-10 rounded-md font-medium transition-all ${value === rating
               ? "bg-dark-navy text-white shadow-md"
               : "bg-gray-200 text-dark-navy hover:bg-blue-100"
-          }`}
+            }`}
         >
           {rating}
         </button>
@@ -507,13 +516,12 @@ const ReviewForm = ({
                     disabled={
                       !formData.year || !availablePeriods.includes("1")
                     }
-                    className={`w-10 h-10 rounded-md font-medium transition-all ${
-                      formData.period === "1"
+                    className={`w-10 h-10 rounded-md font-medium transition-all ${formData.period === "1"
                         ? "bg-dark-navy text-white"
                         : availablePeriods.includes("1") && formData.year
                           ? "bg-gray-200 text-dark-navy hover:bg-gray-300"
                           : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    }`}
+                      }`}
                   >
                     1
                   </button>
@@ -522,13 +530,12 @@ const ReviewForm = ({
                     disabled={
                       !formData.year || !availablePeriods.includes("2")
                     }
-                    className={`w-10 h-10 rounded-md font-medium transition-all ${
-                      formData.period === "2"
+                    className={`w-10 h-10 rounded-md font-medium transition-all ${formData.period === "2"
                         ? "bg-dark-navy text-white"
                         : availablePeriods.includes("2") && formData.year
                           ? "bg-gray-200 text-dark-navy hover:bg-gray-300"
                           : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    }`}
+                      }`}
                   >
                     2
                   </button>
