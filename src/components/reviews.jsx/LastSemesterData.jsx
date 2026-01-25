@@ -21,6 +21,20 @@ export default function LastSemesterData({
       : [];
   }, [lastSemesterData]);
 
+  // Separar facilidad del resto
+  const { facilidadRating, otherRatings } = useMemo(() => {
+    const facilidad = ratingsArray.find(([criterio]) =>
+      criterio.toLowerCase().includes("facilidad"),
+    );
+    const others = ratingsArray.filter(
+      ([criterio]) => !criterio.toLowerCase().includes("facilidad"),
+    );
+    return {
+      facilidadRating: facilidad,
+      otherRatings: others,
+    };
+  }, [ratingsArray]);
+
   const { chartData, chartOptions } = useMemo(() => {
     if (ratingsArray.length === 0) return { chartData: {}, chartOptions: {} };
 
@@ -91,6 +105,72 @@ export default function LastSemesterData({
     return { chartData: data, chartOptions: options };
   }, [ratingsArray]);
 
+  // Componente de estrellas personalizado que muestra fracciones
+  const CustomStarRating = ({ value }) => {
+    const stars = [];
+    const fullStars = Math.floor(value);
+    const decimal = value - fullStars;
+
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        // Estrella completa
+        stars.push(
+          <svg
+            key={i}
+            className="w-8 h-8 text-navy"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>,
+        );
+      } else if (i === fullStars && decimal > 0) {
+        // Estrella parcial
+        stars.push(
+          <div key={i} className="relative w-8 h-8">
+            <svg
+              className="w-8 h-8 text-gray-300 absolute"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            <div
+              className="absolute top-0 left-0 overflow-hidden"
+              style={{ width: `${decimal * 100}%` }}
+            >
+              <svg
+                className="w-8 h-8 text-navy"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            </div>
+          </div>,
+        );
+      } else {
+        // Estrella vacía
+        stars.push(
+          <svg
+            key={i}
+            className="w-8 h-8 text-gray-300"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>,
+        );
+      }
+    }
+
+    return <div className="flex gap-1">{stars}</div>;
+  };
+
   return (
     <div className="space-y-4 lg:p-6 p-3">
       {lastSemesterData && Object.keys(lastSemesterData).length > 0 ? (
@@ -98,25 +178,49 @@ export default function LastSemesterData({
           {/* Header con información general */}
           <div className="mb-6">
             <h2 className="text-4xl font-bold text-navy mb-2">{teacherName}</h2>
-            <h3 className="text-lg text-neutral-800 font-medium">
-              Datos del Último Semestre
-            </h3>
-            <p className="text-neutral-600">
-              Puntuacion General:{" "}
-              <span className="font-semibold">
-                {lastSemesterData.totalAverage || "No data"}
-              </span>
-            </p>
-            <p className="text-neutral-600">
-              Total de reseñas:{" "}
-              <span className="font-semibold">{lastSemesterData.totalReviews || 0}</span>
-            </p>
+
+            {/* Grid con información general y facilidad */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Columna izquierda - Info general */}
+              <div className="space-y-2">
+                <h3 className="text-lg text-neutral-800 font-medium mb-4">
+                  Datos del Último Año
+                </h3>
+                <p className="text-neutral-600">
+                  Puntuación General:{" "}
+                  <span className="font-semibold">
+                    {lastSemesterData.totalAverage || "No data"}
+                  </span>
+                </p>
+                <p className="text-neutral-600">
+                  Total de reseñas:{" "}
+                  <span className="font-semibold">
+                    {lastSemesterData.totalReviews || 0}
+                  </span>
+                </p>
+              </div>
+
+              {/* Columna derecha - Facilidad para aprobar */}
+              {facilidadRating && (
+                <div className="p-4 bg-blue-50 border-2 border-navy rounded-lg">
+                  <h4 className="text-lg font-bold text-navy mb-2 flex items-center gap-2">
+                     Facilidad para Aprobar
+                  </h4>
+                  <div className="flex items-center gap-3">
+                    <CustomStarRating value={facilidadRating[1]} />
+                    <span className="text-2xl font-bold text-navy">
+                      {facilidadRating[1].toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Mapeo de las calificaciones con ProgressBar */}
           <div className="space-y-4">
-            {ratingsArray.length > 0 ? (
-              ratingsArray.map(([criterio, valor], index) => (
+            {otherRatings.length > 0 ? (
+              otherRatings.map(([criterio, valor], index) => (
                 <div key={index}>
                   <div className="flex justify-between items-center mb-2">
                     <div>
@@ -158,7 +262,9 @@ export default function LastSemesterData({
           {/* Gráfico Radar */}
           {ratingsArray.length > 0 && (
             <div className="mt-8">
-              <h2 className="text-3xl font-bold text-navy mb-2">Gráfica de aspectos</h2>
+              <h2 className="text-3xl font-bold text-navy mb-2">
+                Gráfica de aspectos
+              </h2>
 
               <div className="mb-8 flex justify-center">
                 <div className="w-full max-w-md">
