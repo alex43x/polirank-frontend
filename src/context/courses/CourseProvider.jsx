@@ -17,7 +17,6 @@ export const CourseProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get(`/sections/${id}/cursos`);
-      console.log(data)
       return data;
     } catch (error) {
       console.error("Error obteniendo curso por seccion:", error);
@@ -157,7 +156,6 @@ export const CourseProvider = ({ children }) => {
   // Función para obtener los datos del último semestre de una sección
   const fetchLastSemesterData = async (sectionId, params = {}) => {
     setLoading(true);
-    console.log("Fetching last semester data for section:", sectionId);
     try {
       // Endpoint correcto: /sections/:id/last
       const { data } = await api.get(`/sections/${sectionId}/last`, { params });
@@ -189,11 +187,9 @@ export const CourseProvider = ({ children }) => {
   // Función para obtener los datos históricos de una sección
   const fetchHistoricalData = async (sectionId, params = {}) => {
     setLoading(true);
-    console.log("Fetching historical data for section:", sectionId);
     try {
       // Endpoint correcto: /sections/:id/history
       const { data } = await api.get(`/sections/${sectionId}/history`, { params });
-      console.log("Historico:",data)
       // Mapear los datos al formato que espera el UI
       const mappedHistory = {
         history: []

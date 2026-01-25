@@ -14,7 +14,6 @@ export const StudentProvider = ({ children }) => {
   const fetchStudents = async (params = {}) => {
     setLoading(true);
     try {
-      console.log(data)
       const { data } = await api.get("/alumnos", { params });
       setStudents(data.students || []);
       setTotal(data.total || 0);

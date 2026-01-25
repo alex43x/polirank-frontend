@@ -11,10 +11,7 @@ export default function Login() {
     correo: "",
     password: "",
   });
-
-  useEffect(() => {
-    console.log(actionLoading, "Estado de carga");
-  }, [actionLoading]); // Añadida dependencia
+// Añadida dependencia
 
   const handleChange = (e) => {
     setForm({
