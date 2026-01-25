@@ -15,9 +15,10 @@ const ReviewForm = ({
     year: "",
     period: "",
     selectedCourseId: null,
+    facilidad: null,
     dominio: null,
     claridad: null,
-    exigencia: null,
+    flexibilidad: null,
     evaluacion: null,
     puntualidad: null,
     trato: null,
@@ -32,6 +33,7 @@ const ReviewForm = ({
   const [loading, setLoading] = useState(true);
   const [existingReview, setExistingReview] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     console.log(sectionId);
@@ -83,8 +85,8 @@ const ReviewForm = ({
       } else {
         setExistingReview(null);
         setIsEditMode(false);
-        // Limpiar las calificaciones si no hay reseña existente
-        clearRatings();
+        // NO limpiar las calificaciones si no hay reseña existente
+        // clearRatings();
       }
     };
 
@@ -96,12 +98,13 @@ const ReviewForm = ({
     const aspectoMap = {
       1: "dominio",
       2: "claridad",
-      3: "exigencia",
+      3: "flexibilidad",
       4: "evaluacion",
       5: "puntualidad",
       6: "trato",
       7: "disponibilidad",
       8: "material",
+      9: "facilidad",
     };
 
     const newFormData = { ...formData };
@@ -121,9 +124,10 @@ const ReviewForm = ({
   const clearRatings = () => {
     setFormData((prev) => ({
       ...prev,
+      facilidad: null,
       dominio: null,
       claridad: null,
-      exigencia: null,
+      flexibilidad: null,
       evaluacion: null,
       puntualidad: null,
       trato: null,
@@ -148,6 +152,13 @@ const ReviewForm = ({
 
   const categories = [
     {
+      key: "facilidad",
+      label: "Facilidad para Aprobar",
+      description:
+        "Evalúa qué tan fácil o difícil es aprobar la materia con este docente.",
+      highlighted: true,
+    },
+    {
       key: "dominio",
       label: "Dominio de la Materia",
       description:
@@ -160,10 +171,10 @@ const ReviewForm = ({
         "Valora qué tan claro y comprensible es el docente al explicar los conceptos.",
     },
     {
-      key: "exigencia",
-      label: "Exigencia",
+      key: "flexibilidad",
+      label: "Flexibilidad",
       description:
-        "Mide el nivel de dificultad y exigencia académica del docente.",
+        "Mide la capacidad del docente para adaptarse a las necesidades de los estudiantes y ser flexible con plazos y métodos de enseñanza.",
     },
     {
       key: "evaluacion",
@@ -205,11 +216,6 @@ const ReviewForm = ({
   };
 
   const handlePeriodClick = (period) => {
-    setFormData((prev) => ({
-      ...prev,
-      period: period,
-    }));
-
     // Encontrar el curso correspondiente al año y período seleccionado
     const course = availableCourses.find(
       (c) =>
@@ -230,12 +236,13 @@ const ReviewForm = ({
     const aspectoMap = {
       dominio: 1,
       claridad: 2,
-      exigencia: 3,
+      flexibilidad: 3,
       evaluacion: 4,
       puntualidad: 5,
       trato: 6,
       disponibilidad: 7,
       material: 8,
+      facilidad: 9,
     };
 
     // Construir el array de aspectos
@@ -251,6 +258,7 @@ const ReviewForm = ({
     };
 
     try {
+      setIsSubmitting(true);
       if (isEditMode && existingReview) {
         // Actualizar reseña existente
         await updateReview(existingReview.id, reviewData);
@@ -264,9 +272,10 @@ const ReviewForm = ({
         year: "",
         period: "",
         selectedCourseId: null,
+        facilidad: null,
         dominio: null,
         claridad: null,
-        exigencia: null,
+        flexibilidad: null,
         evaluacion: null,
         puntualidad: null,
         trato: null,
@@ -286,6 +295,8 @@ const ReviewForm = ({
       alert(
         `Error al ${isEditMode ? "actualizar" : "enviar"} la reseña. Por favor intenta de nuevo.`
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -301,6 +312,7 @@ const ReviewForm = ({
       acceptClassName: "p-button-danger",
       accept: async () => {
         try {
+          setIsSubmitting(true);
           await deleteReview(existingReview.id);
 
           // Limpiar el formulario
@@ -308,9 +320,10 @@ const ReviewForm = ({
             year: "",
             period: "",
             selectedCourseId: null,
+            facilidad: null,
             dominio: null,
             claridad: null,
-            exigencia: null,
+            flexibilidad: null,
             evaluacion: null,
             puntualidad: null,
             trato: null,
@@ -331,6 +344,8 @@ const ReviewForm = ({
         } catch (error) {
           console.error("Error al eliminar la reseña:", error);
           alert("Error al eliminar la reseña. Por favor intenta de nuevo.");
+        } finally {
+          setIsSubmitting(false);
         }
       },
     });
@@ -368,13 +383,13 @@ const ReviewForm = ({
     });
   };
 
-  const RatingButtons = ({ category, value }) => (
+  const RatingButtons = ({ category, value, highlighted }) => (
     <div className="flex gap-2 justify-start flex-wrap sm:flex-nowrap">
       {[1, 2, 3, 4, 5].map((rating) => (
         <button
           key={rating}
           onClick={() => handleRatingClick(category, rating)}
-          className={`w-10 h-10 rounded-md font-medium transition-all ${
+          className={`${highlighted ? "w-12 h-12 text-lg" : "w-10 h-10"} rounded-md font-medium transition-all ${
             value === rating
               ? "bg-dark-navy text-white shadow-md"
               : "bg-gray-200 text-dark-navy hover:bg-blue-100"
@@ -550,29 +565,59 @@ const ReviewForm = ({
           </h4>
 
           {/* Contenedor con tooltip */}
-          <div className="flex flex-col lg:flex-row  gap-4 bg-white p-4 rounded border border-greige shadow-md">
+          <div className="flex flex-col lg:flex-row gap-4 bg-white p-4 rounded border border-greige shadow-md">
             {/* Grid de calificaciones */}
-            <div className="flex-1 grid grid-cols-1  sm:grid-cols-2 gap-4 mb-6">
-              {categories.map((category) => (
-                <div
-                  key={category.key}
-                  className="space-y-2"
-                  onMouseEnter={() => setHoveredCategory(category)}
-                  onMouseLeave={() => setHoveredCategory(null)}
-                >
-                  <label className="block text-lg text-navy mb-1 font-bold cursor-help">
-                    {category.label}
-                  </label>
-                  <RatingButtons
-                    category={category.key}
-                    value={formData[category.key]}
-                  />
-                  {/* Descripción móvil */}
-                  <p className="text-xs text-gray-500 lg:hidden">
-                    {category.description}
-                  </p>
-                </div>
-              ))}
+            <div className="flex-1 space-y-6">
+              {/* Aspecto destacado - Facilidad */}
+              {categories
+                .filter((cat) => cat.highlighted)
+                .map((category) => (
+                  <div
+                    key={category.key}
+                    className="p-4 bg-yellow-50 border-2 border-yellow-400 rounded-lg"
+                    onMouseEnter={() => setHoveredCategory(category)}
+                    onMouseLeave={() => setHoveredCategory(null)}
+                  >
+                    <label className="block text-xl text-navy mb-2 font-bold cursor-help">
+                      ⭐ {category.label}
+                    </label>
+                    <RatingButtons
+                      category={category.key}
+                      value={formData[category.key]}
+                      highlighted={true}
+                    />
+                    {/* Descripción móvil */}
+                    <p className="text-sm text-gray-600 lg:hidden mt-2">
+                      {category.description}
+                    </p>
+                  </div>
+                ))}
+
+              {/* Resto de aspectos */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {categories
+                  .filter((cat) => !cat.highlighted)
+                  .map((category) => (
+                    <div
+                      key={category.key}
+                      className="space-y-2"
+                      onMouseEnter={() => setHoveredCategory(category)}
+                      onMouseLeave={() => setHoveredCategory(null)}
+                    >
+                      <label className="block text-lg text-navy mb-1 font-bold cursor-help">
+                        {category.label}
+                      </label>
+                      <RatingButtons
+                        category={category.key}
+                        value={formData[category.key]}
+                      />
+                      {/* Descripción móvil */}
+                      <p className="text-xs text-gray-500 lg:hidden">
+                        {category.description}
+                      </p>
+                    </div>
+                  ))}
+              </div>
             </div>
 
             {/* Tooltip lateral - solo desktop */}
@@ -601,16 +646,70 @@ const ReviewForm = ({
         <div className="flex justify-center gap-3 mt-4">
           <button
             onClick={handleSubmit}
-            className="w-full sm:w-auto bg-navy text-white px-4 py-2 rounded-md hover:bg-dark-navy transition-colors shadow-md"
+            disabled={isSubmitting}
+            className="w-full sm:w-auto bg-navy text-white px-4 py-2 rounded-md hover:bg-dark-navy transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {isEditMode ? "Actualizar Reseña" : "Enviar Reseña"}
+            {isSubmitting ? (
+              <>
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                <span>Procesando...</span>
+              </>
+            ) : (
+              <span>{isEditMode ? "Actualizar Reseña" : "Enviar Reseña"}</span>
+            )}
           </button>
           {isEditMode && (
             <button
               onClick={handleDelete}
-              className="w-full sm:w-auto bg-white text-dark-navy px-4 py-2 rounded-md hover:bg-dark-navy hover:text-white transition-colors shadow-md"
+              disabled={isSubmitting}
+              className="w-full sm:w-auto bg-white text-dark-navy px-4 py-2 rounded-md hover:bg-dark-navy hover:text-white transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              Eliminar Reseña
+              {isSubmitting ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  <span>Procesando...</span>
+                </>
+              ) : (
+                <span>Eliminar Reseña</span>
+              )}
             </button>
           )}
         </div>
