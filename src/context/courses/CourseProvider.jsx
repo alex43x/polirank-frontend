@@ -12,6 +12,21 @@ export const CourseProvider = ({ children }) => {
   const [limit, setLimit] = useState(10);
   const [reviews, setReviews] = useState([]);
 
+
+  const getCoursesBySection =async(id)=>{
+    setLoading(true);
+    try {
+      const { data } = await api.get(`/sections/${id}/cursos`);
+      console.log(data)
+      return data;
+    } catch (error) {
+      console.error("Error obteniendo curso por seccion:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }
+
   //Función para obtener cursos
   const fetchCourses = async (params = {}) => {
     setLoading(true);
@@ -178,7 +193,7 @@ export const CourseProvider = ({ children }) => {
     try {
       // Endpoint correcto: /sections/:id/history
       const { data } = await api.get(`/sections/${sectionId}/history`, { params });
-
+      console.log("Historico:",data)
       // Mapear los datos al formato que espera el UI
       const mappedHistory = {
         history: []
@@ -223,6 +238,7 @@ export const CourseProvider = ({ children }) => {
         totalPages,
         limit,
         reviews,
+        getCoursesBySection,
         fetchCourses,
         fetchCourseById,
         createCourse,

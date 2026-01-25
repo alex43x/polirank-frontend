@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import loginImg from "../../assets/images/login.png";
 import { useAuth } from "../../hooks/useAuth";
@@ -11,6 +11,9 @@ export default function Login() {
     correo: "",
     password: "",
   });
+  useEffect(()=>{
+    console.log(loading,"Estado de carga")
+  })
 
   const handleChange = (e) => {
     setForm({
@@ -21,9 +24,16 @@ export default function Login() {
 
   const handleSubmit = async () => {
     try {
-      await login(form);
+      const student = await login(form);
 
-      // Redirección post-login (en teoria se puede hacer por rol pero por ahora dejo asi)
+      // Verificar si el rol es INACTIVE - necesita cambiar contraseña
+      if (student.Rol?.nombre === "INACTIVE") {
+        // Redirigir a la página de cambio de contraseña
+        navigate("/change-password");
+        return;
+      }
+
+      // Si el usuario está activo, redirigir al dashboard
       navigate("/dashboard");
     } catch (error) {
       console.error(error);
@@ -34,17 +44,17 @@ export default function Login() {
   return (
     <div className="flex w-screen h-screen justify-center lg:justify-between">
       {/* Formulario */}
-      <div className="w-full max-w-md lg:max-w-none lg:w-4/12 flex flex-col items-center justify-center gap-4">
-        <h1 className="text-6xl font-extrabold text-navy mb-16">
+      <div className="w-full max-w-md md:max-w-none md:w-4/12 flex flex-col items-center justify-center gap-4">
+        <h1 className="text-6xl md:text-5xl font-extrabold text-navy mb-16">
           Poli<span className="text-neutral-900">Rank</span>
         </h1>
 
         <div className="w-full flex flex-col items-center gap-3 px-8">
-          <h3 className="text-4xl font-medium text-navy">
+          <h3 className="md:text-2xl text-4xl font-medium text-navy">
             Iniciar Sesión
           </h3>
 
-          <p className="text-center text-neutral-600">
+          <p className="text-center md:text-sm text-neutral-600">
             Ingresa tu correo electrónico y tu contraseña
           </p>
 
@@ -69,15 +79,41 @@ export default function Login() {
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="bg-navy text-white rounded-lg px-4 py-2 w-10/12 hover:bg-blue-900 active:bg-blue-950 transition disabled:opacity-50"
+            className="bg-navy text-white rounded-lg px-4 py-2 w-10/12 hover:bg-blue-900 active:bg-blue-950 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Continuar
+            {loading ? (
+              <>
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Cargando...
+              </>
+            ) : (
+              "Continuar"
+            )}
           </button>
         </div>
       </div>
 
       {/* Imagen (solo aparece en version desktop) */}
-      <div className="hidden lg:block w-8/12 h-screen overflow-hidden">
+      <div className="hidden md:block w-8/12 h-screen overflow-hidden">
         <img
           src={loginImg}
           alt="Login"
