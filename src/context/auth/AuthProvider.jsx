@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
      LOGIN
      =========================== */
   const login = async (credentials) => {
-    setActionLoading(true); // Inicia el loading
+    setActionLoading(true);
     try {
       const response = await api.post("/auth/login", credentials);
       
@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }) => {
       setToken(jwt);
       setUser(student);
 
-      //Obtener el perfil completo después del login
+      // Obtener el perfil completo después del login
       try {
         const profile = await fetchProfile(jwt);
         setProfileData(profile);
@@ -69,7 +69,7 @@ export const AuthProvider = ({ children }) => {
 
       return student;
     } finally {
-      setActionLoading(false); // Termina el loading siempre
+      setActionLoading(false);
     }
   };
 
@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }) => {
     setAuthHeader(null);
     setUser(null);
     setToken(null);
-    setProfileData(null); 
+    setProfileData(null);
   };
 
   /* ===========================
@@ -164,22 +164,35 @@ export const AuthProvider = ({ children }) => {
      INIT + EXP CHECK
      =========================== */
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
+    const initAuth = async () => {
+      const storedToken = localStorage.getItem("token");
 
-    if (!storedToken) {
+      if (!storedToken) {
+        setLoading(false);
+        return;
+      }
+
+      if (isTokenExpired(storedToken)) {
+        logout();
+        setLoading(false);
+        return;
+      }
+
+      setAuthHeader(storedToken);
+      setToken(storedToken);
+      
+      // IMPORTANTE: Cargar el perfil antes de setear loading a false
+      try {
+        await getProfile();
+      } catch (error) {
+        console.error("Error al verificar token en inicio:", error);
+        logout();
+      }
+      
       setLoading(false);
-      return;
-    }
+    };
 
-    if (isTokenExpired(storedToken)) {
-      logout();
-      setLoading(false);
-      return;
-    }
-
-    setAuthHeader(storedToken);
-    setToken(storedToken);
-    setLoading(false);
+    initAuth();
   }, []);
 
   return (
@@ -187,17 +200,25 @@ export const AuthProvider = ({ children }) => {
       value={{
         user,
         token,
-        profileData, 
+        profileData,
         login,
         logout,
         getProfile,
         createPassword,
         changePassword,
         isAuthenticated: !!token,
-        loading: actionLoading, // Exportar actionLoading como loading
+        loading, // Estado de inicialización
+        actionLoading, // Estado de acciones
       }}
     >
-      {children}
+      {loading ? (
+        // Mostrar un loader mientras inicializa
+        <div className="flex justify-center items-center h-screen">
+          <div className="text-xl text-navy">Cargando...</div>
+        </div>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 };

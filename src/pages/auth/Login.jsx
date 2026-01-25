@@ -4,16 +4,17 @@ import loginImg from "../../assets/images/login.png";
 import { useAuth } from "../../hooks/useAuth";
 
 export default function Login() {
-  const { login, loading } = useAuth();
+  const { login, actionLoading } = useAuth(); // Cambiado de 'loading' a 'actionLoading'
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
     correo: "",
     password: "",
   });
-  useEffect(()=>{
-    console.log(loading,"Estado de carga")
-  })
+
+  useEffect(() => {
+    console.log(actionLoading, "Estado de carga");
+  }, [actionLoading]); // Añadida dependencia
 
   const handleChange = (e) => {
     setForm({
@@ -45,9 +46,10 @@ export default function Login() {
     <div className="flex w-screen h-screen justify-center lg:justify-between">
       {/* Formulario */}
       <div className="w-full max-w-md md:max-w-none md:w-4/12 flex flex-col items-center justify-center gap-4">
-        <h1 className="text-6xl md:text-5xl font-extrabold text-navy mb-16">
+        <h1 className="text-6xl md:text-5xl font-extrabold text-navy">
           Poli<span className="text-neutral-900">Rank</span>
         </h1>
+        <h2 className="italic text-neutral-700 mb-16 font-bold text-2xl">BETA</h2>
 
         <div className="w-full flex flex-col items-center gap-3 px-8">
           <h3 className="md:text-2xl text-4xl font-medium text-navy">
@@ -78,10 +80,10 @@ export default function Login() {
 
           <button
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={actionLoading}
             className="bg-navy text-white rounded-lg px-4 py-2 w-10/12 hover:bg-blue-900 active:bg-blue-950 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {loading ? (
+            {actionLoading ? (
               <>
                 <svg
                   className="animate-spin h-5 w-5 text-white"
