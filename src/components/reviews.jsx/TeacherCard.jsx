@@ -9,7 +9,7 @@ export default function TeacherCard({ teacher, selected,reviews="-",score="-",po
           : "bg-white text-navy hover:bg-navy hover:text-white"}
       `}
     >
-      <div className="font-bold text-sm  flex justify-between  ">{position===1?(<p>Mejor Calificado ☆</p>):(<p></p>)}Puntaje: {score}</div>
+      <div className="font-bold text-sm  flex justify-between  ">{position===1?(<p>Mejor Calificado ☆</p>):(<p></p>)}Puntaje: {score.toFixed(2)}</div>
       <h1 className="lg:text-3xl md:text-2xl text-lg font-semibold my-2">
         {teacher.nombre}
       </h1>
