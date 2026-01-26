@@ -49,7 +49,9 @@ export default function Login() {
         <h1 className="text-6xl md:text-5xl font-extrabold text-navy">
           Poli<span className="text-neutral-900">Rank</span>
         </h1>
-        <h2 className="italic text-neutral-700 mb-16 font-bold text-2xl">BETA</h2>
+        <h2 className="italic text-neutral-700 mb-2 font-bold text-2xl">
+          BETA
+        </h2>
 
         <div className="w-full flex flex-col items-center gap-3 px-8">
           <h3 className="md:text-2xl text-4xl font-medium text-navy">
@@ -59,7 +61,16 @@ export default function Login() {
           <p className="text-center md:text-sm text-neutral-600">
             Ingresa tu correo electrónico y tu contraseña
           </p>
-
+          <div className="text-dark-navy p-2 bg-blue-50 border border-blue-950 rounded w-10/12 text-sm mb-2">
+            <h1 className="font-bold"> Si es tu primera vez en PoliRank...</h1>
+            <p>
+              <strong>Correo:</strong> Correo institucional
+            </p>
+            <p>
+              <strong>Contraseña:</strong> Correo institucional hasta antes del
+              "@"
+            </p>
+          </div>
           <input
             type="email"
             name="correo"
