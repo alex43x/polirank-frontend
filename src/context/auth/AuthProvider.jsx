@@ -98,6 +98,7 @@ export const AuthProvider = ({ children }) => {
     return {
       student: data.student,
       reviews: data.reviews,
+      tries: data.student.Intentos || [], // Extraer intentos del estudiante
     };
   };
 

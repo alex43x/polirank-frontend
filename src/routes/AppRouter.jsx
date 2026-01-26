@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"; 
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "../pages/auth/Login";
 import ChangePassword from "../pages/auth/ChangePassword";
 import Dashboard from "../pages/dashboard/Dashboard";
@@ -12,6 +12,7 @@ import { StudentProvider } from "../context/students/StudentProvider";
 import { CourseProvider } from "../context/courses/CourseProvider";
 import { SubjectProvider } from "../context/subjects/SubjectProvider";
 import { ReviewProvider } from "../context/reviews/ReviewProvider";
+import TryProvider from "../context/tries/TryProvider";
 
 const AppRouter = () => {
   return (
@@ -45,20 +46,20 @@ const AppRouter = () => {
             element={
               <StudentProvider>
                 <SubjectProvider>
-                  <CourseProvider>
-                    <ReviewProvider>
-                      <Reviews />
-                    </ReviewProvider>
-                  </CourseProvider>
+                  <TryProvider>
+                    <CourseProvider>
+                      <ReviewProvider>
+                        <Reviews />
+                      </ReviewProvider>
+                    </CourseProvider>
+                  </TryProvider>
                 </SubjectProvider>
               </StudentProvider>
             }
           />
 
           {/* Solo ADMIN */}
-          <Route
-            element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]} />}
-          >
+          <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]} />}>
             <Route path="/admin" element={<AdminPanel />} />
           </Route>
         </Route>

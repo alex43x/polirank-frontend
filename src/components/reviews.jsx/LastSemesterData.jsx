@@ -189,7 +189,7 @@ export default function LastSemesterData({
                 <p className="text-neutral-600">
                   Puntuación General:{" "}
                   <span className="font-semibold">
-                    {lastSemesterData.totalAverage || "No data"}
+                    {lastSemesterData.totalAverage.toFixed(2) || "No data"}
                   </span>
                 </p>
                 <p className="text-neutral-600">
