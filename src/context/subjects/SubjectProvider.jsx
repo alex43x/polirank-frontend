@@ -59,6 +59,21 @@ export const SubjectProvider = ({ children }) => {
       setLoading(false);
     }
   };
+
+  //funcion para obtener intentos de una materia
+  const fetchAttemptsBySubjectId = async (id) => {
+    setLoading(true);
+    try {
+      const { data } = await api.get(`/materias/${id}/intentos`);
+      console.log(data)
+      return data || [];
+    } catch (error) {
+      console.error("Error obteniendo intentos por ID de materia:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
   
 
   return (
@@ -73,6 +88,7 @@ export const SubjectProvider = ({ children }) => {
         fetchSubjects,
         fetchSubjectById,
         fetchSectionsBySubjectId,
+        fetchAttemptsBySubjectId,
       }}
     >
       {children}
