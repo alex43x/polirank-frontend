@@ -16,6 +16,17 @@ export const setAuthHeader = (token) => {
 };
 
 /* ===========================
+   CAREER HEADER
+   =========================== */
+export const setCareerHeader = (careerId) => {
+  if (careerId) {
+    api.defaults.headers.common['x-carrera-id'] = careerId;
+  } else {
+    delete api.defaults.headers.common['x-carrera-id'];
+  }
+};
+
+/* ===========================
    INTERCEPTOR GLOBAL
    =========================== */
 api.interceptors.response.use(
