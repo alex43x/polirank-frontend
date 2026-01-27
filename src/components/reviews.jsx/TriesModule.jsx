@@ -12,7 +12,6 @@ export default function TriesModule({
   onSubmitTry,
   onDeleteTry,
   isSubmitting,
-  selectedCareer,
 }) {
   const [selectedTryValue, setSelectedTryValue] = useState(null);
   const [existingTry, setExistingTry] = useState(null);
@@ -188,11 +187,7 @@ export default function TriesModule({
         <h3 className="text-lg sm:text-xl text-neutral-700 font-medium">
           {subjectName}
         </h3>
-        {selectedCareer && (
-          <p className="text-sm text-neutral-500 mt-1">
-            Carrera: {selectedCareer.nombre}
-          </p>
-        )}
+        
       </div>
 
       {/* Estadísticas generales */}

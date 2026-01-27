@@ -49,7 +49,7 @@ export default function Reviews() {
 
   useEffect(()=>{
     console.log(profileData)
-  })
+  },[])
   // Query para obtener las secciones
   const {
     data: sections = [],
@@ -234,7 +234,7 @@ export default function Reviews() {
               type="button"
               title="Ver estadísticas de intentos"
             >
-              Ver Intentos
+              Ver Intentos (Chipitómetro)
             </button>
           </div>
 
