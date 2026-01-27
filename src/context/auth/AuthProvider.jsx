@@ -71,7 +71,6 @@ export const AuthProvider = ({ children }) => {
         }
 
       } catch (error) {
-        console.error("Error al cargar perfil después del login:", error);
       }
 
       return student;
@@ -134,7 +133,6 @@ export const AuthProvider = ({ children }) => {
       
       return profile;
     } catch (error) {
-      console.error("Error al obtener perfil:", error);
       throw error;
     }
   };
@@ -208,7 +206,6 @@ export const AuthProvider = ({ children }) => {
       try {
         await getProfile();
       } catch (error) {
-        console.error("Error al verificar token en inicio:", error);
         logout();
       }
       

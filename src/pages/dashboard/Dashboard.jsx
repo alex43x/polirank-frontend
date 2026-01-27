@@ -14,7 +14,6 @@ export default function Dashboard() {
   const [isChangingCareer, setIsChangingCareer] = useState(false);
 
   useEffect(() => {
-    console.log(user);
     // Seleccionar la primera carrera por defecto
     if (user && user.Matriculacions && user.Matriculacions.length > 0 && !selectedCareer) {
       setSelectedCareer(user.Matriculacions[0].Carrera);
@@ -63,7 +62,6 @@ export default function Dashboard() {
       setSearchParams(resetFilters);
       setCurrentPage(1);
     } catch (error) {
-      console.error("Error al cambiar de carrera:", error);
       alert("Error al cambiar de carrera. Por favor intenta de nuevo.");
     } finally {
       setIsChangingCareer(false);

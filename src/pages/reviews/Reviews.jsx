@@ -47,9 +47,7 @@ export default function Reviews() {
     }
   }, [user, profileLoaded]);
 
-  useEffect(()=>{
-    console.log(profileData)
-  },[])
+ 
   // Query para obtener las secciones
   const {
     data: sections = [],
@@ -167,7 +165,6 @@ export default function Reviews() {
           : "Intentos registrados correctamente"
       );
     } catch (error) {
-      console.error("Error al guardar intentos:", error);
       alert("Error al guardar los intentos. Por favor intenta de nuevo.");
     } finally {
       setIsSubmitting(false);
@@ -187,7 +184,6 @@ export default function Reviews() {
 
       alert("Registro eliminado correctamente");
     } catch (error) {
-      console.error("Error al eliminar intento:", error);
       alert("Error al eliminar el registro. Por favor intenta de nuevo.");
     } finally {
       setIsSubmitting(false);

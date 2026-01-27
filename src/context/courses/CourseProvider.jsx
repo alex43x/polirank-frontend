@@ -19,7 +19,6 @@ export const CourseProvider = ({ children }) => {
       const { data } = await api.get(`/sections/${id}/cursos`);
       return data;
     } catch (error) {
-      console.error("Error obteniendo curso por seccion:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -37,7 +36,6 @@ export const CourseProvider = ({ children }) => {
       setTotalPages(data.totalPages || 0);
       setError(null);
     } catch (error) {
-      console.error("Error obteniendo cursos:", error);
       setCourses([]);
       setPage(1);
       setLimit(10);
@@ -55,7 +53,6 @@ export const CourseProvider = ({ children }) => {
       const { data } = await api.get(`/cursos/${id}`);
       return data;
     } catch (error) {
-      console.error("Error obteniendo curso por ID:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -70,7 +67,6 @@ export const CourseProvider = ({ children }) => {
       setCourses((prevCourses) => [...prevCourses, data]);
       return data;
     } catch (error) {
-      console.error("Error creando curso:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -84,7 +80,6 @@ export const CourseProvider = ({ children }) => {
       const { data } = await api.get(`/cursos/${id}/reviews`);
       setReviews(data.reviews || []);
     } catch (error) {
-      console.error("Error obteniendo reviews por ID:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -99,7 +94,6 @@ export const CourseProvider = ({ children }) => {
       setReviews((prevReviews) => [...prevReviews, data]);
       return data;
     } catch (error) {
-      console.error("Error agregando review al curso:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -113,7 +107,6 @@ export const CourseProvider = ({ children }) => {
       const { data } = await api.get(`/cursos/${courseId}/reviews/${reviewId}`);
       return data;
     } catch (error) {
-      console.error("Error obteniendo review por ID:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -133,7 +126,6 @@ export const CourseProvider = ({ children }) => {
       );
       return data;
     } catch (error) {
-      console.error("Error actualizando review por ID:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -146,7 +138,6 @@ export const CourseProvider = ({ children }) => {
     try {
       await api.delete(`/cursos/${courseId}/reviews/${reviewId}`);
     } catch (error) {
-      console.error("Error eliminando review por ID:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -177,7 +168,6 @@ export const CourseProvider = ({ children }) => {
 
       return mappedData;
     } catch (error) {
-      console.error("Error obteniendo datos del último semestre:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -217,7 +207,6 @@ export const CourseProvider = ({ children }) => {
 
       return mappedHistory;
     } catch (error) {
-      console.error("Error obteniendo datos historicos:", error);
       throw error;
     } finally {
       setLoading(false);

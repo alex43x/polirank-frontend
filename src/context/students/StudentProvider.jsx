@@ -21,7 +21,6 @@ export const StudentProvider = ({ children }) => {
       setLimit(data.limit || 10);
       setTotalPages(data.totalPages || 0);
     } catch (error) {
-      console.error("Error obteniendo alumnos:", error);
       setStudents([]);
       setTotal(0);
       setPage(1);
@@ -39,7 +38,6 @@ export const StudentProvider = ({ children }) => {
       const { data } = await api.get(`/alumnos/${id}`);
       return data;
     } catch (error) {
-      console.error("Error obteniendo alumno por ID:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -53,7 +51,6 @@ export const StudentProvider = ({ children }) => {
       const { data } = await api.post("/alumnos", studentData);
       return data;
     } catch (error) {
-      console.error("Error creando estudiante:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -67,7 +64,6 @@ export const StudentProvider = ({ children }) => {
       const { data } = await api.put(`/alumnos/${id}`, studentData);
       return data;
     } catch (error) {
-      console.error("Error actualizando estudiante:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -80,7 +76,6 @@ export const StudentProvider = ({ children }) => {
     try {
       await api.delete(`/alumnos/${id}`);
     } catch (error) {
-      console.error("Error eliminando estudiante:", error);
       throw error;
     } finally {
       setLoading(false);
