@@ -118,7 +118,6 @@ const ChangePasswordForm = ({
         onSuccess();
       }
     } catch (error) {
-      console.error("Error al cambiar contraseña:", error);
       
       // Manejar diferentes tipos de errores
       let errorMessage = "Error al cambiar la contraseña. Por favor, intenta de nuevo.";

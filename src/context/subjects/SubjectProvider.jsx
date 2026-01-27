@@ -21,7 +21,6 @@ export const SubjectProvider = ({ children }) => {
       setLimit(data.limit );
       setTotalPages(data.totalPages || 0);
     } catch (error) {
-      console.error("Error obteniendo materias:", error);
       setSubjects([]);
       setTotal(0);
       setPage(1);
@@ -39,7 +38,6 @@ export const SubjectProvider = ({ children }) => {
       const { data } = await api.get(`/materias/${id}`);
       return data;
     } catch (error) {
-      console.error("Error obteniendo materia por ID:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -53,7 +51,6 @@ export const SubjectProvider = ({ children }) => {
       const { data } = await api.get(`/materias/${id}/secciones`);
       return data || [];
     } catch (error) {
-      console.error("Error obteniendo secciones por ID de materia:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -65,10 +62,8 @@ export const SubjectProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get(`/materias/${id}/intentos`);
-      console.log(data)
       return data || [];
     } catch (error) {
-      console.error("Error obteniendo intentos por ID de materia:", error);
       throw error;
     } finally {
       setLoading(false);
