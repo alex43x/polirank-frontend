@@ -27,14 +27,9 @@ export default function PrivateLayout() {
             italic
             whitespace-nowrap
           ">
-            BETA · Early Access 
+            BETA
           </span>
-          <span className="
-            text-xs sm:text-sm
-            text-neutral-500
-            italic
-            whitespace-nowrap
-          ">· (IIN & LCIk)</span>
+          
         </div>
 
         {/* Logout */}
