@@ -26,8 +26,8 @@ export default function TriesModule({
 
   // Verificar si el usuario ya tiene un intento registrado para esta materia
   useEffect(() => {
-    if (profileData?.tries && subjectId) {
-      const userTry = profileData.tries.find(
+    if (profileData?.tries?.rows && subjectId) {
+      const userTry = profileData.tries.rows.find(
         (t) => t.asignatura === parseInt(subjectId)
       );
       if (userTry) {
@@ -38,7 +38,7 @@ export default function TriesModule({
         setSelectedTryValue(null);
       }
     }
-  }, [profileData, subjectId]);
+  }, [profileData?.tries, subjectId]);
 
   // Preparar datos para el gráfico de pie con colores similares a #36507D
   const chartData = {
@@ -96,6 +96,8 @@ export default function TriesModule({
         },
       },
     },
+    maintainAspectRatio: true,
+    responsive: true,
   };
 
   // Verificar si hay datos de intentos
@@ -154,7 +156,7 @@ export default function TriesModule({
       : 0;
 
   return (
-    <div className="bg-greige rounded-b-lg w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+    <div className="bg-greige rounded-b-lg w-full p-4 sm:p-6">
       <ConfirmDialog
         pt={{
           root: {
@@ -180,11 +182,12 @@ export default function TriesModule({
         }}
       />
 
-      {/* Subtítulo con nombre de materia */}
+      {/* Subtítulo con nombre de materia y carrera */}
       <div className="mb-6">
         <h3 className="text-lg sm:text-xl text-neutral-700 font-medium">
           {subjectName}
         </h3>
+        
       </div>
 
       {/* Estadísticas generales */}
@@ -192,18 +195,18 @@ export default function TriesModule({
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="bg-white p-4 rounded-lg border border-greige shadow-md">
             <p className="text-sm text-neutral-600 mb-1">Total Estudiantes</p>
-            <p className="text-3xl font-bold text-navy">{totalStudents}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-navy">{totalStudents}</p>
           </div>
           <div className="bg-white p-4 rounded-lg border border-greige shadow-md">
             <p className="text-sm text-neutral-600 mb-1">Aprobados en Primer Intento</p>
-            <p className="text-3xl font-bold text-navy">{successRate}%</p>
+            <p className="text-2xl sm:text-3xl font-bold text-navy">{successRate}%</p>
           </div>
         </div>
       )}
 
       {/* Gráfico de Pie */}
-      <div className="bg-white p-6 rounded-lg border border-greige shadow-md mb-6">
-        <h4 className="text-xl font-bold text-navy mb-4">
+      <div className="bg-white p-4 sm:p-6 rounded-lg border border-greige shadow-md mb-6">
+        <h4 className="text-lg sm:text-xl font-bold text-navy mb-4">
           Distribución de Intentos
         </h4>
         {attemptsLoading ? (
@@ -226,7 +229,7 @@ export default function TriesModule({
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
               />
             </svg>
-            <p className="text-neutral-500 text-lg">
+            <p className="text-neutral-500 text-base sm:text-lg">
               No hay datos de intentos disponibles
             </p>
             <p className="text-neutral-400 text-sm mt-2">
@@ -243,10 +246,10 @@ export default function TriesModule({
       </div>
 
       {/* Formulario para registrar intentos */}
-      <div className="bg-white p-6 rounded-lg border-2 border-navy shadow-md">
+      <div className="bg-white p-4 sm:p-6 rounded-lg border-2 border-navy shadow-md">
         <div className="flex items-center gap-2 mb-4">
           <svg
-            className="w-6 h-6 text-navy"
+            className="w-5 h-5 sm:w-6 sm:h-6 text-navy flex-shrink-0"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -258,7 +261,7 @@ export default function TriesModule({
               d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
             />
           </svg>
-          <h4 className="text-xl font-bold text-navy">
+          <h4 className="text-lg sm:text-xl font-bold text-navy">
             {existingTry ? "Actualizar mis Intentos" : "Registrar mis Intentos"}
           </h4>
         </div>
@@ -276,7 +279,7 @@ export default function TriesModule({
 
         <div className="space-y-4">
           <div>
-            <label className="block text-navy font-semibold mb-2 text-lg">
+            <label className="block text-navy font-semibold mb-2 text-base sm:text-lg">
               ¿Cuántos intentos te tomó aprobar esta materia?
             </label>
             <Dropdown
@@ -287,7 +290,7 @@ export default function TriesModule({
               className="w-full border rounded-md border-gray-300 font-medium bg-white shadow-md"
               pt={{
                 input: {
-                  className: "py-3 px-4 bg-white text-neutral-700 rounded-md text-lg",
+                  className: "py-3 px-4 bg-white text-neutral-700 rounded-md text-base sm:text-lg",
                 },
                 panel: {
                   className:
@@ -304,7 +307,7 @@ export default function TriesModule({
             <button
               onClick={handleSubmit}
               disabled={isSubmitting || selectedTryValue === null}
-              className="flex-1 bg-navy text-white px-6 py-3 rounded-md hover:bg-dark-navy transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-semibold"
+              className="flex-1 bg-navy text-white px-4 sm:px-6 py-3 rounded-md hover:bg-dark-navy transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-semibold text-sm sm:text-base"
             >
               {isSubmitting ? (
                 <>
@@ -339,7 +342,7 @@ export default function TriesModule({
               <button
                 onClick={handleDelete}
                 disabled={isSubmitting}
-                className="sm:w-auto bg-white text-red-600 border-2 border-red-600 px-6 py-3 rounded-md hover:bg-red-600 hover:text-white transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-semibold"
+                className="sm:w-auto bg-white text-red-600 border-2 border-red-600 px-4 sm:px-6 py-3 rounded-md hover:bg-red-600 hover:text-white transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-semibold text-sm sm:text-base"
               >
                 {isSubmitting ? (
                   <>
@@ -361,7 +364,7 @@ export default function TriesModule({
                         className="opacity-75"
                         fill="currentColor"
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
+                      ></path>
                     </svg>
                     <span>Procesando...</span>
                   </>

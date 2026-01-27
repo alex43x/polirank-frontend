@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import AuthContext from "./AuthContext";
-import api, { setAuthHeader } from "../../api/api";
+import api, { setAuthHeader, setCareerHeader } from "../../api/api";
 
 /* ===========================
    JWT EXP CHECK
@@ -28,6 +28,7 @@ export const AuthProvider = ({ children }) => {
     const savedProfile = localStorage.getItem("profileData");
     return savedProfile ? JSON.parse(savedProfile) : null;
   });
+  
 
   const [loading, setLoading] = useState(true); // Loading inicial
   const [actionLoading, setActionLoading] = useState(false); // Loading para acciones
@@ -62,6 +63,13 @@ export const AuthProvider = ({ children }) => {
         const profile = await fetchProfile(jwt);
         setProfileData(profile);
         localStorage.setItem("profileData", JSON.stringify(profile));
+
+        // Setear el header de carrera si existe
+        if (profile.student?.Matriculacions?.[0]?.Carrera?.id) {
+          setCareerHeader(profile.student.Matriculacions[0].Carrera.id);
+          localStorage.setItem("careerId", profile.student.Matriculacions[0].Carrera.id);
+        }
+
       } catch (error) {
         console.error("Error al cargar perfil después del login:", error);
       }
@@ -79,7 +87,9 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("profileData");
+    localStorage.removeItem("careerId");
     setAuthHeader(null);
+    setCareerHeader(null);
     setUser(null);
     setToken(null);
     setProfileData(null);
@@ -91,13 +101,14 @@ export const AuthProvider = ({ children }) => {
   const fetchProfile = async (authToken = null) => {
     if (authToken) {
       setAuthHeader(authToken);
+      
     }
     
     const { data } = await api.get("/auth/profile");
     return {
       student: data.student,
       reviews: data.reviews,
-      tries: data.student.Intentos || [], // Extraer intentos del estudiante
+      tries: data.tries || [], // Extraer intentos del estudiante
     };
   };
 
@@ -114,6 +125,12 @@ export const AuthProvider = ({ children }) => {
       
       setProfileData(profile);
       localStorage.setItem("profileData", JSON.stringify(profile));
+      
+      // Setear el header de carrera si existe
+      if (profile.student?.Matriculacions?.[0]?.Carrera?.id) {
+        setCareerHeader(profile.student.Matriculacions[0].Carrera.id);
+        localStorage.setItem("careerId", profile.student.Matriculacions[0].Carrera.id);
+      }
       
       return profile;
     } catch (error) {
@@ -180,6 +197,12 @@ export const AuthProvider = ({ children }) => {
 
       setAuthHeader(storedToken);
       setToken(storedToken);
+      
+      // Restaurar el header de carrera si existe
+      const storedCareerId = localStorage.getItem("careerId");
+      if (storedCareerId) {
+        setCareerHeader(storedCareerId);
+      }
       
       // IMPORTANTE: Cargar el perfil antes de setear loading a false
       try {
