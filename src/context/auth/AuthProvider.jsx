@@ -15,21 +15,13 @@ const isTokenExpired = (token) => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem("user");
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
-
+  const [user, setUser] = useState(null); // No cargar desde localStorage aquí
   const [token, setToken] = useState(() => {
     return localStorage.getItem("token");
   });
 
-  const [profileData, setProfileData] = useState(() => {
-    const savedProfile = localStorage.getItem("profileData");
-    return savedProfile ? JSON.parse(savedProfile) : null;
-  });
+  const [profileData, setProfileData] = useState(null); // No cargar desde localStorage aquí
   
-
   const [loading, setLoading] = useState(true); // Loading inicial
   const [actionLoading, setActionLoading] = useState(false); // Loading para acciones
 
@@ -52,25 +44,28 @@ export const AuthProvider = ({ children }) => {
       }
 
       localStorage.setItem("token", jwt);
-      localStorage.setItem("user", JSON.stringify(student));
-
       setAuthHeader(jwt);
       setToken(jwt);
+
+      // El login ya devuelve los datos completos incluyendo semestres
+      // Usar esos datos directamente en lugar de hacer otra llamada
+      localStorage.setItem("user", JSON.stringify(student));
       setUser(student);
+      
+      // Crear profileData con los datos del login
+      const profileData = {
+        student: student,
+        reviews: [], // Se cargarán cuando sea necesario
+        tries: []    // Se cargarán cuando sea necesario
+      };
+      
+      localStorage.setItem("profileData", JSON.stringify(profileData));
+      setProfileData(profileData);
 
-      // Obtener el perfil completo después del login
-      try {
-        const profile = await fetchProfile(jwt);
-        setProfileData(profile);
-        localStorage.setItem("profileData", JSON.stringify(profile));
-
-        // Setear el header de carrera si existe
-        if (profile.student?.Matriculacions?.[0]?.Carrera?.id) {
-          setCareerHeader(profile.student.Matriculacions[0].Carrera.id);
-          localStorage.setItem("careerId", profile.student.Matriculacions[0].Carrera.id);
-        }
-
-      } catch (error) {
+      // Setear el header de carrera si existe
+      if (student?.Matriculacions?.[0]?.Carrera?.id) {
+        setCareerHeader(student.Matriculacions[0].Carrera.id);
+        localStorage.setItem("careerId", student.Matriculacions[0].Carrera.id);
       }
 
       return student;
@@ -87,6 +82,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("user");
     localStorage.removeItem("profileData");
     localStorage.removeItem("careerId");
+    localStorage.removeItem("selectedCareer"); // Limpiar también selectedCareer
     setAuthHeader(null);
     setCareerHeader(null);
     setUser(null);
@@ -100,14 +96,52 @@ export const AuthProvider = ({ children }) => {
   const fetchProfile = async (authToken = null) => {
     if (authToken) {
       setAuthHeader(authToken);
-      
     }
     
     const { data } = await api.get("/auth/profile");
+    
+    // Verificar si las carreras tienen el campo semestres
+    const hasCompleteCareers = data.student?.Matriculacions?.every(
+      m => m.Carrera.semestres !== undefined
+    );
+    
+    
+    // Si el API no devuelve semestres, intentar obtenerlos de otra fuente
+    if (!hasCompleteCareers && data.student?.Matriculacions) {
+      
+      // Intentar obtener de localStorage si existe
+      const savedUser = localStorage.getItem("user");
+      if (savedUser) {
+        try {
+          const parsedUser = JSON.parse(savedUser);
+          if (parsedUser.Matriculacions) {
+            // Enriquecer con datos de localStorage
+            data.student.Matriculacions = data.student.Matriculacions.map(matriculacion => {
+              const saved = parsedUser.Matriculacions.find(
+                m => m.Carrera.id === matriculacion.Carrera.id
+              );
+              if (saved && saved.Carrera.semestres) {
+                return {
+                  ...matriculacion,
+                  Carrera: {
+                    ...matriculacion.Carrera,
+                    semestres: saved.Carrera.semestres
+                  }
+                };
+              }
+              return matriculacion;
+            });
+          }
+        } catch (error) {
+          
+        }
+      }
+    }
+    
     return {
       student: data.student,
       reviews: data.reviews,
-      tries: data.tries || [], // Extraer intentos del estudiante
+      tries: data.tries || [],
     };
   };
 
@@ -133,7 +167,6 @@ export const AuthProvider = ({ children }) => {
       
       return profile;
     } catch (error) {
-      throw error;
     }
   };
 
@@ -202,9 +235,24 @@ export const AuthProvider = ({ children }) => {
         setCareerHeader(storedCareerId);
       }
       
-      // IMPORTANTE: Cargar el perfil antes de setear loading a false
+      // CRÍTICO: Siempre cargar el perfil desde la API, no desde localStorage
+      // Esto asegura que tengamos los datos más actualizados y completos
       try {
-        await getProfile();
+        const profile = await fetchProfile(storedToken);
+        
+        // Guardar los datos completos
+        localStorage.setItem("user", JSON.stringify(profile.student));
+        localStorage.setItem("profileData", JSON.stringify(profile));
+        
+        setUser(profile.student);
+        setProfileData(profile);
+        
+        // Setear el header de carrera si existe
+        if (profile.student?.Matriculacions?.[0]?.Carrera?.id) {
+          setCareerHeader(profile.student.Matriculacions[0].Carrera.id);
+          localStorage.setItem("careerId", profile.student.Matriculacions[0].Carrera.id);
+        }
+        
       } catch (error) {
         logout();
       }
