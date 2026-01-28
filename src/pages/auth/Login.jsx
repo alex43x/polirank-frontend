@@ -35,7 +35,6 @@ export default function Login() {
       // Si el usuario está activo, redirigir al dashboard
       navigate("/dashboard");
     } catch (error) {
-      console.error(error);
       alert("Credenciales incorrectas");
     }
   };

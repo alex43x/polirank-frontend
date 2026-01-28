@@ -6,6 +6,7 @@ import AdminPanel from "../pages/admin/AdminPanel";
 import Reviews from "../pages/reviews/Reviews";
 import ProtectedRoute from "./ProtectedRoute";
 import PrivateLayout from "../layouts/PrivateLayout";
+import Maintenance from "../pages/admin/Maintenance";
 import { ROLES } from "../constants/roles";
 
 import { StudentProvider } from "../context/students/StudentProvider";
@@ -15,6 +16,11 @@ import { ReviewProvider } from "../context/reviews/ReviewProvider";
 import TryProvider from "../context/tries/TryProvider";
 
 const AppRouter = () => {
+  const isMaintenanceMode = import.meta.env.VITE_MAINTENANCE_MODE === 'true';
+  if (isMaintenanceMode) {
+    return <Maintenance />;
+  }
+
   return (
     <BrowserRouter>
       <Routes>

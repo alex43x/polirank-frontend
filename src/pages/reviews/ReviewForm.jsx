@@ -49,7 +49,7 @@ const ReviewForm = ({
           setAvailableCourses(response.cursos);
         }
       } catch (error) {
-        console.error("Error al cargar cursos:", error);
+        throw error
       } finally {
         setLoading(false);
       }
@@ -288,7 +288,6 @@ const ReviewForm = ({
         onSuccess();
       }
     } catch (error) {
-      console.error("Error al enviar la reseña:", error);
       alert(
         `Error al ${isEditMode ? "actualizar" : "enviar"} la reseña. Por favor intenta de nuevo.`
       );
@@ -337,7 +336,7 @@ const ReviewForm = ({
             onSuccess();
           }
         } catch (error) {
-          console.error("Error al eliminar la reseña:", error);
+          e.error("Error al eliminar la reseña:", error);
           alert("Error al eliminar la reseña. Por favor intenta de nuevo.");
         } finally {
           setIsSubmitting(false);
