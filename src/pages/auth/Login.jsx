@@ -247,7 +247,7 @@ export default function Login() {
 
               <div className="mt-6 pt-4 border-t border-neutral-200">
                 <p className="text-xs text-neutral-500 text-center">
-                  Última actualización: 28 de Enero del 2025
+                  Última actualización: 28 de Enero del 2026
                 </p>
               </div>
             </div>
