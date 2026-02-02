@@ -4,6 +4,7 @@ import ChangePassword from "../pages/auth/ChangePassword";
 import Dashboard from "../pages/dashboard/Dashboard";
 import AdminPanel from "../pages/admin/AdminPanel";
 import Reviews from "../pages/reviews/Reviews";
+import Students from "../pages/students/Students";
 import ProtectedRoute from "./ProtectedRoute";
 import PrivateLayout from "../layouts/PrivateLayout";
 import Maintenance from "../pages/admin/Maintenance";
@@ -60,6 +61,16 @@ const AppRouter = () => {
                     </CourseProvider>
                   </TryProvider>
                 </SubjectProvider>
+              </StudentProvider>
+            }
+          />
+
+          {/* Estudiantes */}
+          <Route
+            path="/alumnos"
+            element={
+              <StudentProvider>
+                <Students />
               </StudentProvider>
             }
           />
