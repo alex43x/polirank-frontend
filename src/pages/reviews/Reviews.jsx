@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSubject } from "../../hooks/useSubject";
@@ -27,9 +27,27 @@ export default function Reviews() {
   const [visible, setVisible] = useState(false);
   const [visibleTries, setVisibleTries] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedCareer, setSelectedCareer] = useState(null);
+  const [profileLoaded, setProfileLoaded] = useState(false);
 
   const subjectName = location.state?.subjectName || "Materia";
 
+  // Seleccionar la primera carrera por defecto
+  useEffect(() => {
+    if (user && user.Matriculacions && user.Matriculacions.length > 0 && !selectedCareer) {
+      setSelectedCareer(user.Matriculacions[0].Carrera);
+    }
+  }, [user, selectedCareer]);
+
+  // Cargar el perfil solo una vez al montar el componente
+  useEffect(() => {
+    if (user && !profileLoaded) {
+      getProfile();
+      setProfileLoaded(true);
+    }
+  }, [user, profileLoaded]);
+
+ 
   // Query para obtener las secciones
   const {
     data: sections = [],
@@ -117,7 +135,7 @@ export default function Reviews() {
       queryKey: ["historical", selectedSection?.id],
     });
 
-    getProfile();
+    await getProfile();
   };
 
   const handleSubmitTry = async (selectedTryValue, existingTry) => {
@@ -135,18 +153,18 @@ export default function Reviews() {
         await createTry(tryData);
       }
 
-      // Refrescar datos
-      await refetchAttempts();
-      await getProfile();
+      // Refrescar datos - IMPORTANTE: esperar a que termine
+      await Promise.all([
+        refetchAttempts(),
+        getProfile()
+      ]);
 
-      // NO cerrar el modal - el usuario lo cierra manualmente con la X
       alert(
         existingTry
           ? "Intentos actualizados correctamente"
           : "Intentos registrados correctamente"
       );
     } catch (error) {
-      console.error("Error al guardar intentos:", error);
       alert("Error al guardar los intentos. Por favor intenta de nuevo.");
     } finally {
       setIsSubmitting(false);
@@ -158,14 +176,14 @@ export default function Reviews() {
       setIsSubmitting(true);
       await deleteTry(existingTry.id);
 
-      // Refrescar datos
-      await refetchAttempts();
-      await getProfile();
+      // Refrescar datos - IMPORTANTE: esperar a que termine
+      await Promise.all([
+        refetchAttempts(),
+        getProfile()
+      ]);
 
-      // NO cerrar el modal - el usuario lo cierra manualmente con la X
       alert("Registro eliminado correctamente");
     } catch (error) {
-      console.error("Error al eliminar intento:", error);
       alert("Error al eliminar el registro. Por favor intenta de nuevo.");
     } finally {
       setIsSubmitting(false);
@@ -212,7 +230,7 @@ export default function Reviews() {
               type="button"
               title="Ver estadísticas de intentos"
             >
-              Ver Intentos
+              Ver Intentos (Chipitómetro)
             </button>
           </div>
 
@@ -251,19 +269,19 @@ export default function Reviews() {
           {/* Dialog de Intentos */}
           <Dialog
             visible={visibleTries}
-            style={{ width: "95vw", maxWidth: "700px" }}
+            style={{ width: "95vw", maxWidth: "700px", maxHeight: "90vh" }}
             onHide={() => setVisibleTries(false)}
             dismissableMask={true}
             modal={true}
-            header=" Estadísticas de Intentos"
-            contentClassName="p-0"
+            header="Estadísticas de Intentos"
+            contentClassName="p-0 overflow-y-auto"
             maskStyle={{ backgroundColor: "rgba(0, 0, 0, 0.6)" }}
             pt={{
               root: { className: "rounded-lg" },
               header: {
                 className: "bg-navy text-white px-6 py-4 rounded-t-lg text-2xl font-medium",
               },
-              content: { className: "p-0" },
+              content: { className: "p-0 overflow-y-auto" },
               closeButton: {
                 className: "text-white hover:bg-dark-navy rounded-md transition-colors",
               },
@@ -278,6 +296,7 @@ export default function Reviews() {
               onSubmitTry={handleSubmitTry}
               onDeleteTry={handleDeleteTry}
               isSubmitting={isSubmitting}
+              selectedCareer={selectedCareer}
             />
           </Dialog>
         </div>

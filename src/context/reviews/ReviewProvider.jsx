@@ -21,7 +21,6 @@ export const ReviewProvider = ({ children }) => {
       setLimit(data.limit || 20);
       setTotalPages(data.totalPages || 1);
     } catch (error) {
-      console.error("Error obteniendo reviews:", error);
       setReviews([]);
       setTotal(0);
       setPage(1);
@@ -39,7 +38,6 @@ export const ReviewProvider = ({ children }) => {
       const { data } = await api.get(`/reviews/${id}`);
       return data;
     } catch (error) {
-      console.error("Error obteniendo review por ID:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -53,7 +51,6 @@ export const ReviewProvider = ({ children }) => {
       const { data } = await api.post("/reviews/", reviewData);
       return data;
     } catch (error) {
-      console.error("Error creando review:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -67,7 +64,6 @@ export const ReviewProvider = ({ children }) => {
       const { data } = await api.put(`/reviews/${id}`, reviewData);
       return data;
     } catch (error) {
-      console.error("Error actualizando review:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -81,7 +77,6 @@ export const ReviewProvider = ({ children }) => {
       const { data } = await api.delete(`/reviews/${id}`);
       return data;
     } catch (error) {
-      console.error("Error eliminando review:", error);
       throw error;
     } finally {
       setLoading(false);

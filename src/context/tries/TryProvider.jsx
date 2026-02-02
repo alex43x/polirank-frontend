@@ -15,7 +15,6 @@ export const TryProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get("/intentos", { params });
-      console.log(data);
       setTries(data.tries || data.intentos || []);
       setTotal(data.total || 0);
       setPage(data.currentPage || 1);
@@ -23,7 +22,6 @@ export const TryProvider = ({ children }) => {
       setTotalPages(data.totalPages || 0);
       return data;
     } catch (error) {
-      console.error("Error obteniendo intentos:", error);
       setTries([]);
       setTotal(0);
       setPage(1);
@@ -40,10 +38,8 @@ export const TryProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get(`/intentos/${id}`);
-      console.log(data);
       return data;
     } catch (error) {
-      console.error("Error obteniendo intento por ID:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -55,10 +51,8 @@ export const TryProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.post("/intentos", tryData);
-      console.log("Intento creado:", data);
       return data;
     } catch (error) {
-      console.error("Error creando intento:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -70,10 +64,8 @@ export const TryProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.put(`/intentos/${id}`, tryData);
-      console.log("Intento actualizado:", data);
       return data;
     } catch (error) {
-      console.error("Error actualizando intento:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -85,10 +77,8 @@ export const TryProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.delete(`/intentos/${id}`);
-      console.log("Intento eliminado:", data);
       return data;
     } catch (error) {
-      console.error("Error eliminando intento:", error);
       throw error;
     } finally {
       setLoading(false);
