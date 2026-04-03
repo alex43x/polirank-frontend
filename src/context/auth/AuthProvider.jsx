@@ -160,9 +160,13 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("profileData", JSON.stringify(profile));
       
       // Setear el header de carrera si existe
-      if (profile.student?.Matriculacions?.[0]?.Carrera?.id) {
-        setCareerHeader(profile.student.Matriculacions[0].Carrera.id);
-        localStorage.setItem("careerId", profile.student.Matriculacions[0].Carrera.id);
+      if (profile.student?.Matriculacions?.length > 0) {
+        const storedCareerId = localStorage.getItem("careerId");
+        const isValid = storedCareerId && profile.student.Matriculacions.some(m => m.Carrera.id.toString() === storedCareerId.toString());
+        const careerIdToSet = isValid ? storedCareerId : profile.student.Matriculacions[0].Carrera.id;
+        
+        setCareerHeader(careerIdToSet);
+        localStorage.setItem("careerId", careerIdToSet);
       }
       
       return profile;
@@ -248,9 +252,13 @@ export const AuthProvider = ({ children }) => {
         setProfileData(profile);
         
         // Setear el header de carrera si existe
-        if (profile.student?.Matriculacions?.[0]?.Carrera?.id) {
-          setCareerHeader(profile.student.Matriculacions[0].Carrera.id);
-          localStorage.setItem("careerId", profile.student.Matriculacions[0].Carrera.id);
+        if (profile.student?.Matriculacions?.length > 0) {
+          const storedCareerId = localStorage.getItem("careerId");
+          const isValid = storedCareerId && profile.student.Matriculacions.some(m => m.Carrera.id.toString() === storedCareerId.toString());
+          const careerIdToSet = isValid ? storedCareerId : profile.student.Matriculacions[0].Carrera.id;
+          
+          setCareerHeader(careerIdToSet);
+          localStorage.setItem("careerId", careerIdToSet);
         }
         
       } catch (error) {
