@@ -78,29 +78,39 @@ export default function Dashboard() {
       careerToSelect = user.Matriculacions[0].Carrera;
     }
     
-    
     // Guardar en localStorage y estado con los datos completos
     localStorage.setItem("selectedCareer", JSON.stringify(careerToSelect));
     localStorage.setItem("careerId", careerToSelect.id.toString());
+    setCareerHeader(careerToSelect.id);
     setSelectedCareer(careerToSelect);
   }, [user]); // Solo depende de user
 
   // Estados locales para los filtros (sin debounce)
-  const [localFilters, setLocalFilters] = useState({
-    search: "",
-    dpto_id: null,
-    semester: null,
+  const [localFilters, setLocalFilters] = useState(() => {
+    const saved = localStorage.getItem("dashboardFilters");
+    return saved ? JSON.parse(saved) : { search: "", dpto_id: null, semester: null };
   });
 
   // Estados que realmente disparan la búsqueda (con debounce)
-  const [searchParams, setSearchParams] = useState({
-    search: "",
-    dpto_id: null,
-    semester: null,
+  const [searchParams, setSearchParams] = useState(() => {
+    const saved = localStorage.getItem("dashboardFilters");
+    return saved ? JSON.parse(saved) : { search: "", dpto_id: null, semester: null };
   });
 
   // Estado para la página actual
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(() => {
+    const saved = localStorage.getItem("dashboardPage");
+    return saved ? parseInt(saved, 10) : 1;
+  });
+
+  // Guardar filtros y página en localStorage
+  useEffect(() => {
+    localStorage.setItem("dashboardFilters", JSON.stringify(localFilters));
+  }, [localFilters]);
+
+  useEffect(() => {
+    localStorage.setItem("dashboardPage", currentPage.toString());
+  }, [currentPage]);
 
   const deptos = [
     { id: 1, nombre: "Departamento de Ciencias Básicas" },
