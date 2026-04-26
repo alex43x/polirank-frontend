@@ -34,8 +34,8 @@ export default function Reviews() {
 
   // Seleccionar la primera carrera por defecto
   useEffect(() => {
-    if (user && user.Matriculacions && user.Matriculacions.length > 0 && !selectedCareer) {
-      setSelectedCareer(user.Matriculacions[0].Carrera);
+    if (user && user.matriculaciones && user.matriculaciones.length > 0 && !selectedCareer) {
+      setSelectedCareer(user.matriculaciones[0].carrera);
     }
   }, [user, selectedCareer]);
 
@@ -237,7 +237,7 @@ export default function Reviews() {
                   Chipitómetro
                 </button>
                 
-                {user?.Rol?.nombre !== "GUEST" && (
+                {user?.rol?.nombre !== "GUEST" && (
                   <button
                     className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-navy text-white px-8 py-3 rounded-2xl hover:bg-dark-navy hover:shadow-navy/40 transition-all duration-300 font-bold shadow-lg shadow-navy/20 active:scale-95"
                     onClick={handleOpenDialog}

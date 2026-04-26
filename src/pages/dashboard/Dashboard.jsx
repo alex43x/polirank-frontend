@@ -25,12 +25,12 @@ export default function Dashboard() {
 
   // Sincronizar selectedCareer con user.Matriculacions
   useEffect(() => {
-    if (!user || !user.Matriculacions || user.Matriculacions.length === 0) return;
+    if (!user || !user.matriculaciones || user.matriculaciones.length === 0) return;
 
     if (selectedCareer) {
-      const exists = user.Matriculacions.find(m => m.Carrera.id === selectedCareer.id);
+      const exists = user.matriculaciones.find(m => m.carrera.id === selectedCareer.id);
       if (exists) {
-        const updatedCareer = exists.Carrera;
+        const updatedCareer = exists.carrera;
         const hasChanges = !selectedCareer.semestres || selectedCareer.semestres !== updatedCareer.semestres || selectedCareer.nombre !== updatedCareer.nombre;
         if (hasChanges) {
           setSelectedCareer(updatedCareer);
@@ -43,10 +43,10 @@ export default function Dashboard() {
     const savedCareerId = localStorage.getItem("careerId");
     let careerToSelect = null;
     if (savedCareerId) {
-      const found = user.Matriculacions.find(m => m.Carrera.id === parseInt(savedCareerId));
-      if (found) careerToSelect = found.Carrera;
+      const found = user.matriculaciones.find(m => m.carrera.id === parseInt(savedCareerId));
+      if (found) careerToSelect = found.carrera;
     }
-    if (!careerToSelect) careerToSelect = user.Matriculacions[0].Carrera;
+    if (!careerToSelect) careerToSelect = user.matriculaciones[0].carrera;
 
     localStorage.setItem("selectedCareer", JSON.stringify(careerToSelect));
     localStorage.setItem("careerId", careerToSelect.id.toString());
@@ -89,8 +89,8 @@ export default function Dashboard() {
     try {
       setIsChangingCareer(true);
       await setCareerHeader(carrera.id);
-      const matriculacionCompleta = user.Matriculacions.find(m => m.Carrera.id === carrera.id);
-      const carreraCompleta = matriculacionCompleta ? matriculacionCompleta.Carrera : carrera;
+      const matriculacionCompleta = user.matriculaciones.find(m => m.carrera.id === carrera.id);
+      const carreraCompleta = matriculacionCompleta ? matriculacionCompleta.carrera : carrera;
       localStorage.setItem("selectedCareer", JSON.stringify(carreraCompleta));
       localStorage.setItem("careerId", carreraCompleta.id.toString());
       setSelectedCareer(carreraCompleta);
@@ -181,20 +181,20 @@ export default function Dashboard() {
             </div>
 
             {/* Selector de Carreras tipo "Tabs" */}
-            {user?.Matriculacions && user.Matriculacions.length > 1 && (
+            {user?.matriculaciones && user.matriculaciones.length > 1 && (
               <div className="bg-gray-100/50 p-1 rounded-2xl flex flex-wrap gap-1 border border-gray-200/50 h-fit">
-                {user.Matriculacions.map((matriculacion) => (
+                {user.matriculaciones.map((matriculacion) => (
                   <button
                     key={matriculacion.id}
-                    onClick={() => handleCareerChange(matriculacion.Carrera)}
+                    onClick={() => handleCareerChange(matriculacion.carrera)}
                     disabled={isChangingCareer}
                     className={`px-6 py-2 rounded-xl font-bold text-xs transition-all duration-300 ${
-                      selectedCareer?.id === matriculacion.Carrera.id
+                      selectedCareer?.id === matriculacion.carrera.id
                         ? 'bg-white text-navy shadow-lg shadow-navy/5'
                         : 'text-gray-400 hover:text-navy hover:bg-white/50'
                     }`}
                   >
-                    {matriculacion.Carrera.nombre}
+                    {matriculacion.carrera.nombre}
                   </button>
                 ))}
               </div>

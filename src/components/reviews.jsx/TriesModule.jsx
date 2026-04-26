@@ -28,7 +28,7 @@ export default function TriesModule({
   useEffect(() => {
     if (profileData?.tries?.rows && subjectId) {
       const userTry = profileData.tries.rows.find(
-        (t) => t.asignatura === parseInt(subjectId)
+        (t) => t.asignatura?.id === parseInt(subjectId)
       );
       if (userTry) {
         setExistingTry(userTry);
@@ -189,7 +189,7 @@ export default function TriesModule({
               </div>
             </div>
 
-            {profileData?.student?.Rol?.nombre === "GUEST" ? (
+            {profileData?.student?.rol?.nombre === "GUEST" ? (
               <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 mt-4 italic text-xs text-navy font-medium">
                   Identifícate como alumno para registrar tu progreso.
               </div>

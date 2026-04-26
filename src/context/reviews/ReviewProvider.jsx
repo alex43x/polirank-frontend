@@ -15,11 +15,12 @@ export const ReviewProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get("/reviews", { params });
-      setReviews(data.reviews || []);
-      setTotal(data.total || 0);
-      setPage(data.currentPage || 1);
-      setLimit(data.limit || 20);
-      setTotalPages(data.totalPages || 1);
+      setReviews(data.data || []);
+      setTotal(data.meta?.total || 0);
+      setPage(data.meta?.page || 1);
+      setLimit(data.meta?.limit || 20);
+      setTotalPages(data.meta?.totalPages || 1);
+      return data.data || [];
     } catch (error) {
       setReviews([]);
       setTotal(0);
@@ -36,7 +37,7 @@ export const ReviewProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get(`/reviews/${id}`);
-      return data;
+      return data.data;
     } catch (error) {
       throw error;
     } finally {
@@ -49,7 +50,7 @@ export const ReviewProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.post("/reviews/", reviewData);
-      return data;
+      return data.data;
     } catch (error) {
       throw error;
     } finally {
@@ -62,7 +63,7 @@ export const ReviewProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.put(`/reviews/${id}`, reviewData);
-      return data;
+      return data.data;
     } catch (error) {
       throw error;
     } finally {
@@ -75,7 +76,7 @@ export const ReviewProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.delete(`/reviews/${id}`);
-      return data;
+      return data.data;
     } catch (error) {
       throw error;
     } finally {
