@@ -146,7 +146,7 @@ export default function Dashboard() {
     );
   }
 
-  const numSemestres = selectedCareer?.semestres || 0;
+  const numSemestres = selectedCareer?.semestres || 10;
 
   return (
     <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-4 md:space-y-6">
