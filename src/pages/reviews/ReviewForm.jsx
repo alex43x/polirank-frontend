@@ -73,6 +73,12 @@ const ReviewForm = ({
       } else {
         setExistingReview(null);
         setIsEditMode(false);
+        // Resetear solo las calificaciones, manteniendo year, period y selectedCourseId
+        setFormData(prev => ({
+          ...prev,
+          facilidad: null, dominio: null, claridad: null, flexibilidad: null,
+          evaluacion: null, puntualidad: null, trato: null, disponibilidad: null, material: null
+        }));
       }
     };
     checkExistingReview();
@@ -83,7 +89,14 @@ const ReviewForm = ({
       1: "dominio", 2: "claridad", 3: "flexibilidad", 4: "evaluacion",
       5: "puntualidad", 6: "trato", 7: "disponibilidad", 8: "material", 9: "facilidad",
     };
-    const newFormData = { ...formData };
+    
+    // Empezar con los datos actuales de curso pero sin calificaciones
+    const newFormData = { 
+      ...formData,
+      facilidad: null, dominio: null, claridad: null, flexibilidad: null,
+      evaluacion: null, puntualidad: null, trato: null, disponibilidad: null, material: null
+    };
+
     review.detalles.forEach((aspecto) => {
       const key = aspectoMap[aspecto.aspecto?.id];
       if (key) newFormData[key] = aspecto.valor;
