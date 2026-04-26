@@ -21,7 +21,7 @@ export default function SubjectCard({ subject }) {
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-3">
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-3 py-1.5 rounded-full group-hover:bg-navy group-hover:text-white transition-colors duration-300">
-              {subject.Departamento.nombre.split(' ').pop()}
+              {subject.departamento.nombre.split(' ').pop()}
             </span>
             <div className="w-8 h-8 rounded-full bg-navy/5 flex items-center justify-center text-navy opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

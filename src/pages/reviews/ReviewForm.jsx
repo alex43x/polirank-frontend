@@ -64,7 +64,7 @@ const ReviewForm = ({
         return;
       }
       const review = profileData.reviews.rows.find(
-        (r) => r.curso === formData.selectedCourseId
+        (r) => r.curso?.id === formData.selectedCourseId
       );
       if (review) {
         setExistingReview(review);
@@ -84,8 +84,8 @@ const ReviewForm = ({
       5: "puntualidad", 6: "trato", 7: "disponibilidad", 8: "material", 9: "facilidad",
     };
     const newFormData = { ...formData };
-    review.ReviewConts.forEach((aspecto) => {
-      const key = aspectoMap[aspecto.aspecto];
+    review.detalles.forEach((aspecto) => {
+      const key = aspectoMap[aspecto.aspecto?.id];
       if (key) newFormData[key] = aspecto.valor;
     });
     setFormData(newFormData);

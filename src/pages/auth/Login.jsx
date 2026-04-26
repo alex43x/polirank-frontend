@@ -26,7 +26,7 @@ export default function Login() {
       const student = await login(form);
 
       // Verificar si el rol es INACTIVE - necesita cambiar contraseña
-      if (student.Rol?.nombre === "INACTIVE") {
+      if (student.rol?.nombre === "INACTIVE") {
         // Redirigir a la página de cambio de contraseña
         navigate("/change-password");
         return;

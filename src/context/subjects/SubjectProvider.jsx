@@ -15,11 +15,12 @@ export const SubjectProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get("/materias", { params });
-      setSubjects(data.subjects || []);
-      setTotal(data.total || 0);
-      setPage(data.currentPage || 1);
-      setLimit(data.limit );
-      setTotalPages(data.totalPages || 0);
+      setSubjects(data.data || []);
+      setTotal(data.meta?.total || 0);
+      setPage(data.meta?.currentPage || 1);
+      setLimit(data.meta?.limit);
+      setTotalPages(data.meta?.totalPages || 0);
+      return data.data || [];
     } catch (error) {
       setSubjects([]);
       setTotal(0);
@@ -36,7 +37,7 @@ export const SubjectProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get(`/materias/${id}`);
-      return data;
+      return data.data;
     } catch (error) {
       throw error;
     } finally {
@@ -49,7 +50,7 @@ export const SubjectProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get(`/materias/${id}/secciones`);
-      return data || [];
+      return data.data || [];
     } catch (error) {
       throw error;
     } finally {
@@ -62,7 +63,7 @@ export const SubjectProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get(`/materias/${id}/intentos`);
-      return data || [];
+      return data.data || [];
     } catch (error) {
       throw error;
     } finally {
