@@ -12,6 +12,7 @@ export default function Login() {
     password: "",
   });
 
+  const [errorMsg, setErrorMsg] = useState("");
   const [showTerms, setShowTerms] = useState(false);
 
   const handleChange = (e) => {
@@ -23,6 +24,7 @@ export default function Login() {
 
   const handleSubmit = async () => {
     try {
+      setErrorMsg("");
       const student = await login(form);
 
       // Verificar si el rol es INACTIVE - necesita cambiar contraseña
@@ -35,7 +37,9 @@ export default function Login() {
       // Si el usuario está activo, redirigir al dashboard
       navigate("/dashboard");
     } catch (error) {
-      alert("Credenciales incorrectas");
+      console.error(error);
+      const message = error.response?.data?.error?.message || error.response?.data?.message || "Credenciales incorrectas";
+      setErrorMsg(message);
     }
   };  return (
     <div className="min-h-screen w-full flex items-center justify-center bg-white font-outfit">
@@ -70,6 +74,31 @@ export default function Login() {
                 </div>
               </div>
             </div>
+
+            {/* Mensaje de Error Premium */}
+            {errorMsg && (
+              <div className="bg-red-50 border border-red-100 rounded-3xl p-4 mb-6 animate-shake">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-red-500 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-red-200">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[10px] font-black text-red-500 uppercase tracking-widest leading-none mb-1">Error de Acceso</p>
+                    <p className="text-xs text-red-400 font-bold leading-tight">{errorMsg}</p>
+                  </div>
+                  <button 
+                    onClick={() => setErrorMsg("")}
+                    className="text-red-300 hover:text-red-500 transition-colors p-1"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-4">
               <div className="space-y-2">
