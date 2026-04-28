@@ -78,12 +78,25 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("user");
     localStorage.removeItem("profileData");
     localStorage.removeItem("careerId");
-    localStorage.removeItem("selectedCareer"); // Limpiar también selectedCareer
+    localStorage.removeItem("selectedCareer");
+    localStorage.removeItem("isGuest");
     setAuthHeader(null);
     setCareerHeader(null);
     setUser(null);
     setToken(null);
     setProfileData(null);
+  };
+
+  const continueAsGuest = () => {
+    localStorage.setItem("isGuest", "true");
+    const guestUser = { 
+      id: "guest",
+      nombre: "Invitado", 
+      rol: { nombre: "GUEST" },
+      matriculaciones: [] 
+    };
+    setUser(guestUser);
+    localStorage.setItem("user", JSON.stringify(guestUser));
   };
 
   /* ===========================
@@ -217,6 +230,14 @@ export const AuthProvider = ({ children }) => {
       const storedToken = localStorage.getItem("token");
 
       if (!storedToken) {
+        // Por defecto, si no hay token, el usuario es un Invitado (GUEST)
+        const guestUser = { 
+          id: "guest",
+          nombre: "Invitado", 
+          rol: { nombre: "GUEST" },
+          matriculaciones: [] 
+        };
+        setUser(guestUser);
         setLoading(false);
         return;
       }
@@ -279,7 +300,9 @@ export const AuthProvider = ({ children }) => {
         getProfile,
         createPassword,
         changePassword,
+        continueAsGuest,
         isAuthenticated: !!token,
+        isGuest: user?.rol?.nombre === "GUEST",
         loading, // Estado de inicialización
         actionLoading, // Estado de acciones
       }}

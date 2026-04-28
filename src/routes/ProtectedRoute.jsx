@@ -7,8 +7,8 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   // Ya no necesitas verificar loading aquí porque 
   // el AuthProvider no renderiza children hasta que termine de cargar
 
-  // No autenticado
-  if (!isAuthenticated) {
+  // No autenticado ni Invitado
+  if (!isAuthenticated && user?.rol?.nombre !== "GUEST") {
     return <Navigate to="/" replace />;
   }
 
