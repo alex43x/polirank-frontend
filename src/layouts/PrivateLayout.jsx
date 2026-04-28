@@ -1,8 +1,9 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 export default function PrivateLayout() {
-  const { logout } = useAuth();
+  const { logout, isGuest } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -32,7 +33,7 @@ export default function PrivateLayout() {
           
         </div>
 
-        {/* Logout */}
+        {/* Action Button */}
         <button
           className="
             bg-navy text-white
@@ -42,9 +43,9 @@ export default function PrivateLayout() {
             hover:bg-blue-900 active:bg-blue-950
             transition
           "
-          onClick={logout}
+          onClick={isGuest ? () => navigate("/") : logout}
         >
-          Cerrar sesión
+          {isGuest ? "Iniciar sesión" : "Cerrar sesión"}
         </button>
       </aside>
 

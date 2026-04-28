@@ -17,7 +17,7 @@ import { Dialog } from "primereact/dialog";
 export default function TeacherReviews() {
   const { teacherId } = useParams();
   const navigate = useNavigate();
-  const { user, getProfile, profileData } = useAuth();
+  const { user, getProfile, profileData, isGuest } = useAuth();
   const { fetchTeacherById, fetchSectionsByTeacherId } = useTeacher();
   const { fetchAttemptsBySubjectId } = useSubject();
   const { fetchLastSemesterData, fetchHistoricalData } = useCourse();
@@ -63,7 +63,7 @@ export default function TeacherReviews() {
       const data = await fetchSectionsByTeacherId(teacherId);
       return data || { secciones: [] };
     },
-    enabled: !!teacherId && !!user,
+    enabled: !!teacherId,
     staleTime: 1000 * 60 * 10,
   });
 
@@ -188,7 +188,29 @@ export default function TeacherReviews() {
 
   return (
     <div className="min-h-screen pb-12 bg-[#F3F4F6]">
-      {/* Header Premium Flotante */}
+      {/* Banner de Invitado */}
+      {isGuest && (
+        <div className="bg-navy p-3 flex items-center justify-between gap-4 sticky top-0 z-50 shadow-lg">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p className="text-white text-xs md:text-sm font-bold">
+              Estás en modo lectura. <span className="hidden md:inline font-normal opacity-80">Inicia sesión para ver estadísticas detalladas y publicar reseñas.</span>
+            </p>
+          </div>
+          <button
+            onClick={() => navigate("/")}
+            className="bg-white text-navy px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-colors flex-shrink-0"
+          >
+            Iniciar Sesión
+          </button>
+        </div>
+      )}
+
+      {/* Header Profile Section */}
       <div className="max-w-[1600px] mx-auto px-2 md:px-4 lg:px-8 pt-6">
         <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 p-6 md:p-8 mb-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-8">
@@ -216,7 +238,7 @@ export default function TeacherReviews() {
               </div>
 
               <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-center md:justify-end border-t md:border-t-0 pt-6 md:pt-0 border-gray-100">
-                {selectedSection && (
+                {!isGuest && selectedSection && (
                   <button
                     onClick={handleOpenTriesDialog}
                     className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border-2 border-navy text-navy px-6 py-3 rounded-2xl hover:bg-navy hover:text-white transition-all duration-300 font-bold shadow-sm group"
