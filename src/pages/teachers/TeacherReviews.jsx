@@ -197,16 +197,10 @@ export default function TeacherReviews() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <p className="text-white text-xs md:text-sm font-bold">
+            <p className="text-white text-xs md:text-sm font-bold flex-1 text-center md:text-left">
               Estás en modo lectura. <span className="hidden md:inline font-normal opacity-80">Inicia sesión para ver estadísticas detalladas y publicar reseñas.</span>
             </p>
           </div>
-          <button
-            onClick={() => navigate("/")}
-            className="bg-white text-navy px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-colors flex-shrink-0"
-          >
-            Iniciar Sesión
-          </button>
         </div>
       )}
 
