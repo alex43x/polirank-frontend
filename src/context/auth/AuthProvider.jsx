@@ -223,6 +223,73 @@ export const AuthProvider = ({ children }) => {
   };
 
   /* ===========================
+     REQUEST ACCESS (Register/Reset)
+     =========================== */
+  const requestAccess = async (correo) => {
+    setActionLoading(true);
+    try {
+      const { data } = await api.post("/auth/request-access", { correo });
+      return data;
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  /* ===========================
+     VERIFY TOKEN
+     =========================== */
+  const verifyToken = async (token) => {
+    try {
+      const { data } = await api.get(`/auth/verify-token?token=${token}`);
+      return data.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  /* ===========================
+     RESET PASSWORD
+     =========================== */
+  const resetPassword = async (token, newPassword) => {
+    setActionLoading(true);
+    try {
+      const response = await api.post("/auth/reset-password", { token, newPassword });
+      const { token: jwt, student } = response.data.data;
+
+      localStorage.setItem("token", jwt);
+      setAuthHeader(jwt);
+      setToken(jwt);
+      localStorage.setItem("user", JSON.stringify(student));
+      setUser(student);
+
+      return student;
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  /* ===========================
+     REGISTER
+     =========================== */
+  const register = async (token, nombre, password, carreras) => {
+    setActionLoading(true);
+    try {
+      const response = await api.post("/auth/register", { token, nombre, password, carreras });
+      const { token: jwt, student } = response.data;
+
+      localStorage.setItem("token", jwt);
+      setAuthHeader(jwt);
+      setToken(jwt);
+      localStorage.setItem("user", JSON.stringify(student));
+      setUser(student);
+
+      return student;
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  /* ===========================
      INIT + EXP CHECK
      =========================== */
   useEffect(() => {
@@ -301,6 +368,10 @@ export const AuthProvider = ({ children }) => {
         createPassword,
         changePassword,
         continueAsGuest,
+        requestAccess,
+        verifyToken,
+        resetPassword,
+        register,
         isAuthenticated: !!token,
         isGuest: user?.rol?.nombre === "GUEST",
         loading, // Estado de inicialización
