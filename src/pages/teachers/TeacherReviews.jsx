@@ -10,6 +10,7 @@ import { useTry } from "../../hooks/useTry";
 import TeacherSubjectCard from "../../components/teachers/TeacherSubjectCard";
 import LastSemesterData from "../../components/reviews.jsx/LastSemesterData";
 import HistoricalData from "../../components/reviews.jsx/HistoricalData";
+import TeacherComparisonChart from "../../components/teachers/TeacherComparisonChart";
 import ReviewForm from "../reviews/ReviewForm";
 import TriesModule from "../../components/reviews.jsx/TriesModule";
 import { Dialog } from "primereact/dialog";
@@ -68,6 +69,13 @@ export default function TeacherReviews() {
   });
 
   const sections = sectionsData.secciones || [];
+
+  // Auto-seleccionar la primera materia para que la tabla sea visible inmediatamente (Modo Diseño)
+  useEffect(() => {
+    if (sections.length > 0 && !selectedSection) {
+      setSelectedSection(sections[0]);
+    }
+  }, [sections, selectedSection]);
 
   // Query para obtener intentos de la materia seleccionada
   const {
@@ -326,13 +334,16 @@ export default function TeacherReviews() {
             </div>
 
             {selectedSection && (
-              <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
-                {historicalLoading ? (
-                  <div className="p-12 text-center text-gray-400 italic">Cargando base histórica...</div>
-                ) : (
-                  <HistoricalData historicalData={historicalData} />
-                )}
-              </div>
+              <>
+                <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
+                  {historicalLoading ? (
+                    <div className="p-12 text-center text-gray-400 italic">Cargando base histórica...</div>
+                  ) : (
+                    <HistoricalData historicalData={historicalData} />
+                  )}
+                </div>
+                <TeacherComparisonChart subjectName={selectedSection?.materia?.nombre} />
+              </>
             )}
           </div>
         </div>

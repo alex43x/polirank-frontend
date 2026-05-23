@@ -14,7 +14,11 @@ export default function Dashboard() {
 
   // Modo de búsqueda: 'subjects' | 'teachers'
   const [searchMode, setSearchMode] = useState(() => {
-    return localStorage.getItem("dashboardSearchMode") || 'subjects';
+    try {
+      return localStorage.getItem("dashboardSearchMode") || 'subjects';
+    } catch (e) {
+      return 'subjects';
+    }
   });
 
   useEffect(() => {
@@ -71,15 +75,19 @@ export default function Dashboard() {
       setSelectedCareer(careerToSelect);
     } 
     // Si es un Invitado (GUEST)
-    else if (user.rol?.nombre === "GUEST") {
+    else {
       const savedCareer = localStorage.getItem("selectedCareer");
-      if (savedCareer) {
-        const career = JSON.parse(savedCareer);
-        setSelectedCareer(career);
-        setCareerHeader(career.id);
+      if (savedCareer && savedCareer !== "undefined") {
+        try {
+          const career = JSON.parse(savedCareer);
+          setSelectedCareer(career);
+          setCareerHeader(career.id);
+        } catch (e) {
+          const defaultCareer = { id: 3, nombre: "Ingeniería Informática", semestres: 10 }; 
+          setSelectedCareer(defaultCareer);
+          setCareerHeader(defaultCareer.id);
+        }
       } else {
-        // Por defecto para invitados si no hay nada guardado, 
-        // podríamos dejar que elijan o poner uno por defecto (ej ID 1: Informatica)
         const defaultCareer = { id: 3, nombre: "Ingeniería Informática", semestres: 10 }; 
         setSelectedCareer(defaultCareer);
         setCareerHeader(defaultCareer.id);
@@ -89,13 +97,21 @@ export default function Dashboard() {
 
   // Estados locales para los filtros por modo
   const [subjectFilters, setSubjectFilters] = useState(() => {
-    const saved = localStorage.getItem("subjectFilters");
-    return saved ? JSON.parse(saved) : { search: "", dpto_id: null, semester: null };
+    try {
+      const saved = localStorage.getItem("subjectFilters");
+      return (saved && saved !== "undefined") ? JSON.parse(saved) : { search: "", dpto_id: null, semester: null };
+    } catch (e) {
+      return { search: "", dpto_id: null, semester: null };
+    }
   });
 
   const [teacherFilters, setTeacherFilters] = useState(() => {
-    const saved = localStorage.getItem("teacherFilters");
-    return saved ? JSON.parse(saved) : { search: "" };
+    try {
+      const saved = localStorage.getItem("teacherFilters");
+      return (saved && saved !== "undefined") ? JSON.parse(saved) : { search: "" };
+    } catch (e) {
+      return { search: "" };
+    }
   });
 
   const [subjectSearchParams, setSubjectSearchParams] = useState(subjectFilters);
@@ -103,12 +119,12 @@ export default function Dashboard() {
 
   const [subjectPage, setSubjectPage] = useState(() => {
     const saved = localStorage.getItem("subjectPage");
-    return saved ? parseInt(saved, 10) : 1;
+    return (saved && saved !== "undefined") ? parseInt(saved, 10) : 1;
   });
 
   const [teacherPage, setTeacherPage] = useState(() => {
     const saved = localStorage.getItem("teacherPage");
-    return saved ? parseInt(saved, 10) : 1;
+    return (saved && saved !== "undefined") ? parseInt(saved, 10) : 1;
   });
 
   // Alias para conveniencia
@@ -196,10 +212,14 @@ export default function Dashboard() {
   }, [searchParams, currentPage, selectedCareer, isChangingCareer, user, searchMode]);
 
   const fetchTeachers = async (params) => {
-    const data = await fetchTeachersApi(params);
-    setTeachers(data.data || []);
-    setTeachersTotal(data.meta?.total || 0);
-    setTeachersTotalPages(data.meta?.totalPages || 1);
+    try {
+      const data = await fetchTeachersApi(params);
+      setTeachers(data?.data || []);
+      setTeachersTotal(data?.meta?.total || 0);
+      setTeachersTotalPages(data?.meta?.totalPages || 1);
+    } catch (error) {
+      setTeachers([]);
+    }
   };
 
   const handleSearchChange = (e) => {

@@ -9,6 +9,7 @@ import { useTry } from "../../hooks/useTry";
 import TeacherCard from "../../components/reviews.jsx/TeacherCard";
 import LastSemesterData from "../../components/reviews.jsx/LastSemesterData";
 import HistoricalData from "../../components/reviews.jsx/HistoricalData";
+import TeacherComparisonChart from "../../components/teachers/TeacherComparisonChart";
 import ReviewForm from "./ReviewForm";
 import TriesModule from "../../components/reviews.jsx/TriesModule";
 import { Dialog } from "primereact/dialog";
@@ -17,7 +18,7 @@ export default function Reviews() {
   const { subjectId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, getProfile, profileData } = useAuth();
+  const { user, getProfile, profileData, isGuest } = useAuth();
   const { fetchSectionsBySubjectId, fetchAttemptsBySubjectId } = useSubject();
   const { fetchLastSemesterData, fetchHistoricalData } = useCourse();
   const { createTry, updateTry, deleteTry } = useTry();
@@ -49,18 +50,48 @@ export default function Reviews() {
 
   // Query para obtener las secciones
   const {
-    data: sections = [],
+    data: sectionsData = [],
     isLoading: sectionsLoading,
-    error: sectionsError,
   } = useQuery({
     queryKey: ["sections", subjectId],
     queryFn: async () => {
-      const data = await fetchSectionsBySubjectId(subjectId);
-      return Array.isArray(data) ? data : [];
+      try {
+        const data = await fetchSectionsBySubjectId(subjectId);
+        if (!data || data.length === 0) throw new Error("No data");
+        return Array.isArray(data) ? data : [];
+      } catch (error) {
+        // Mock data para diseño
+        return [
+          { 
+            section: { id: 101, numero: 1, Docente: { id: 1, nombre: "Dr. Carlos Arrellaga" } },
+            totalReviews: 24,
+            promedioGeneral: 4.8
+          },
+          { 
+            section: { id: 102, numero: 2, Docente: { id: 2, nombre: "Ing. Maria Garcia" } },
+            totalReviews: 18,
+            promedioGeneral: 4.5
+          },
+          { 
+            section: { id: 103, numero: 3, Docente: { id: 3, nombre: "Lic. Roberto Sanchez" } },
+            totalReviews: 12,
+            promedioGeneral: 3.9
+          }
+        ];
+      }
     },
-    enabled: !!subjectId && !!user,
+    enabled: !!subjectId,
     staleTime: 1000 * 60 * 10,
   });
+
+  const sections = sectionsData;
+
+  // Auto-seleccionar la primera sección
+  useEffect(() => {
+    if (sections.length > 0 && !selectedSection) {
+      setSelectedSection(sections[0].section);
+    }
+  }, [sections, selectedSection]);
 
   // Query para obtener intentos de la materia
   const {
@@ -309,13 +340,16 @@ export default function Reviews() {
             </div>
 
             {selectedSection && (
-              <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
-                {historicalLoading ? (
-                  <div className="p-12 text-center text-gray-400 italic">Cargando base histórica...</div>
-                ) : (
-                  <HistoricalData historicalData={historicalData} />
-                )}
-              </div>
+              <>
+                <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
+                  {historicalLoading ? (
+                    <div className="p-12 text-center text-gray-400 italic">Cargando base histórica...</div>
+                  ) : (
+                    <HistoricalData historicalData={historicalData} />
+                  )}
+                </div>
+                <TeacherComparisonChart subjectName={subjectName} />
+              </>
             )}
           </div>
         </div>

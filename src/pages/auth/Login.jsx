@@ -14,7 +14,7 @@ const VIEWS = {
 };
 
 export default function Login() {
-  const { login, requestAccess, verifyToken, resetPassword, register, actionLoading } = useAuth();
+  const { login, continueAsGuest, requestAccess, verifyToken, resetPassword, register, actionLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -101,6 +101,11 @@ export default function Login() {
       const message = error.response?.data?.error?.message || "Credenciales incorrectas";
       setErrorMsg(message);
     }
+  };
+
+  const handleContinueAsGuest = () => {
+    continueAsGuest();
+    navigate("/dashboard");
   };
 
   const handleRequestAccess = async () => {
@@ -230,6 +235,12 @@ export default function Login() {
                   className="w-full bg-navy text-white rounded-2xl h-16 font-black uppercase tracking-widest shadow-xl shadow-navy/20 hover:bg-dark-navy transition-all flex items-center justify-center gap-4 mt-4"
                 >
                   {actionLoading ? <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/20 border-t-white"></div> : "Entrar"}
+                </button>
+                <button
+                  onClick={handleContinueAsGuest}
+                  className="w-full bg-gray-100 text-navy rounded-2xl h-16 font-black uppercase tracking-widest hover:bg-gray-200 transition-all flex items-center justify-center gap-4 mt-2"
+                >
+                  Modo Diseño (Invitado)
                 </button>
                 <div className="text-center pt-4">
                   <p className="text-xs text-gray-400 font-bold">
