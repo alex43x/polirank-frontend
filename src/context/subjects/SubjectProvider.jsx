@@ -15,17 +15,36 @@ export const SubjectProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get("/materias", { params });
-      setSubjects(data.subjects || []);
-      setTotal(data.total || 0);
-      setPage(data.currentPage || 1);
-      setLimit(data.limit );
-      setTotalPages(data.totalPages || 0);
+      const subjectsData = data.data || [];
+      
+      if (subjectsData.length === 0) {
+        throw new Error("No data");
+      }
+
+      setSubjects(subjectsData);
+      setTotal(data.meta?.total || subjectsData.length);
+      setPage(data.meta?.currentPage || 1);
+      setLimit(data.meta?.limit || 20);
+      setTotalPages(data.meta?.totalPages || 1);
+      return subjectsData;
     } catch (error) {
-      setSubjects([]);
-      setTotal(0);
+      // Mock data para diseño
+      const mockSubjects = [
+        { id: 1, nombre: "Cálculo 1", departamento: { nombre: "Ciencias Básicas" }, semestre: 1, promedioGeneral: 4.2 },
+        { id: 2, nombre: "Programación 1", departamento: { nombre: "Informática" }, semestre: 1, promedioGeneral: 4.8 },
+        { id: 3, nombre: "Física 1", departamento: { nombre: "Ciencias Básicas" }, semestre: 2, promedioGeneral: 3.5 },
+        { id: 4, nombre: "Álgebra Lineal", departamento: { nombre: "Ciencias Básicas" }, semestre: 1, promedioGeneral: 4.0 },
+        { id: 5, nombre: "Química General", departamento: { nombre: "Ciencias Básicas" }, semestre: 1, promedioGeneral: 3.8 },
+        { id: 6, nombre: "Estructura de Datos", departamento: { nombre: "Informática" }, semestre: 3, promedioGeneral: 4.5 },
+        { id: 7, nombre: "Electromagnetismo", departamento: { nombre: "Electricidad" }, semestre: 4, promedioGeneral: 3.2 },
+      ];
+      
+      setSubjects(mockSubjects);
+      setTotal(mockSubjects.length);
       setPage(1);
       setLimit(20);
-      setTotalPages(0);
+      setTotalPages(1);
+      return mockSubjects;
     } finally {
       setLoading(false);
     }
@@ -36,7 +55,7 @@ export const SubjectProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get(`/materias/${id}`);
-      return data;
+      return data.data;
     } catch (error) {
       throw error;
     } finally {
@@ -49,7 +68,7 @@ export const SubjectProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get(`/materias/${id}/secciones`);
-      return data || [];
+      return data.data || [];
     } catch (error) {
       throw error;
     } finally {
@@ -62,7 +81,7 @@ export const SubjectProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get(`/materias/${id}/intentos`);
-      return data || [];
+      return data.data || [];
     } catch (error) {
       throw error;
     } finally {

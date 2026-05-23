@@ -1,10 +1,9 @@
-export default function TeacherCard({ 
-  teacher, 
+export default function TeacherSubjectCard({ 
+  subject, 
   selected, 
   reviews="-", 
   score=0, 
-  position=0, 
-  subjectName="", 
+  position=0,
   sectionNumber 
 }) {
   const getInitials = (name) => {
@@ -16,7 +15,7 @@ export default function TeacherCard({
       .join("");
   };
 
-  const avatarText = `${getInitials(subjectName)}${sectionNumber || position}`;
+  const avatarText = `${getInitials(subject?.nombre)}${sectionNumber || position}`;
 
   return (
     <div
@@ -53,7 +52,7 @@ export default function TeacherCard({
           </div>
           
           <h3 className="text-base font-black leading-tight mb-1 truncate">
-            {teacher.nombre}
+            {subject?.nombre || "Materia"}
           </h3>
           
           <div className="flex items-center gap-0.5">

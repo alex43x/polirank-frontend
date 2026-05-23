@@ -29,6 +29,15 @@ input[type="email"],
 input[type="password"],
 input[type="number"],
 input[type="tel"] {
-  @apply border rounded-md py-2 px-3 border-[#e0e0e0] font-medium bg-neutral-50;
+  @apply border rounded-md border-[#e0e0e0] font-medium bg-neutral-50;
 }
 
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}

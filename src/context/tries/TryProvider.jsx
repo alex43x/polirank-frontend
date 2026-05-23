@@ -15,12 +15,12 @@ export const TryProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get("/intentos", { params });
-      setTries(data.tries || data.intentos || []);
-      setTotal(data.total || 0);
-      setPage(data.currentPage || 1);
-      setLimit(data.limit || 20);
-      setTotalPages(data.totalPages || 0);
-      return data;
+      setTries(data.data?.tries || data.data?.intentos || []);
+      setTotal(data.data?.total || 0);
+      setPage(data.data?.currentPage || 1);
+      setLimit(data.data?.limit || 20);
+      setTotalPages(data.data?.totalPages || 0);
+      return data.data;
     } catch (error) {
       setTries([]);
       setTotal(0);
@@ -38,7 +38,7 @@ export const TryProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get(`/intentos/${id}`);
-      return data;
+      return data.data;
     } catch (error) {
       throw error;
     } finally {
@@ -51,7 +51,7 @@ export const TryProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.post("/intentos", tryData);
-      return data;
+      return data.data;
     } catch (error) {
       throw error;
     } finally {
@@ -64,7 +64,7 @@ export const TryProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.put(`/intentos/${id}`, tryData);
-      return data;
+      return data.data;
     } catch (error) {
       throw error;
     } finally {
@@ -77,7 +77,7 @@ export const TryProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.delete(`/intentos/${id}`);
-      return data;
+      return data.data;
     } catch (error) {
       throw error;
     } finally {

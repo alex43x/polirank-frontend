@@ -14,6 +14,8 @@ import { CourseProvider } from "../context/courses/CourseProvider";
 import { SubjectProvider } from "../context/subjects/SubjectProvider";
 import { ReviewProvider } from "../context/reviews/ReviewProvider";
 import TryProvider from "../context/tries/TryProvider";
+import { TeacherProvider } from "../context/teachers/TeacherProvider";
+import TeacherReviews from "../pages/teachers/TeacherReviews";
 
 const AppRouter = () => {
   const isMaintenanceMode = import.meta.env.VITE_MAINTENANCE_MODE === 'true';
@@ -26,6 +28,7 @@ const AppRouter = () => {
       <Routes>
         {/* Públicas */}
         <Route path="/" element={<Login />} />
+        <Route path="/auth/verify" element={<Login />} />
         <Route path="/change-password" element={<ChangePassword />} />
 
         {/* Rutas protegidas */}
@@ -40,9 +43,11 @@ const AppRouter = () => {
           <Route
             path="/dashboard"
             element={
-              <SubjectProvider>
-                <Dashboard />
-              </SubjectProvider>
+              <TeacherProvider>
+                <SubjectProvider>
+                  <Dashboard />
+                </SubjectProvider>
+              </TeacherProvider>
             }
           />
 
@@ -59,6 +64,26 @@ const AppRouter = () => {
                       </ReviewProvider>
                     </CourseProvider>
                   </TryProvider>
+                </SubjectProvider>
+              </StudentProvider>
+            }
+          />
+
+          {/* Teacher Reviews: Student + Subject + Course + Review + Teacher */}
+          <Route
+            path="/profesor/:teacherId"
+            element={
+              <StudentProvider>
+                <SubjectProvider>
+                  <TeacherProvider>
+                    <TryProvider>
+                      <CourseProvider>
+                        <ReviewProvider>
+                          <TeacherReviews />
+                        </ReviewProvider>
+                      </CourseProvider>
+                    </TryProvider>
+                  </TeacherProvider>
                 </SubjectProvider>
               </StudentProvider>
             }

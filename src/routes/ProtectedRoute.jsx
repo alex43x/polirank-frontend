@@ -2,20 +2,18 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, isGuest } = useAuth();
 
-  // Ya no necesitas verificar loading aquí porque 
-  // el AuthProvider no renderiza children hasta que termine de cargar
-
-  // No autenticado
-  if (!isAuthenticated) {
+  // No autenticado ni Invitado
+  if (!isAuthenticated && !isGuest) {
     return <Navigate to="/" replace />;
   }
 
   // Rol no autorizado
+  const userRoleName = user?.rol?.nombre || user?.rol; // Manejar si es objeto o string
   if (
     allowedRoles.length > 0 &&
-    !allowedRoles.includes(user?.rol)
+    !allowedRoles.includes(userRoleName)
   ) {
     return <Navigate to="/unauthorized" replace />;
   }

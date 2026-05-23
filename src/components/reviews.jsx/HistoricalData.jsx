@@ -41,52 +41,62 @@ export default function HistoricalData({ historicalData }) {
     <div className="space-y-4 lg:p-6 p-3">
       {sortedHistory.length > 0 ? (
         <>
-          <div className="mb-4">
-            <h2 className="text-4xl font-bold text-navy mb-2">
-              Datos Históricos
+          <div className="mb-8">
+            <h2 className="text-2xl md:text-3xl lg:text-3xl font-black text-navy mb-2 tracking-tight">
+              Historial de Evaluaciones
             </h2>
-            <p className="text-neutral-600">
-              Evolución de evaluaciones por semestre
+            <p className="text-gray-400 text-sm font-bold uppercase tracking-widest">
+              Análisis comparativo por períodos lectivos
             </p>
           </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
+          <div className="overflow-x-auto rounded-3xl border border-gray-100 shadow-sm scrollbar-hide">
+            <table className="w-full min-w-[800px] border-collapse bg-white">
               <thead>
                 <tr>
-                  <th className="bg-navy text-white p-3 text-left font-bold rounded-tl-lg">
-                    Aspectos/Semestres
+                  <th className="md:sticky left-0 z-20 bg-navy text-white p-5 text-left font-black uppercase tracking-widest text-[10px] rounded-tl-3xl md:shadow-[8px_0_15px_-5px_rgba(0,0,0,0.3)] min-w-[140px] md:min-w-[200px]">
+                    Aspectos / Período
                   </th>
                   {sortedHistory.map((item, index) => (
                     <th
                       key={index}
-                      className={`bg-navy text-white p-3 text-center font-bold ${
-                        index === sortedHistory.length - 1 ? 'rounded-tr-lg' : ''
+                      className={`bg-navy text-white p-5 text-center font-black uppercase tracking-widest text-[10px] border-l border-white/10 ${
+                        index === sortedHistory.length - 1 ? 'rounded-tr-3xl' : ''
                       }`}
                     >
-                      {item.year}-{item.periodo}
+                      {item.year} - S{item.periodo}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-50">
                 {allCriteria.map((criterio, idx) => (
-                  <tr key={idx} className="border-b border-neutral-200">
-                    <td className="p-3 font-medium text-neutral-900 bg-white">
-                      {criterio}
+                  <tr key={idx} className="group hover:bg-gray-50/50 transition-colors">
+                    <td className="md:sticky left-0 z-10 p-5 font-bold text-navy text-sm bg-white group-hover:bg-gray-50 transition-colors md:shadow-[8px_0_15px_-5px_rgba(0,0,0,0.1)] min-w-[140px] md:min-w-[200px]">
+                      <div className="flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full bg-navy/30"></div>
+                        <span className="whitespace-normal">{criterio}</span>
+                      </div>
                     </td>
                     {sortedHistory.map((item, periodIdx) => {
                       const valor = item.averageRatings?.[criterio];
                       return (
                         <td
                           key={periodIdx}
-                          className="p-3 text-center bg-neutral-50"
+                          className="p-5 text-center border-l border-gray-50"
                         >
-                          <span className="font-semibold text-neutral-700">
-                            {valor !== undefined && valor !== null 
-                              ? `${parseFloat(valor).toFixed(1)}/5` 
-                              : '-'}
-                          </span>
+                          <div className={`inline-flex flex-col items-center justify-center min-w-[50px] p-2 rounded-2xl ${
+                            valor >= 4 ? 'bg-green-50 text-green-600' : 
+                            valor >= 3 ? 'bg-blue-50 text-blue-600' : 
+                            valor > 0 ? 'bg-orange-50 text-orange-600' : 
+                            'bg-gray-50 text-gray-300'
+                          }`}>
+                            <span className="text-sm font-black">
+                              {valor !== undefined && valor !== null 
+                                ? valor.toFixed(2)
+                                : '-'}
+                            </span>
+                            <span className="text-[8px] font-bold opacity-50 uppercase mt-0.5">/ 5.0</span>
+                          </div>
                         </td>
                       );
                     })}
@@ -94,20 +104,22 @@ export default function HistoricalData({ historicalData }) {
                 ))}
 
                 {/* Fila de promedio general */}
-                <tr className="border-t-2 border-navy">
-                  <td className="p-3 font-bold text-white bg-navy rounded-bl-lg">
-                    Promedio General del Semestre
+                <tr className="bg-navy/5">
+                  <td className="md:sticky left-0 z-10 p-6 font-black text-navy text-[10px] uppercase tracking-widest bg-gray-50 md:shadow-[8px_0_15px_-5px_rgba(0,0,0,0.1)] rounded-bl-3xl min-w-[140px] md:min-w-[200px]">
+                    Promedio del Semestre
                   </td>
                   {sortedHistory.map((item, periodIdx) => {
                     const promedio = calculateAverage(item.averageRatings);
                     return (
                       <td
                         key={periodIdx}
-                        className={`p-3 text-center font-bold text-white bg-navy ${
-                          periodIdx === sortedHistory.length - 1 ? 'rounded-br-lg' : ''
+                        className={`p-6 text-center font-black text-navy border-l border-white/20 ${
+                          periodIdx === sortedHistory.length - 1 ? 'rounded-br-3xl' : ''
                         }`}
                       >
-                        {promedio > 0 ? promedio.toFixed(2) : '-'}
+                        <div className="text-lg tracking-tighter">
+                          {promedio > 0 ? promedio.toFixed(2) : '-'}
+                        </div>
                       </td>
                     );
                   })}
