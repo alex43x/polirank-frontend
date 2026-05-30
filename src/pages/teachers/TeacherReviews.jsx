@@ -136,6 +136,8 @@ export default function TeacherReviews() {
   const handleReviewSuccess = async () => {
     setVisible(false);
     await queryClient.invalidateQueries({ queryKey: ["teacherSections", teacherId] });
+    await queryClient.invalidateQueries({ queryKey: ["coursesBySection", selectedSection?.id] });
+    await queryClient.invalidateQueries({ queryKey: ["reviewsForSection", selectedSection?.id] });
     await queryClient.invalidateQueries({ queryKey: ["lastSemester", selectedSection?.id] });
     await queryClient.invalidateQueries({ queryKey: ["historical", selectedSection?.id] });
     await getProfile();

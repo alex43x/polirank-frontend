@@ -24,6 +24,7 @@ const ReviewForm = ({
     trato: null,
     disponibilidad: null,
     material: null,
+    texto: "",
   });
   const { createReview, updateReview, deleteReview } = useReview();
   const { getCoursesBySection } = useCourse();
@@ -77,7 +78,7 @@ const ReviewForm = ({
         setFormData(prev => ({
           ...prev,
           facilidad: null, dominio: null, claridad: null, flexibilidad: null,
-          evaluacion: null, puntualidad: null, trato: null, disponibilidad: null, material: null
+          evaluacion: null, puntualidad: null, trato: null, disponibilidad: null, material: null, texto: ""
         }));
       }
     };
@@ -94,13 +95,14 @@ const ReviewForm = ({
     const newFormData = { 
       ...formData,
       facilidad: null, dominio: null, claridad: null, flexibilidad: null,
-      evaluacion: null, puntualidad: null, trato: null, disponibilidad: null, material: null
+      evaluacion: null, puntualidad: null, trato: null, disponibilidad: null, material: null, texto: ""
     };
 
     review.detalles.forEach((aspecto) => {
       const key = aspectoMap[aspecto.aspecto?.id];
       if (key) newFormData[key] = aspecto.valor;
     });
+    newFormData.texto = review.comentario?.texto || "";
     setFormData(newFormData);
   };
 
@@ -199,7 +201,7 @@ const ReviewForm = ({
       aspecto: aspectoMap[cat.key],
       valor: formData[cat.key],
     }));
-    const reviewData = { curso: formData.selectedCourseId, aspectos: aspectos };
+    const reviewData = { curso: formData.selectedCourseId, aspectos: aspectos, texto: formData.texto };
 
     try {
       setIsSubmitting(true);
@@ -238,6 +240,7 @@ const ReviewForm = ({
   const handleDelete = () => {
     if (!existingReview) return;
     confirmDialog({
+      group: "reviewForm",
       message: "¿Estás seguro de que deseas eliminar esta reseña permanentemente?",
       header: "Confirmar Eliminación",
       icon: "pi pi-exclamation-triangle",
@@ -266,6 +269,7 @@ const ReviewForm = ({
     }
 
     confirmDialog({
+      group: "reviewForm",
       message: isEditMode 
         ? "¿Estás seguro de que deseas actualizar esta reseña?" 
         : "¿Estás seguro de que deseas enviar esta reseña?",
@@ -280,6 +284,7 @@ const ReviewForm = ({
   return (
     <div className="bg-[#F8FAFC] max-h-[90vh] overflow-y-auto rounded-[3rem]">
       <ConfirmDialog 
+        group="reviewForm"
         className="rounded-[2.5rem] overflow-hidden" 
         pt={{
           root: { className: "bg-white shadow-2xl border-0 overflow-hidden" },
@@ -404,6 +409,26 @@ const ReviewForm = ({
                 <StarRating category={category.key} value={formData[category.key]} />
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Campo de Comentario */}
+        <section className={`space-y-6 transition-opacity duration-500 ${!formData.selectedCourseId ? "opacity-20 pointer-events-none" : "opacity-100"}`}>
+          <div className="flex items-center gap-3">
+             <div className="w-1.5 h-6 bg-navy rounded-full"></div>
+             <h4 className="text-xl font-black text-navy uppercase tracking-tight">Comentario Adicional (Opcional)</h4>
+          </div>
+          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+            <textarea
+              value={formData.texto}
+              onChange={(e) => setFormData((prev) => ({ ...prev, texto: e.target.value }))}
+              placeholder="¿Qué más te gustaría compartir sobre tu experiencia con este docente?"
+              className="w-full h-32 p-6 border-2 border-gray-100 bg-gray-50/50 rounded-2xl transition-all font-medium text-navy resize-none focus:border-navy/30 focus:bg-white focus:outline-none focus:ring-4 focus:ring-navy/5"
+              maxLength={1000}
+            />
+            <div className="text-right mt-2 text-xs font-bold text-gray-400">
+              {formData.texto.length}/1000
+            </div>
           </div>
         </section>
 

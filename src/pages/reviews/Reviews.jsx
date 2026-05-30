@@ -11,6 +11,7 @@ import LastSemesterData from "../../components/reviews.jsx/LastSemesterData";
 import HistoricalData from "../../components/reviews.jsx/HistoricalData";
 import ReviewForm from "./ReviewForm";
 import TriesModule from "../../components/reviews.jsx/TriesModule";
+import CommentsSection from "../../components/reviews.jsx/CommentsSection";
 import { Dialog } from "primereact/dialog";
 
 export default function Reviews() {
@@ -126,6 +127,12 @@ export default function Reviews() {
 
     await queryClient.invalidateQueries({
       queryKey: ["sections", subjectId],
+    });
+    await queryClient.invalidateQueries({
+      queryKey: ["coursesBySection", selectedSection?.id],
+    });
+    await queryClient.invalidateQueries({
+      queryKey: ["reviewsForSection", selectedSection?.id],
     });
     await queryClient.invalidateQueries({
       queryKey: ["lastSemester", selectedSection?.id],
@@ -254,47 +261,47 @@ export default function Reviews() {
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-2 md:px-4 lg:px-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Secciones del Lado Izquierdo */}
-          <div className="lg:w-[380px] flex-shrink-0">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-black text-navy uppercase tracking-tight flex items-center gap-2">
-                <div className="w-2 h-6 bg-navy rounded-full"></div>
-                Secciones ({sections.length})
-              </h2>
-            </div>
-            
-            {sections.length === 0 ? (
-              <div className="bg-white border-2 border-dashed border-gray-100 rounded-3xl p-10 text-center">
-                <p className="text-gray-400 font-bold">No hay secciones registradas</p>
-              </div>
-            ) : (
-              <div className="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0 scrollbar-hide">
-                {sections.map((sectionData, index) => (
-                  <div
-                    key={sectionData.section.id}
-                    onClick={() => handleSectionSelect(sectionData)}
-                    className="min-w-[280px] lg:min-w-0"
-                  >
-                    <TeacherCard
-                      teacher={sectionData.section.Docente}
-                      selected={selectedSection?.id === sectionData.section.id}
-                      reviews={sectionData.totalReviews}
-                      score={sectionData.promedioGeneral}
-                      position={index + 1}
-                      subjectName={subjectName}
-                      sectionNumber={sectionData.section.numero}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
+      <div className="max-w-[1600px] mx-auto px-2 md:px-4 lg:px-8 space-y-6">
+        {/* Secciones — horizontal scrollable */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg md:text-xl font-black text-navy uppercase tracking-tight flex items-center gap-2">
+              <div className="w-2 h-6 bg-navy rounded-full"></div>
+              Secciones ({sections.length})
+            </h2>
           </div>
+          
+          {sections.length === 0 ? (
+            <div className="bg-white border-2 border-dashed border-gray-100 rounded-3xl p-10 text-center">
+              <p className="text-gray-400 font-bold">No hay secciones registradas</p>
+            </div>
+          ) : (
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+              {sections.map((sectionData, index) => (
+                <div
+                  key={sectionData.section.id}
+                  onClick={() => handleSectionSelect(sectionData)}
+                  className="min-w-[280px] flex-shrink-0"
+                >
+                  <TeacherCard
+                    teacher={sectionData.section.Docente}
+                    selected={selectedSection?.id === sectionData.section.id}
+                    reviews={sectionData.totalReviews}
+                    score={sectionData.promedioGeneral}
+                    position={index + 1}
+                    subjectName={subjectName}
+                    sectionNumber={sectionData.section.numero}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-          {/* Área de Visualización del Lado Derecho */}
-          <div className="flex-1 min-w-0 space-y-6">
-            <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden min-h-[600px]">
+        {/* Mitad izquierda: métricas | Mitad derecha: comentarios */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex-1 min-w-0">
+            <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden min-h-[400px]">
               {lastSemesterLoading ? (
                 <div className="flex flex-col justify-center items-center h-96">
                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-navy"></div>
@@ -307,18 +314,25 @@ export default function Reviews() {
                 />
               )}
             </div>
+          </div>
 
-            {selectedSection && (
-              <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
-                {historicalLoading ? (
-                  <div className="p-12 text-center text-gray-400 italic">Cargando base histórica...</div>
-                ) : (
-                  <HistoricalData historicalData={historicalData} />
-                )}
-              </div>
+          {selectedSection && (
+            <div className="flex-1 min-w-0">
+              <CommentsSection sectionId={selectedSection.id} />
+            </div>
+          )}
+        </div>
+
+        {/* Histórico — ancho completo */}
+        {selectedSection && (
+          <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
+            {historicalLoading ? (
+              <div className="p-12 text-center text-gray-400 italic">Cargando base histórica...</div>
+            ) : (
+              <HistoricalData historicalData={historicalData} />
             )}
           </div>
-        </div>
+        )}
       </div>
 
       {/* Dialogs con Estilos Mejorados */}

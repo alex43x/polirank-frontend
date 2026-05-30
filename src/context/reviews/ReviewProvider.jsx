@@ -84,6 +84,156 @@ export const ReviewProvider = ({ children }) => {
     }
   };
 
+  // Funciones de comentarios y votos
+  const voteComentario = async (reviewId, valor) => {
+    setLoading(true);
+    try {
+      const { data } = await api.post(`/reviews/${reviewId}/comentario/voto`, { valor });
+      return data.data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteVoteComentario = async (reviewId) => {
+    setLoading(true);
+    try {
+      const { data } = await api.delete(`/reviews/${reviewId}/comentario/voto`);
+      return data.data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteComentario = async (reviewId) => {
+    setLoading(true);
+    try {
+      const { data } = await api.delete(`/reviews/${reviewId}/comentario`);
+      return data.data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchPendingReviews = async (params = {}) => {
+    setLoading(true);
+    try {
+      const { data } = await api.get("/reviews/moderacion/pendientes", { params });
+      return data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const approveComentario = async (reviewId) => {
+    setLoading(true);
+    try {
+      const { data } = await api.patch(`/reviews/${reviewId}/comentario/aprobar`);
+      return data.data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const rejectComentario = async (reviewId) => {
+    return deleteComentario(reviewId);
+  };
+
+  const fetchPendingReviewsModeration = async (params = {}) => {
+    setLoading(true);
+    try {
+      const { data } = await api.get("/reviews/moderacion/pendientes", { params });
+      return data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const approveComentarioModeration = async (reviewId) => {
+    setLoading(true);
+    try {
+      const { data } = await api.patch(`/reviews/${reviewId}/comentario/aprobar`);
+      return data.data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const rechazarComentarioModeration = async (reviewId) => {
+    setLoading(true);
+    try {
+      const { data } = await api.delete(`/reviews/${reviewId}/comentario/moderacion`);
+      return data.data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Funciones de reportes y baneos
+  const fetchPendingReports = async () => {
+    setLoading(true);
+    try {
+      const { data } = await api.get("/reports");
+      return data.data || [];
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const approveReport = async (reportId) => {
+    setLoading(true);
+    try {
+      const { data } = await api.patch(`/reports/${reportId}/aprobar`);
+      return data.data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const rejectReport = async (reportId) => {
+    setLoading(true);
+    try {
+      const { data } = await api.patch(`/reports/${reportId}/rechazar`);
+      return data.data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const banComment = async (comentarioId) => {
+    setLoading(true);
+    try {
+      const { data } = await api.patch(`/reports/comentarios/${comentarioId}/banear`);
+      return data.data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <ReviewContext.Provider
       value={{
@@ -98,6 +248,19 @@ export const ReviewProvider = ({ children }) => {
         createReview,
         updateReview,
         deleteReview,
+        voteComentario,
+        deleteVoteComentario,
+        deleteComentario,
+        fetchPendingReviews,
+        approveComentario,
+        rejectComentario,
+        fetchPendingReviewsModeration,
+        approveComentarioModeration,
+        rechazarComentarioModeration,
+        fetchPendingReports,
+        approveReport,
+        rejectReport,
+        banComment,
       }}
     >
       {children}

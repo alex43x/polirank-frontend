@@ -123,10 +123,11 @@ export default function LastSemesterData({
           },
           pointLabels: {
             font: {
-              size: 12,
-              weight: "600",
+              size: 11,
+              weight: "700",
             },
             color: "#36507D",
+            padding: 20,
           },
         },
       },
@@ -190,29 +191,38 @@ export default function LastSemesterData({
       }
     }
 
-    return <div className="flex gap-1">{stars}</div>;
+      return <div className="flex gap-1">{stars}</div>;
+  };
+
+  const renderAspectName = (name) => {
+    const parts = name.split("/");
+    return parts.map((part, i) => (
+      <span key={i} className={i > 0 ? "block" : ""}>
+        {part.trim()}
+      </span>
+    ));
   };
 
   return (
-    <div className="space-y-2 lg:p-10 p-4">
+    <div className="space-y-2 lg:p-4 p-4">
       {lastSemesterData && Object.keys(lastSemesterData).length > 0 ? (
         <>
           {/* Header con información general */}
-          <div className="border-b border-solid border-gray-100 pb-6 px-6 md:px-10">
-            <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-10">
+          <div className="border-b border-solid border-gray-100 p-6">
+            <div className="space-y-4">
               <div className="min-w-0">
-                <span className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 block">Docente</span>
-                <h2 className="text-3xl md:text-5xl lg:text-5xl font-black text-navy leading-[1.1] break-words">
+                <span className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-1 block">Docente</span>
+                <h2 className="text-2xl md:text-3xl font-black text-navy leading-tight break-words">
                   {teacherName}
                 </h2>
               </div>
-              <div className="flex items-center justify-around md:justify-end gap-2 md:gap-8 bg-gray-50/50 p-4 md:px-10 md:py-8 rounded-[2rem] md:rounded-[3rem] border border-gray-100 w-full xl:w-fit shadow-inner">
-                <div className="flex-1 xl:flex-none text-center xl:text-right min-w-0">
+              <div className="flex items-center justify-around md:justify-start gap-2 md:gap-8 bg-gray-50/50 p-4 md:px-10 md:py-6 rounded-[2rem] md:rounded-[3rem] border border-gray-100 w-full shadow-inner">
+                <div className="flex-1 md:flex-none text-center md:text-left min-w-0">
                   <span className="block text-xl md:text-3xl lg:text-4xl font-black text-navy leading-none mb-1">{lastSemesterData.totalAverage.toFixed(2)}</span>
                   <span className="text-[8px] md:text-[11px] text-gray-400 font-bold uppercase tracking-tight md:whitespace-nowrap leading-tight">Puntaje General</span>
                 </div>
                 <div className="h-8 md:h-12 w-[1px] bg-gray-200 flex-shrink-0 mx-1"></div>
-                <div className="flex-1 xl:flex-none text-center xl:text-right min-w-0">
+                <div className="flex-1 md:flex-none text-center md:text-left min-w-0">
                   <span className="block text-xl md:text-3xl lg:text-4xl font-black text-navy leading-none mb-1">{lastSemesterData.totalReviews || 0}</span>
                   <span className="text-[8px] md:text-[11px] text-gray-400 font-bold uppercase tracking-tight md:whitespace-nowrap leading-tight">Reseñas Totales</span>
                 </div>
@@ -220,7 +230,7 @@ export default function LastSemesterData({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 items-start pt-6">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 items-start">
             {/* Columna Izquierda: Valores por Aspecto */}
             <div className="space-y-6 order-2 xl:order-1">
                <div className="bg-gray-50/50 p-6 rounded-3xl border border-gray-100 mb-2">
@@ -243,7 +253,7 @@ export default function LastSemesterData({
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 md:gap-4 mb-3">
-                               <h4 className="text-base md:text-lg font-black text-navy leading-tight break-words">{criterio}</h4>
+                                <h4 className="text-sm md:text-base font-black text-navy leading-tight break-words">{renderAspectName(criterio)}</h4>
                                <div className="bg-navy text-white px-3 py-1 rounded-xl text-[11px] font-black tracking-widest shadow-sm self-start">
                                  {valor.toFixed(2)}
                                </div>
@@ -314,11 +324,11 @@ export default function LastSemesterData({
                   <Chart type="radar" data={chartData} options={chartOptions} />
                 </div>
                 {/* Leyenda del Radar Chart */}
-                <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                <div className="mt-10 space-y-3">
                   {ratingsArray.map(([criterio], i) => (
-                    <div key={i} className="flex items-start gap-4 text-[12px] border-b border-gray-50 pb-3 sm:border-0 sm:pb-0">
-                      <span className="font-black text-navy min-w-[36px] bg-blue-50 px-2 py-1 rounded-lg text-center shadow-sm">{getInitials(criterio)}</span>
-                      <span className="text-gray-600 font-extrabold leading-tight">{criterio}</span>
+                    <div key={i} className="flex items-center gap-3 text-[12px]">
+                      <span className="font-black text-navy min-w-[36px] bg-blue-50 px-2 py-1 rounded-lg text-center shadow-sm flex-shrink-0">{getInitials(criterio)}</span>
+                      <span className="text-gray-600 font-extrabold leading-tight break-words min-w-0">{renderAspectName(criterio)}</span>
                     </div>
                   ))}
                 </div>

@@ -109,6 +109,7 @@ export default function TriesModule({
     if (selectedTryValue === null) return;
 
     confirmDialog({
+      group: "triesModule",
       message: existingTry 
         ? "¿Segur@ que deseas actualizar tu registro de intentos para esta materia?" 
         : "¿Segur@ que deseas registrar esta cantidad de intentos?",
@@ -123,6 +124,7 @@ export default function TriesModule({
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6 md:space-y-10">
       <ConfirmDialog 
+        group="triesModule"
         className="rounded-[2.5rem] overflow-hidden" 
         pt={{
           root: { className: "bg-white shadow-2xl border-0 overflow-hidden" },
