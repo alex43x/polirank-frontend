@@ -42,7 +42,15 @@ export default function PrivateLayout() {
     </svg>
   );
 
-  if (totalContributions >= 12) {
+  if (totalContributions >= 20) {
+    rankName = "Maestro PoliRank";
+    rankColor = "bg-gradient-to-br from-orange-50 to-amber-50 text-orange-600 border-orange-200/50 shadow-md shadow-orange-100/50";
+    rankIcon = (
+      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-.562-.317 16.404 16.404 0 01-1.582-1.115c-1.1-.889-2.433-2.156-3.476-3.82C2.365 9.045 1.5 6.87 1.5 5.125c0-1.777.888-2.84 1.672-3.447A4.66 4.66 0 016.25.75c1.337 0 2.556.538 3.75 1.588C11.194 1.288 12.413.75 13.75.75a4.66 4.66 0 013.078.928c.784.607 1.672 1.67 1.672 3.447 0 1.745-.864 3.92-2.473 5.825-1.043 1.664-2.376 2.931-3.476 3.82a16.404 16.404 0 01-2.144 1.432l-.019.01-.005.003-.001.001a.507.507 0 01-.38 0l-.001-.001z" />
+      </svg>
+    );
+  } else if (totalContributions >= 12) {
     rankName = "Leyenda Académica";
     rankColor = "bg-purple-50 text-purple-600 border-purple-200/50 shadow-sm shadow-purple-100/50";
     rankIcon = (
@@ -87,6 +95,18 @@ export default function PrivateLayout() {
             </h1>
           </div>
 
+          {/* Ayuda / Tutorial */}
+          <button
+            onClick={() => navigate("/tutorial")}
+            className="flex items-center gap-1.5 text-gray-400 hover:text-navy transition-all duration-200 active:scale-95"
+            title="Tutorial"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            <span className="hidden sm:inline text-[10px] font-black uppercase tracking-widest">Tutorial</span>
+          </button>
+
           {/* User Actions */}
           <div className="flex items-center gap-3 md:gap-6">
             
@@ -125,7 +145,7 @@ export default function PrivateLayout() {
 
               {/* Menú Desplegable Premium */}
               {isOpen && (
-                <div className="absolute right-0 mt-3 w-[320px] sm:w-[360px] bg-white border border-gray-100 shadow-2xl rounded-3xl z-[150] overflow-hidden transition-all duration-300 top-12 animate-in fade-in slide-in-from-top-3">
+                <div className="absolute right-2 sm:right-0 mt-3 w-[calc(100vw-32px)] sm:w-[360px] max-w-[360px] bg-white border border-gray-100 shadow-2xl rounded-3xl z-[150] overflow-hidden transition-all duration-300 top-12 animate-in fade-in slide-in-from-top-3">
                   {isGuest ? (
                     /* Contenido para Invitado */
                     <div className="p-6 text-center">
@@ -177,6 +197,23 @@ export default function PrivateLayout() {
                             {totalContributions} {totalContributions === 1 ? "aporte" : "aportes"}
                           </span>
                         </div>
+
+                        {/* Panel de administración si es ADMIN */}
+                        {user?.rol?.nombre === "ADMIN" && (
+                          <button
+                            onClick={() => {
+                              setIsOpen(false);
+                              navigate("/admin");
+                            }}
+                            className="mt-3 w-full bg-blue-50 hover:bg-blue-100 text-blue-600 py-2.5 px-4 rounded-xl font-bold uppercase tracking-wider text-[10px] text-center transition-all duration-200 active:scale-95 border border-blue-200/50 flex items-center justify-center gap-2"
+                          >
+                            <svg className="w-3.5 h-3.5 animate-spin-slow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            Panel de Administración
+                          </button>
+                        )}
                       </div>
 
                       {/* Selector de Pestañas */}
@@ -296,9 +333,24 @@ export default function PrivateLayout() {
 
                       {/* Footer de menú */}
                       <div className="p-4 border-t border-gray-50 bg-gray-50/20 flex items-center justify-between">
-                        <span className="text-[8px] font-bold uppercase tracking-widest text-gray-300">
-                          PoliRank v1.0
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              setIsOpen(false);
+                              navigate("/tutorial");
+                            }}
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gray-100/80 text-gray-400 hover:text-navy hover:bg-gray-100 font-black text-[9px] uppercase tracking-widest transition-all duration-200 active:scale-95"
+                            title="Tutorial"
+                          >
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            <span className="hidden sm:inline">Tutorial</span>
+                          </button>
+                          <span className="text-[8px] font-bold uppercase tracking-widest text-gray-300">
+                            v1.0
+                          </span>
+                        </div>
                         <button
                           onClick={() => {
                             setIsOpen(false);

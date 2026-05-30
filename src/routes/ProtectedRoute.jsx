@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
@@ -15,13 +15,13 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   // Rol no autorizado
   if (
     allowedRoles.length > 0 &&
-    !allowedRoles.includes(user?.rol)
+    !allowedRoles.includes(user?.rol?.nombre)
   ) {
     return <Navigate to="/unauthorized" replace />;
   }
 
   // Autorizado
-  return children;
+  return children || <Outlet />;
 };
 
 export default ProtectedRoute;

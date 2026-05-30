@@ -3,6 +3,7 @@ import Login from "../pages/auth/Login";
 import ChangePassword from "../pages/auth/ChangePassword";
 import Dashboard from "../pages/dashboard/Dashboard";
 import AdminPanel from "../pages/admin/AdminPanel";
+import Tutorial from "../pages/tutorial/Tutorial";
 import Reviews from "../pages/reviews/Reviews";
 import ProtectedRoute from "./ProtectedRoute";
 import PrivateLayout from "../layouts/PrivateLayout";
@@ -51,6 +52,12 @@ const AppRouter = () => {
             }
           />
 
+          {/* Tutorial */}
+          <Route
+            path="/tutorial"
+            element={<Tutorial />}
+          />
+
           {/* Reviews: Student + Subject + Course + Review */}
           <Route
             path="/reviews/:subjectId"
@@ -91,7 +98,14 @@ const AppRouter = () => {
 
           {/* Solo ADMIN */}
           <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]} />}>
-            <Route path="/admin" element={<AdminPanel />} />
+            <Route
+              path="/admin"
+              element={
+                <ReviewProvider>
+                  <AdminPanel />
+                </ReviewProvider>
+              }
+            />
           </Route>
         </Route>
 
