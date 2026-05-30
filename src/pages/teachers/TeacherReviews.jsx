@@ -10,6 +10,7 @@ import { useTry } from "../../hooks/useTry";
 import TeacherSubjectCard from "../../components/teachers/TeacherSubjectCard";
 import LastSemesterData from "../../components/reviews.jsx/LastSemesterData";
 import HistoricalData from "../../components/reviews.jsx/HistoricalData";
+import CommentsSection from "../../components/reviews.jsx/CommentsSection";
 import ReviewForm from "../reviews/ReviewForm";
 import TriesModule from "../../components/reviews.jsx/TriesModule";
 import { Dialog } from "primereact/dialog";
@@ -264,46 +265,73 @@ export default function TeacherReviews() {
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-2 md:px-4 lg:px-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Materias del Lado Izquierdo */}
-          <div className="lg:w-[380px] flex-shrink-0">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-black text-navy uppercase tracking-tight flex items-center gap-2">
-                <div className="w-2 h-6 bg-navy rounded-full"></div>
-                Materias ({sections.length})
-              </h2>
+      <div className="max-w-[1600px] mx-auto px-2 md:px-4 lg:px-8 space-y-6">
+        {/* Navegación rápida entre secciones */}
+        {selectedSection && (
+          <div className="sticky top-0 z-10 -mx-2 md:-mx-4 lg:-mx-8 px-2 md:px-4 lg:px-8 py-2 bg-[#F3F4F6]/80 backdrop-blur-md border-b border-gray-200/60">
+            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+              <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mr-1 flex-shrink-0">Ir a:</span>
+              <button
+                onClick={() => document.getElementById("metricas")?.scrollIntoView({ behavior: "smooth" })}
+                className="flex-shrink-0 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-[11px] font-bold text-navy hover:bg-navy hover:text-white hover:border-navy transition-all duration-200 shadow-sm"
+              >
+                Métricas
+              </button>
+              <button
+                onClick={() => document.getElementById("comentarios")?.scrollIntoView({ behavior: "smooth" })}
+                className="flex-shrink-0 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-[11px] font-bold text-navy hover:bg-navy hover:text-white hover:border-navy transition-all duration-200 shadow-sm"
+              >
+                Comentarios
+              </button>
+              <button
+                onClick={() => document.getElementById("historico")?.scrollIntoView({ behavior: "smooth" })}
+                className="flex-shrink-0 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-[11px] font-bold text-navy hover:bg-navy hover:text-white hover:border-navy transition-all duration-200 shadow-sm"
+              >
+                Histórico
+              </button>
             </div>
-            
-            {sections.length === 0 ? (
-              <div className="bg-white border-2 border-dashed border-gray-100 rounded-3xl p-10 text-center">
-                <p className="text-gray-400 font-bold">No hay materias registradas</p>
-              </div>
-            ) : (
-              <div className="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0 scrollbar-hide">
-                 {sections.map((sectionData, index) => (
-                   <div
-                    key={sectionData?.id || index}
-                    onClick={() => sectionData && handleSectionSelect(sectionData)}
-                    className="min-w-[280px] lg:min-w-0"
-                   >
-                    <TeacherSubjectCard
-                      subject={sectionData?.materia}
-                      selected={selectedSection?.id === sectionData?.id}
-                      reviews={sectionData?.totalReviews}
-                      score={sectionData?.promedioGeneral}
-                      position={index + 1}
-                      sectionNumber={sectionData?.numero}
-                    />
-                   </div>
-                 ))}
-              </div>
-            )}
           </div>
+        )}
 
-          {/* Área de Visualización del Lado Derecho */}
-          <div className="flex-1 min-w-0 space-y-6">
-            <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden min-h-[600px]">
+        {/* Materias — horizontal scrollable */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg md:text-xl font-black text-navy uppercase tracking-tight flex items-center gap-2">
+              <div className="w-2 h-6 bg-navy rounded-full"></div>
+              Materias ({sections.length})
+            </h2>
+          </div>
+          
+          {sections.length === 0 ? (
+            <div className="bg-white border-2 border-dashed border-gray-100 rounded-3xl p-10 text-center">
+              <p className="text-gray-400 font-bold">No hay materias registradas</p>
+            </div>
+          ) : (
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+              {sections.map((sectionData, index) => (
+                <div
+                  key={sectionData?.id || index}
+                  onClick={() => sectionData && handleSectionSelect(sectionData)}
+                  className="min-w-[280px] flex-shrink-0"
+                >
+                  <TeacherSubjectCard
+                    subject={sectionData?.materia}
+                    selected={selectedSection?.id === sectionData?.id}
+                    reviews={sectionData?.totalReviews}
+                    score={sectionData?.promedioGeneral}
+                    position={index + 1}
+                    sectionNumber={sectionData?.numero}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Mitad izquierda: métricas | Mitad derecha: comentarios */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex-1 min-w-0" id="metricas">
+            <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden min-h-[400px]">
               {!selectedSection ? (
                 <div className="flex flex-col items-center justify-center h-full min-h-[600px] text-center p-12">
                    <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-6">
@@ -312,7 +340,7 @@ export default function TeacherReviews() {
                       </svg>
                    </div>
                    <h3 className="text-2xl font-black text-navy mb-2">Selecciona una materia</h3>
-                   <p className="text-gray-400 max-w-sm">Elige una de las materias de la izquierda para ver las estadísticas y desempeño de este docente.</p>
+                   <p className="text-gray-400 max-w-sm">Elige una de las materias de arriba para ver las estadísticas y desempeño de este docente.</p>
                 </div>
               ) : lastSemesterLoading ? (
                 <div className="flex flex-col justify-center items-center h-96">
@@ -326,18 +354,25 @@ export default function TeacherReviews() {
                 />
               )}
             </div>
+          </div>
 
-            {selectedSection && (
-              <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
-                {historicalLoading ? (
-                  <div className="p-12 text-center text-gray-400 italic">Cargando base histórica...</div>
-                ) : (
-                  <HistoricalData historicalData={historicalData} />
-                )}
-              </div>
+          {selectedSection && (
+            <div className="flex-1 min-w-0" id="comentarios">
+              <CommentsSection sectionId={selectedSection.id} />
+            </div>
+          )}
+        </div>
+
+        {/* Histórico — ancho completo */}
+        {selectedSection && (
+          <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden" id="historico">
+            {historicalLoading ? (
+              <div className="p-12 text-center text-gray-400 italic">Cargando base histórica...</div>
+            ) : (
+              <HistoricalData historicalData={historicalData} />
             )}
           </div>
-        </div>
+        )}
       </div>
 
       {/* Dialogs */}

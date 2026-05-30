@@ -93,17 +93,65 @@ export default function TriesModule({
     responsive: true,
   };
 
-  const hasAttemptsData = 
-    attemptsData && 
-    (attemptsData["1_intento"] > 0 || attemptsData["2_intentos"] > 0 || 
-     attemptsData["3_intentos"] > 0 || attemptsData["mas_intentos"] > 0);
+  const n1 = attemptsData["1_intento"] || 0;
+  const n2 = attemptsData["2_intentos"] || 0;
+  const n3 = attemptsData["3_intentos"] || 0;
+  const n4 = attemptsData["mas_intentos"] || 0;
 
-  const totalStudents = (attemptsData["1_intento"] || 0) + (attemptsData["2_intentos"] || 0) + 
-                       (attemptsData["3_intentos"] || 0) + (attemptsData["mas_intentos"] || 0);
+  const hasAttemptsData = attemptsData && (n1 > 0 || n2 > 0 || n3 > 0 || n4 > 0);
 
-  const successRate = totalStudents > 0 
-    ? (((attemptsData["1_intento"] || 0) / totalStudents) * 100).toFixed(1)
+  const totalStudents = n1 + n2 + n3 + n4;
+
+  const successRate = totalStudents > 0 ? ((n1 / totalStudents) * 100).toFixed(1) : 0;
+
+  const weightedAverage = totalStudents > 0
+    ? ((n1 * 1 + n2 * 2 + n3 * 3 + n4 * 4) / totalStudents)
     : 0;
+
+  const getInsights = () => {
+    const msgs = [];
+    const p1 = totalStudents > 0 ? (n1 / totalStudents) * 100 : 0;
+    const p2 = totalStudents > 0 ? (n2 / totalStudents) * 100 : 0;
+    const p4 = totalStudents > 0 ? (n4 / totalStudents) * 100 : 0;
+    const avg = weightedAverage;
+
+    if (totalStudents === 0) {
+      msgs.push("Aún no hay datos de otros alumnos. ¡Sé el primero en reportar tus intentos!");
+    } else {
+      if (totalStudents < 5) {
+        msgs.push("Aún hay pocos datos registrados. Entre más alumnos reporten, más precisas serán las estadísticas.");
+      } else {
+        if (p1 > 60) msgs.push("La mayoría aprueba en 1 intento. ¡Esta materia es bastante accesible!");
+        else if (p1 > 40) msgs.push("Más del 40% aprueba en 1 intento, señal de que es una materia llevadera.");
+        else if (p1 > 0 && p1 < 20) msgs.push("Menos del 20% aprueba en 1 intento. ¡Esta materia es todo un reto!");
+        else if (p1 > 0 && p1 < 25) msgs.push("Solo 1 de cada 4 alumnos aprueba en 1 intento. Prepárate bien.");
+
+        if (p4 > 40) msgs.push("Muchos alumnos necesitan 4+ intentos. Esta materia requiere persistencia.");
+        else if (p4 > 25) msgs.push("Un porcentaje significativo de alumnos necesita 4+ intentos. No te desanimes si no es a la primera.");
+
+        if (p1 + p2 > 80) msgs.push("Casi todos aprueban en 1 o 2 intentos. ¡Es de las materias más accesibles!");
+
+        if (avg < 1.5 && avg > 0) msgs.push("El promedio de intentos es muy bajo. Los alumnos aprueban rápido esta materia.");
+        else if (avg >= 2.5) msgs.push("El promedio de intentos es alto. Esta materia suele requerir varios intentos.");
+
+        if (totalStudents >= 5) msgs.push(`Ya somos ${totalStudents} alumnos reportando intentos en esta materia.`);
+      }
+    }
+
+    if (existingTry) {
+      const uv = existingTry.valor;
+      if (uv === 1 && p1 > 0) msgs.push(`¡Aprobaste al primer intento! Solo el ${p1.toFixed(0)}% de los alumnos lo logra.`);
+      else if (uv === 1) msgs.push("¡Aprobaste al primer intento! Sigue así.");
+      else if (uv < avg) msgs.push(`¡Vas mejor que el promedio (${avg.toFixed(1)} intentos)! Sigue así.`);
+      else if (uv === Math.round(avg)) msgs.push(`Estás justo en el promedio (${avg.toFixed(1)} intentos).`);
+    } else {
+      msgs.push("Reporta tus intentos para ver cómo te comparas con el resto de alumnos.");
+    }
+
+    return msgs;
+  };
+
+  const insights = getInsights();
 
   const handleSubmit = () => {
     if (selectedTryValue === null) return;
@@ -139,19 +187,26 @@ export default function TriesModule({
       <div className="grid grid-cols-1 2xl:grid-cols-2 gap-6 md:gap-8 items-stretch">
         {/* Lado Izquierdo: Gráfico y Stats Rápidos */}
         <div className="flex flex-col gap-6 w-full">
-          <div className="grid grid-cols-2 gap-4 md:gap-6">
-            <div className="bg-white p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-gray-100 shadow-sm">
+          <div className="grid grid-cols-3 gap-4 md:gap-6">
+            <div className="bg-white p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-gray-100 shadow-sm">
               <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-2 text-center md:text-left">Muestra</span>
               <div className="flex flex-col items-center md:items-baseline gap-0.5">
-                <span className="text-2xl md:text-3xl font-black text-navy">{totalStudents}</span>
+                <span className="text-lg md:text-3xl font-black text-navy">{totalStudents}</span>
                 <span className="text-[9px] md:text-[11px] font-bold text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">Total Alumnos</span>
               </div>
             </div>
-            <div className="bg-white p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-gray-100 shadow-sm">
+            <div className="bg-white p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-gray-100 shadow-sm">
               <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-2 text-center md:text-left">Pase Directo</span>
               <div className="flex flex-col items-center md:items-baseline gap-0.5">
-                <span className="text-2xl md:text-3xl font-black text-green-600 truncate">{successRate}%</span>
+                <span className="text-lg md:text-3xl font-black text-green-600">{successRate}%</span>
                 <span className="text-[9px] md:text-[11px] font-bold text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full italic">1er Intento</span>
+              </div>
+            </div>
+            <div className="bg-white p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-gray-100 shadow-sm">
+              <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-2 text-center md:text-left">Promedio</span>
+              <div className="flex flex-col items-center md:items-baseline gap-0.5">
+                <span className="text-lg md:text-3xl font-black text-navy">{weightedAverage > 0 ? weightedAverage.toFixed(1) : "-"}</span>
+                <span className="text-[9px] md:text-[11px] font-bold text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">Intentos x Alumno</span>
               </div>
             </div>
           </div>
@@ -174,6 +229,76 @@ export default function TriesModule({
               </div>
             )}
           </div>
+
+          {/* Comparativa personal: Tú vs Promedio */}
+          {existingTry && hasAttemptsData && (
+            <div className="bg-white p-5 md:p-6 rounded-[2rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-1 h-4 bg-navy rounded-full"></div>
+                <h4 className="text-[11px] md:text-xs font-black text-navy uppercase tracking-tight">Tu Comparativa</h4>
+              </div>
+              <div className="space-y-3">
+                <div className="relative pt-5 pb-3">
+                  <div className="flex justify-between text-[10px] font-bold text-gray-400 mb-1.5">
+                    <span>1 intento</span>
+                    <span>2</span>
+                    <span>3</span>
+                    <span>4+ intentos</span>
+                  </div>
+                  <div className="relative h-3 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="absolute inset-0 flex">
+                      <div className="flex-1 border-r border-white/40"></div>
+                      <div className="flex-1 border-r border-white/40"></div>
+                      <div className="flex-1 border-r border-white/40"></div>
+                      <div className="flex-1"></div>
+                    </div>
+                  </div>
+                  {/* Marcador del promedio */}
+                  <div
+                    className="absolute top-[26px] -translate-x-1/2 transition-all duration-500"
+                    style={{ left: `${Math.min(((weightedAverage - 1) / 3) * 100, 100)}%` }}
+                  >
+                    <div className="flex flex-col items-center gap-0.5">
+                      <div className="w-0 h-0 border-l-[5px] border-r-[5px] border-b-[6px] border-l-transparent border-r-transparent border-b-gray-400"></div>
+                      <div className="bg-gray-400 text-white text-[8px] font-black px-1.5 py-0.5 rounded whitespace-nowrap">
+                        Prom. {weightedAverage.toFixed(1)}
+                      </div>
+                    </div>
+                  </div>
+                  {/* Marcador del usuario */}
+                  <div
+                    className="absolute top-[26px] -translate-x-1/2 transition-all duration-500"
+                    style={{ left: `${Math.min(((existingTry.valor - 1) / 3) * 100, 100)}%` }}
+                  >
+                    <div className="flex flex-col items-center gap-0.5">
+                      <div className="w-0 h-0 border-l-[5px] border-r-[5px] border-b-[6px] border-l-transparent border-r-transparent border-b-navy"></div>
+                      <div className="bg-navy text-white text-[8px] font-black px-1.5 py-0.5 rounded whitespace-nowrap">
+                        Tú: {existingTry.valor}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Insights */}
+          {insights.length > 0 && (
+            <div className="bg-white p-5 md:p-6 rounded-[2rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-1 h-4 bg-navy rounded-full"></div>
+                <h4 className="text-[11px] md:text-xs font-black text-navy uppercase tracking-tight">Perspectiva</h4>
+              </div>
+              <ul className="space-y-2.5">
+                {insights.map((msg, i) => (
+                  <li key={i} className="flex items-start gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-navy/30 mt-[7px] flex-shrink-0"></span>
+                    <span className="text-xs md:text-[13px] font-medium text-gray-600 leading-relaxed">{msg}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* Lado Derecho: Formulario */}
