@@ -327,7 +327,7 @@ export default function Reviews() {
 
         {/* Mitad izquierda: métricas | Mitad derecha: comentarios */}
         <div className="flex flex-col lg:flex-row gap-6">
-          <div className="flex-1 min-w-0" id="metricas">
+          <div className="flex-1 min-w-0 scroll-mt-16" id="metricas">
             <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden min-h-[400px]">
               {lastSemesterLoading ? (
                 <div className="flex flex-col justify-center items-center h-96">
@@ -344,7 +344,7 @@ export default function Reviews() {
           </div>
 
           {selectedSection && (
-            <div className="flex-1 min-w-0" id="comentarios">
+            <div className="flex-1 min-w-0 scroll-mt-16" id="comentarios">
               <CommentsSection sectionId={selectedSection.id} />
             </div>
           )}
@@ -352,7 +352,7 @@ export default function Reviews() {
 
         {/* Histórico — ancho completo */}
         {selectedSection && (
-          <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden" id="historico">
+          <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden scroll-mt-16" id="historico">
             {historicalLoading ? (
               <div className="p-12 text-center text-gray-400 italic">Cargando base histórica...</div>
             ) : (
