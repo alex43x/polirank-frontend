@@ -262,6 +262,33 @@ export default function Reviews() {
       </div>
 
       <div className="max-w-[1600px] mx-auto px-2 md:px-4 lg:px-8 space-y-6">
+        {/* Navegación rápida entre secciones */}
+        {selectedSection && (
+          <div className="sticky top-0 z-10 -mx-2 md:-mx-4 lg:-mx-8 px-2 md:px-4 lg:px-8 py-2 bg-[#F3F4F6]/80 backdrop-blur-md border-b border-gray-200/60">
+            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+              <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mr-1 flex-shrink-0">Ir a:</span>
+              <button
+                onClick={() => document.getElementById("metricas")?.scrollIntoView({ behavior: "smooth" })}
+                className="flex-shrink-0 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-[11px] font-bold text-navy hover:bg-navy hover:text-white hover:border-navy transition-all duration-200 shadow-sm"
+              >
+                Métricas
+              </button>
+              <button
+                onClick={() => document.getElementById("comentarios")?.scrollIntoView({ behavior: "smooth" })}
+                className="flex-shrink-0 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-[11px] font-bold text-navy hover:bg-navy hover:text-white hover:border-navy transition-all duration-200 shadow-sm"
+              >
+                Comentarios
+              </button>
+              <button
+                onClick={() => document.getElementById("historico")?.scrollIntoView({ behavior: "smooth" })}
+                className="flex-shrink-0 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-[11px] font-bold text-navy hover:bg-navy hover:text-white hover:border-navy transition-all duration-200 shadow-sm"
+              >
+                Histórico
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Secciones — horizontal scrollable */}
         <div>
           <div className="flex items-center justify-between mb-4">
@@ -300,7 +327,7 @@ export default function Reviews() {
 
         {/* Mitad izquierda: métricas | Mitad derecha: comentarios */}
         <div className="flex flex-col lg:flex-row gap-6">
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0" id="metricas">
             <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden min-h-[400px]">
               {lastSemesterLoading ? (
                 <div className="flex flex-col justify-center items-center h-96">
@@ -317,7 +344,7 @@ export default function Reviews() {
           </div>
 
           {selectedSection && (
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0" id="comentarios">
               <CommentsSection sectionId={selectedSection.id} />
             </div>
           )}
@@ -325,7 +352,7 @@ export default function Reviews() {
 
         {/* Histórico — ancho completo */}
         {selectedSection && (
-          <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
+          <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden" id="historico">
             {historicalLoading ? (
               <div className="p-12 text-center text-gray-400 italic">Cargando base histórica...</div>
             ) : (

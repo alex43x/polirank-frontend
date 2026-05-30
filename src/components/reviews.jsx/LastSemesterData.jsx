@@ -241,6 +241,22 @@ export default function LastSemesterData({
                   <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-2">Puntajes individuales de cada categoría</p>
                </div>
 
+               {otherRatings.filter(([, v]) => v >= 4).length > 0 && (
+                 <div className="bg-emerald-50/50 border border-emerald-200 p-4 md:p-5 rounded-[1.5rem]">
+                   <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-2.5 block">Fortalezas Destacadas</span>
+                   <div className="flex flex-wrap gap-2">
+                     {otherRatings
+                       .filter(([, v]) => v >= 4)
+                       .map(([criterio, valor], i) => (
+                         <div key={i} className="inline-flex items-center gap-1.5 bg-white border border-emerald-200 px-3 py-1.5 rounded-full shadow-sm">
+                           <span className="text-[11px] font-black text-navy leading-tight">{criterio}</span>
+                           <span className="text-[10px] font-black text-emerald-600">{valor.toFixed(1)}</span>
+                         </div>
+                       ))}
+                   </div>
+                 </div>
+               )}
+
                <div className="space-y-4">
                 {otherRatings.length > 0 ? (
                   otherRatings.map(([criterio, valor], index) => {
