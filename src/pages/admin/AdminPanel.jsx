@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useReview } from "../../hooks/useReview";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/api";
@@ -266,8 +266,13 @@ function ReviewCard({ review, onBan, isProcessing }) {
 
 export default function AdminPanel() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { approveReport, rejectReport, banComment, approveComentarioModeration, rechazarComentarioModeration } = useReview();
   const [activeTab, setActiveTab] = useState("pendientes");
+
+  const invalidateAllSections = () => {
+    queryClient.invalidateQueries({ queryKey: ["reviewsForSection"] });
+  };
   const [toast, setToast] = useState(null);
   const [processing, setProcessing] = useState(null);
   const [page, setPage] = useState(1);
@@ -328,6 +333,7 @@ export default function AdminPanel() {
       await approveReport(reportId);
       showToast("Reporte aprobado. El comentario ha sido baneado.");
       refetchReports();
+      invalidateAllSections();
     } catch {
       showToast("Error al aprobar el reporte.", "error");
     } finally {
@@ -342,6 +348,7 @@ export default function AdminPanel() {
       await rejectReport(reportId);
       showToast("Reporte rechazado. El comentario sigue visible.", "info");
       refetchReports();
+      invalidateAllSections();
     } catch {
       showToast("Error al rechazar el reporte.", "error");
     } finally {
@@ -357,6 +364,7 @@ export default function AdminPanel() {
       showToast("Comentario baneado exitosamente.", "success");
       refetchReviews();
       refetchReports();
+      invalidateAllSections();
     } catch {
       showToast("Error al banear el comentario.", "error");
     } finally {
@@ -370,6 +378,7 @@ export default function AdminPanel() {
       await approveComentarioModeration(reviewId);
       showToast("Comentario aprobado. Ya es visible para la comunidad.");
       refetchPending();
+      invalidateAllSections();
     } catch {
       showToast("Error al aprobar el comentario.", "error");
     } finally {
@@ -384,6 +393,7 @@ export default function AdminPanel() {
       await rechazarComentarioModeration(reviewId);
       showToast("Comentario rechazado y eliminado.", "info");
       refetchPending();
+      invalidateAllSections();
     } catch {
       showToast("Error al rechazar el comentario.", "error");
     } finally {
