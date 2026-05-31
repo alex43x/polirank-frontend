@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { BADGES, getBadgeStyles, getBadgeLabel } from "../../constants/badges";
 
 const steps = [
   {
@@ -222,57 +223,20 @@ export default function Tutorial() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-            <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-700 rounded-2xl p-6 text-center">
-              <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              </div>
-              <span className="text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-400">Observador</span>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold mt-1">0 aportes</p>
-            </div>
-
-            <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200/50 dark:border-blue-900/50 rounded-2xl p-6 text-center">
-              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M6.267 3.455a.75.75 0 00-.708-.523H4.75A2.75 2.75 0 002 5.682v9.636a2.75 2.75 0 002.75 2.75h10.5a2.75 2.75 0 002.75-2.75v-9.636A2.75 2.75 0 0015.25 2.93h-.809a.75.75 0 00-.707.523L13.12 5H6.88L6.267 3.455zM5 9a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <span className="text-xs font-black uppercase tracking-wider text-blue-600 dark:text-blue-400">Colaborador</span>
-              <p className="text-[10px] text-blue-400 dark:text-blue-500 font-bold mt-1">1 a 4 aportes</p>
-            </div>
-
-            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200/50 dark:border-amber-900/50 rounded-2xl p-6 text-center">
-              <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.961 0 1.36 1.243.58 1.8l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              </div>
-              <span className="text-xs font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">Héroe PoliRank</span>
-              <p className="text-[10px] text-amber-400 dark:text-amber-500 font-bold mt-1">5 a 11 aportes</p>
-            </div>
-
-            <div className="bg-purple-50 dark:bg-purple-950/30 border border-purple-200/50 dark:border-purple-900/50 rounded-2xl p-6 text-center shadow-sm shadow-purple-100/50 dark:shadow-purple-900/20">
-              <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5 2a1 1 0 011.1-.1l3.9 2.22 3.9-2.22a1 1 0 011.1.1l3.9 2.22c.4.2.6.6.6 1.1v9c0 .5-.2.9-.6 1.1l-3.9 2.22a1 1 0 01-1.1-.1l-3.9-2.22-3.9 2.22a1 1 0 01-1.1-.1L1.1 14.3c-.4-.2-.6-.6-.6-1.1v-9c0-.5.2-.9.6-1.1L5 2zm2.5 4.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm5 0a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <span className="text-xs font-black uppercase tracking-wider text-purple-600 dark:text-purple-400">Leyenda Académica</span>
-              <p className="text-[10px] text-purple-400 dark:text-purple-500 font-bold mt-1">12 a 19 aportes</p>
-            </div>
-
-            <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 border border-orange-200/50 dark:border-orange-900/50 rounded-2xl p-6 text-center shadow-md shadow-orange-100/50 dark:shadow-orange-900/20">
-              <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-400 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-.562-.317 16.404 16.404 0 01-1.582-1.115c-1.1-.889-2.433-2.156-3.476-3.82C2.365 9.045 1.5 6.87 1.5 5.125c0-1.777.888-2.84 1.672-3.447A4.66 4.66 0 016.25.75c1.337 0 2.556.538 3.75 1.588C11.194 1.288 12.413.75 13.75.75a4.66 4.66 0 013.078.928c.784.607 1.672 1.67 1.672 3.447 0 1.745-.864 3.92-2.473 5.825-1.043 1.664-2.376 2.931-3.476 3.82a16.404 16.404 0 01-2.144 1.432l-.019.01-.005.003-.001.001a.507.507 0 01-.38 0l-.001-.001z" />
-                </svg>
-              </div>
-              <span className="text-xs font-black uppercase tracking-wider text-orange-600 dark:text-orange-400">Maestro PoliRank</span>
-              <p className="text-[10px] text-orange-400 dark:text-orange-500 font-bold mt-1">20+ aportes</p>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+            {BADGES.map((b) => {
+              const style = getBadgeStyles(b.color);
+              const label = getBadgeLabel(b, b.min);
+              return (
+                <div key={b.id} className={`${style.card} rounded-2xl p-6 text-center`}>
+                  <div className={`w-10 h-10 ${style.cardIcon} rounded-xl flex items-center justify-center mx-auto mb-3`}>
+                    {b.icon("w-5 h-5")}
+                  </div>
+                  <span className={`text-xs font-black uppercase tracking-wider ${style.name}`}>{b.name}</span>
+                  <p className={`text-[10px] ${style.desc} font-bold mt-1`}>{label}</p>
+                </div>
+              );
+            })}
           </div>
 
           <p className="text-center text-[11px] text-gray-400 dark:text-gray-500 font-bold mt-6">

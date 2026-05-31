@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../context/theme/useTheme";
+import { getBadge, getBadgeStyles, getBadgeLabel } from "../constants/badges";
 
 export default function PrivateLayout() {
   const { logout, user, isGuest, profileData, getProfile } = useAuth();
@@ -17,6 +18,13 @@ export default function PrivateLayout() {
       getProfile();
     }
   }, [user, isGuest, profileData, getProfile]);
+
+  // Refrescar perfil al abrir el menú
+  useEffect(() => {
+    if (isOpen && !isGuest && user) {
+      getProfile();
+    }
+  }, [isOpen]);
 
   // Cierre con click outside
   useEffect(() => {
@@ -35,48 +43,11 @@ export default function PrivateLayout() {
   const triesList = profileData?.tries?.rows || [];
   const totalContributions = reviewsList.length + triesList.length;
 
-  let rankName = "Observador";
-  let rankColor = "bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 border-slate-200/60 dark:border-slate-700";
-  let rankIcon = (
-    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-    </svg>
-  );
-
-  if (totalContributions >= 20) {
-    rankName = "Maestro PoliRank";
-    rankColor = "bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 text-orange-600 dark:text-orange-400 border-orange-200/50 dark:border-orange-900/50 shadow-md shadow-orange-100/50 dark:shadow-orange-900/20";
-    rankIcon = (
-      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-        <path d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-.562-.317 16.404 16.404 0 01-1.582-1.115c-1.1-.889-2.433-2.156-3.476-3.82C2.365 9.045 1.5 6.87 1.5 5.125c0-1.777.888-2.84 1.672-3.447A4.66 4.66 0 016.25.75c1.337 0 2.556.538 3.75 1.588C11.194 1.288 12.413.75 13.75.75a4.66 4.66 0 013.078.928c.784.607 1.672 1.67 1.672 3.447 0 1.745-.864 3.92-2.473 5.825-1.043 1.664-2.376 2.931-3.476 3.82a16.404 16.404 0 01-2.144 1.432l-.019.01-.005.003-.001.001a.507.507 0 01-.38 0l-.001-.001z" />
-      </svg>
-    );
-  } else if (totalContributions >= 12) {
-    rankName = "Leyenda Académica";
-    rankColor = "bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 border-purple-200/50 dark:border-purple-900/50 shadow-sm shadow-purple-100/50 dark:shadow-purple-900/20";
-    rankIcon = (
-      <svg className="w-3.5 h-3.5 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M5 2a1 1 0 011.1-.1l3.9 2.22 3.9-2.22a1 1 0 011.1.1l3.9 2.22c.4.2.6.6.6 1.1v9c0 .5-.2.9-.6 1.1l-3.9 2.22a1 1 0 01-1.1-.1l-3.9-2.22-3.9 2.22a1 1 0 01-1.1-.1L1.1 14.3c-.4-.2-.6-.6-.6-1.1v-9c0-.5.2-.9.6-1.1L5 2zm2.5 4.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm5 0a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" clipRule="evenodd" />
-      </svg>
-    );
-  } else if (totalContributions >= 5) {
-    rankName = "Héroe PoliRank";
-    rankColor = "bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 border-amber-200/50 dark:border-amber-900/50 shadow-sm shadow-amber-100/50 dark:shadow-amber-900/20";
-    rankIcon = (
-      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.961 0 1.36 1.243.58 1.8l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-      </svg>
-    );
-  } else if (totalContributions >= 1) {
-    rankName = "Colaborador";
-    rankColor = "bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border-blue-200/50 dark:border-blue-900/50 shadow-sm shadow-blue-100/50 dark:shadow-blue-900/20";
-    rankIcon = (
-      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M6.267 3.455a.75.75 0 00-.708-.523H4.75A2.75 2.75 0 002 5.682v9.636a2.75 2.75 0 002.75 2.75h10.5a2.75 2.75 0 002.75-2.75v-9.636A2.75 2.75 0 0015.25 2.93h-.809a.75.75 0 00-.707.523L13.12 5H6.88L6.267 3.455zM5 9a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-      </svg>
-    );
-  }
+  const badge = getBadge(totalContributions);
+  const badgeStyle = getBadgeStyles(badge.color);
+  const rankName = badge.name;
+  const rankColor = badgeStyle.container;
+  const rankIcon = badge.icon("w-3.5 h-3.5");
 
   const getReviewAvgScore = (review) => {
     if (!review.detalles || review.detalles.length === 0) return 0;
@@ -237,7 +208,7 @@ export default function PrivateLayout() {
                             <span className="text-[9px] font-black uppercase tracking-widest leading-none">{rankName}</span>
                           </div>
                           <span className="text-[9px] font-bold opacity-80 uppercase px-1.5 py-0.5 rounded-lg border border-current bg-white/50 dark:bg-black/20">
-                            {totalContributions} {totalContributions === 1 ? "aporte" : "aportes"}
+                            {getBadgeLabel(badge, totalContributions)}
                           </span>
                         </div>
 
