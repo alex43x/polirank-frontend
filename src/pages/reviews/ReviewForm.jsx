@@ -226,7 +226,7 @@ const ReviewForm = ({
           type="button"
           onClick={() => handleRatingClick(category, star)}
           className={`transition-all duration-200 transform hover:scale-125 ${
-            star <= value ? "text-yellow-400" : "text-gray-200 hover:text-yellow-200"
+            star <= value ? "text-yellow-400" : "text-gray-200 dark:text-gray-600 hover:text-yellow-200"
           }`}
         >
           <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
@@ -282,17 +282,17 @@ const ReviewForm = ({
   };
 
   return (
-    <div className="bg-[#F8FAFC] max-h-[90vh] overflow-y-auto rounded-[3rem]">
+    <div className="bg-[#F8FAFC] dark:bg-gray-900 max-h-[90vh] overflow-y-auto rounded-[3rem]">
       <ConfirmDialog 
         group="reviewForm"
         className="rounded-[2.5rem] overflow-hidden" 
         pt={{
-          root: { className: "bg-white shadow-2xl border-0 overflow-hidden" },
+          root: { className: "bg-white dark:bg-gray-800 shadow-2xl border-0 overflow-hidden" },
           header: { className: "bg-navy text-white p-8 flex justify-center" },
-          content: { className: "bg-white p-10 text-xl font-medium leading-relaxed text-navy text-center" },
-          footer: { className: "bg-gray-50 p-8 gap-4 flex justify-center items-center" },
+          content: { className: "bg-white dark:bg-gray-800 p-10 text-xl font-medium leading-relaxed text-navy dark:text-gray-100 text-center" },
+          footer: { className: "bg-gray-50 dark:bg-gray-800 p-8 gap-4 flex justify-center items-center" },
           acceptButton: { className: "bg-navy px-10 py-4 rounded-2xl border-0 font-bold text-white hover:bg-dark-navy transition-colors" },
-          rejectButton: { className: "bg-gray-200 text-gray-700 px-10 py-4 rounded-2xl border-0 font-bold hover:bg-gray-300 transition-colors" }
+          rejectButton: { className: "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-10 py-4 rounded-2xl border-0 font-bold hover:bg-gray-300 transition-colors" }
         }}
       />
 
@@ -330,29 +330,31 @@ const ReviewForm = ({
         <section className="space-y-6">
           <div className="flex items-center gap-3">
              <div className="w-1.5 h-6 bg-navy rounded-full"></div>
-             <h4 className="text-xl font-black text-navy uppercase tracking-tight">Periodo Lectivo</h4>
+             <h4 className="text-xl font-black text-navy dark:text-gray-100 uppercase tracking-tight">Periodo Lectivo</h4>
           </div>
 
-          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-3">
-              <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Año de cursado</label>
+              <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Año de cursado</label>
               <Dropdown
                 value={formData.year}
                 onChange={(e) => setFormData((prev) => ({ ...prev, year: e.value, period: "", selectedCourseId: null }))}
                 options={availableYears}
                 placeholder="Escoge el año..."
-                className="w-full h-16 border-2 border-gray-100 bg-gray-50/50 rounded-2xl transition-all font-bold text-navy"
+                className="w-full h-16 border-2 border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900 rounded-2xl transition-all font-bold text-navy dark:text-gray-100"
                 pt={{
+                  root: { className: "bg-gray-50/50 dark:bg-gray-900" },
                   input: { className: "px-8 py-5" },
-                  trigger: { className: "w-16" },
-                  panel: { className: "bg-white shadow-2xl rounded-2xl mt-4 border-0 overflow-hidden ring-1 ring-black/5" },
-                  item: { className: "p-5 font-bold text-gray-500 hover:bg-navy hover:text-white transition-colors" }
+                  trigger: { className: "w-16 text-gray-400 dark:text-gray-500" },
+                  panel: { className: "bg-white dark:bg-gray-800 shadow-2xl rounded-2xl mt-4 border-0 overflow-hidden ring-1 ring-black/5" },
+                  list: { className: "bg-white dark:bg-gray-800" },
+                  item: { className: "p-5 font-bold text-gray-500 dark:text-gray-300 hover:bg-navy hover:text-white transition-colors dark:hover:bg-gray-700" }
                 }}
               />
             </div>
 
             <div className="space-y-3">
-              <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Semestre</label>
+              <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Semestre</label>
               <div className="flex gap-4">
                 {[1, 2].map((p) => (
                   <button
@@ -363,8 +365,8 @@ const ReviewForm = ({
                       formData.period === p.toString()
                         ? "bg-navy text-white shadow-lg"
                         : availablePeriods.includes(p.toString())
-                          ? "bg-gray-50 text-navy hover:bg-navy hover:text-white"
-                          : "bg-gray-50 text-gray-200 cursor-not-allowed"
+                          ? "bg-gray-50 dark:bg-gray-900 text-navy dark:text-gray-100 hover:bg-navy hover:text-white"
+                          : "bg-gray-50 dark:bg-gray-900 text-gray-200 dark:text-gray-600 cursor-not-allowed"
                     }`}
                   >
                     {p}° Semestre
@@ -379,29 +381,29 @@ const ReviewForm = ({
         <section className={`space-y-8 transition-opacity duration-500 ${!formData.selectedCourseId ? "opacity-20 pointer-events-none" : "opacity-100"}`}>
           <div className="flex items-center gap-3">
              <div className="w-1.5 h-6 bg-navy rounded-full"></div>
-             <h4 className="text-xl font-black text-navy uppercase tracking-tight">Calificación Detallada</h4>
+             <h4 className="text-xl font-black text-navy dark:text-gray-100 uppercase tracking-tight">Calificación Detallada</h4>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {categories.map((category) => (
               <div 
                 key={category.key}
-                className={`p-8 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm transition-all duration-300 hover:shadow-xl ${
+                className={`p-8 bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm transition-all duration-300 hover:shadow-xl ${
                   formData[category.key] ? "border-navy/10" : "hover:border-navy/20"
                 }`}
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-navy/5 text-navy rounded-xl">
+                    <div className="p-2.5 bg-navy/5 dark:bg-gray-700 text-navy dark:text-gray-100 rounded-xl">
                       {getCategoryIcon(category.key)}
                     </div>
                     <div>
-                      <h5 className="font-black text-navy leading-none mb-1">{category.label}</h5>
-                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{category.description}</span>
+                      <h5 className="font-black text-navy dark:text-gray-100 leading-none mb-1">{category.label}</h5>
+                      <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">{category.description}</span>
                     </div>
                   </div>
                   {formData[category.key] && (
-                    <span className="bg-navy/10 text-navy text-xs font-black px-3 py-1 rounded-full">
+                    <span className="bg-navy/10 dark:bg-gray-700 text-navy dark:text-gray-100 text-xs font-black px-3 py-1 rounded-full">
                       {formData[category.key]}/5
                     </span>
                   )}
@@ -416,17 +418,17 @@ const ReviewForm = ({
         <section className={`space-y-6 transition-opacity duration-500 ${!formData.selectedCourseId ? "opacity-20 pointer-events-none" : "opacity-100"}`}>
           <div className="flex items-center gap-3">
              <div className="w-1.5 h-6 bg-navy rounded-full"></div>
-             <h4 className="text-xl font-black text-navy uppercase tracking-tight">Comentario Adicional (Opcional)</h4>
+             <h4 className="text-xl font-black text-navy dark:text-gray-100 uppercase tracking-tight">Comentario Adicional (Opcional)</h4>
           </div>
-          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm">
             <textarea
               value={formData.texto}
               onChange={(e) => setFormData((prev) => ({ ...prev, texto: e.target.value }))}
               placeholder="¿Qué más te gustaría compartir sobre tu experiencia con este docente?"
-              className="w-full h-32 p-6 border-2 border-gray-100 bg-gray-50/50 rounded-2xl transition-all font-medium text-navy resize-none focus:border-navy/30 focus:bg-white focus:outline-none focus:ring-4 focus:ring-navy/5"
+              className="w-full h-32 p-6 border-2 border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900 rounded-2xl transition-all font-medium text-navy dark:text-gray-100 resize-none focus:border-navy/30 focus:bg-white dark:focus:bg-gray-800 focus:outline-none focus:ring-4 focus:ring-navy/5"
               maxLength={1000}
             />
-            <div className="text-right mt-2 text-xs font-bold text-gray-400">
+            <div className="text-right mt-2 text-xs font-bold text-gray-400 dark:text-gray-500">
               {formData.texto.length}/1000
             </div>
           </div>
@@ -452,7 +454,7 @@ const ReviewForm = ({
           {isEditMode && (
             <button
                onClick={handleDelete}
-               className="md:w-auto px-10 h-20 bg-red-50 text-red-500 rounded-[2rem] font-bold uppercase tracking-widest text-xs hover:bg-red-500 hover:text-white transition-all active:scale-95"
+                className="md:w-auto px-10 h-20 bg-red-50 dark:bg-red-950/30 text-red-500 dark:text-red-400 rounded-[2rem] font-bold uppercase tracking-widest text-xs hover:bg-red-500 hover:text-white transition-all active:scale-95"
             >
               Borrar
             </button>

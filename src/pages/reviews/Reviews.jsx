@@ -196,23 +196,23 @@ export default function Reviews() {
 
   if (sectionsLoading && sections.length === 0) {
     return (
-      <div className="flex flex-col justify-center items-center h-screen bg-gray-50">
+      <div className="flex flex-col justify-center items-center h-screen bg-gray-50 dark:bg-gray-950">
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-navy"></div>
-        <p className="mt-4 text-navy font-bold animate-pulse">Cargando análisis académico...</p>
+        <p className="mt-4 text-navy dark:text-gray-100 font-bold animate-pulse">Cargando análisis académico...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-12 bg-[#F3F4F6]">
+    <div className="min-h-screen pb-12 bg-[#F3F4F6] dark:bg-gray-950">
       {/* Header Premium Flotante */}
       <div className="max-w-[1600px] mx-auto px-2 md:px-4 lg:px-8 pt-6">
-        <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 p-6 md:p-8 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-200/50 dark:shadow-none p-6 md:p-8 mb-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-8">
               <div className="flex items-center gap-4 md:gap-6 w-full md:w-auto">
                 <button
                   onClick={() => navigate(-1)}
-                  className="group flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full border border-gray-100 bg-white hover:bg-navy hover:border-navy transition-all duration-300 shadow-sm flex-shrink-0"
+                  className="group flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-navy hover:border-navy transition-all duration-300 shadow-sm flex-shrink-0"
                   title="Volver al Dashboard"
                 >
                   <svg className="w-5 h-5 text-navy group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -222,20 +222,20 @@ export default function Reviews() {
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="px-2 py-0.5 bg-blue-50 text-navy text-[9px] font-black rounded uppercase tracking-widest">Materia</span>
+                    <span className="px-2 py-0.5 bg-blue-50 dark:bg-gray-700 text-navy dark:text-gray-100 text-[9px] font-black rounded uppercase tracking-widest">Materia</span>
                     <div className="h-1 w-1 bg-gray-300 rounded-full"></div>
-                    <span className="text-gray-400 text-[9px] font-bold uppercase tracking-widest break-words leading-tight">{selectedCareer?.nombre}</span>
+                    <span className="text-gray-400 dark:text-gray-500 text-[9px] font-bold uppercase tracking-widest break-words leading-tight">{selectedCareer?.nombre}</span>
                   </div>
-                  <h1 className="text-2xl md:text-3xl lg:text-5xl font-black text-navy tracking-tight leading-tight break-words">
+                  <h1 className="text-2xl md:text-3xl lg:text-5xl font-black text-navy dark:text-gray-100 tracking-tight leading-tight break-words">
                     {subjectName}
                   </h1>
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-center md:justify-end border-t md:border-t-0 pt-6 md:pt-0 border-gray-100">
+              <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-center md:justify-end border-t md:border-t-0 pt-6 md:pt-0 border-gray-100 dark:border-gray-700">
                 <button
                   onClick={handleOpenTriesDialog}
-                  className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border-2 border-navy text-navy px-6 py-3 rounded-2xl hover:bg-navy hover:text-white transition-all duration-300 font-bold shadow-sm group"
+                  className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border-2 border-navy dark:border-navy text-navy dark:text-gray-100 px-6 py-3 rounded-2xl hover:bg-navy hover:text-white transition-all duration-300 font-bold shadow-sm group"
                   type="button"
                 >
                   <svg className="w-5 h-5 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -264,24 +264,24 @@ export default function Reviews() {
       <div className="max-w-[1600px] mx-auto px-2 md:px-4 lg:px-8 space-y-6">
         {/* Navegación rápida entre secciones */}
         {selectedSection && (
-          <div className="sticky top-0 z-10 -mx-2 md:-mx-4 lg:-mx-8 px-2 md:px-4 lg:px-8 py-2 bg-[#F3F4F6]/80 backdrop-blur-md border-b border-gray-200/60">
+          <div className="sticky top-0 z-10 -mx-2 md:-mx-4 lg:-mx-8 px-2 md:px-4 lg:px-8 py-2 bg-[#F3F4F6]/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-200/60 dark:border-gray-700/60">
             <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
-              <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mr-1 flex-shrink-0">Ir a:</span>
+              <span className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mr-1 flex-shrink-0">Ir a:</span>
               <button
                 onClick={() => document.getElementById("metricas")?.scrollIntoView({ behavior: "smooth" })}
-                className="flex-shrink-0 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-[11px] font-bold text-navy hover:bg-navy hover:text-white hover:border-navy transition-all duration-200 shadow-sm"
+                className="flex-shrink-0 px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-[11px] font-bold text-navy dark:text-gray-100 hover:bg-navy hover:text-white hover:border-navy transition-all duration-200 shadow-sm"
               >
                 Métricas
               </button>
               <button
                 onClick={() => document.getElementById("comentarios")?.scrollIntoView({ behavior: "smooth" })}
-                className="flex-shrink-0 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-[11px] font-bold text-navy hover:bg-navy hover:text-white hover:border-navy transition-all duration-200 shadow-sm"
+                className="flex-shrink-0 px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-[11px] font-bold text-navy dark:text-gray-100 hover:bg-navy hover:text-white hover:border-navy transition-all duration-200 shadow-sm"
               >
                 Comentarios
               </button>
               <button
                 onClick={() => document.getElementById("historico")?.scrollIntoView({ behavior: "smooth" })}
-                className="flex-shrink-0 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-[11px] font-bold text-navy hover:bg-navy hover:text-white hover:border-navy transition-all duration-200 shadow-sm"
+                className="flex-shrink-0 px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-[11px] font-bold text-navy dark:text-gray-100 hover:bg-navy hover:text-white hover:border-navy transition-all duration-200 shadow-sm"
               >
                 Histórico
               </button>
@@ -292,15 +292,15 @@ export default function Reviews() {
         {/* Secciones — horizontal scrollable */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg md:text-xl font-black text-navy uppercase tracking-tight flex items-center gap-2">
+            <h2 className="text-lg md:text-xl font-black text-navy dark:text-gray-100 uppercase tracking-tight flex items-center gap-2">
               <div className="w-2 h-6 bg-navy rounded-full"></div>
               Secciones ({sections.length})
             </h2>
           </div>
           
           {sections.length === 0 ? (
-            <div className="bg-white border-2 border-dashed border-gray-100 rounded-3xl p-10 text-center">
-              <p className="text-gray-400 font-bold">No hay secciones registradas</p>
+            <div className="bg-white dark:bg-gray-800 border-2 border-dashed border-gray-100 dark:border-gray-700 rounded-3xl p-10 text-center">
+              <p className="text-gray-400 dark:text-gray-500 font-bold">No hay secciones registradas</p>
             </div>
           ) : (
             <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
@@ -328,11 +328,11 @@ export default function Reviews() {
         {/* Mitad izquierda: métricas | Mitad derecha: comentarios */}
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="flex-1 min-w-0 scroll-mt-16" id="metricas">
-            <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden min-h-[400px]">
+            <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-200/50 dark:shadow-none overflow-hidden min-h-[400px]">
               {lastSemesterLoading ? (
                 <div className="flex flex-col justify-center items-center h-96">
                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-navy"></div>
-                   <p className="mt-4 text-gray-400 font-medium italic">Analizando reportes de curso...</p>
+                   <p className="mt-4 text-gray-400 dark:text-gray-500 font-medium italic">Analizando reportes de curso...</p>
                 </div>
               ) : (
                 <LastSemesterData
@@ -352,9 +352,9 @@ export default function Reviews() {
 
         {/* Histórico — ancho completo */}
         {selectedSection && (
-          <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden scroll-mt-16" id="historico">
+          <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-200/50 dark:shadow-none overflow-hidden scroll-mt-16" id="historico">
             {historicalLoading ? (
-              <div className="p-12 text-center text-gray-400 italic">Cargando base histórica...</div>
+              <div className="p-12 text-center text-gray-400 dark:text-gray-500 italic">Cargando base histórica...</div>
             ) : (
               <HistoricalData historicalData={historicalData} />
             )}
@@ -388,14 +388,14 @@ export default function Reviews() {
         dismissableMask={true}
         modal={true}
         header="Estadísticas de Intentos (Chipitómetro)"
-        contentClassName="p-0 overflow-y-auto"
+        contentClassName="p-0 overflow-y-auto bg-gray-50 dark:bg-gray-900"
         maskStyle={{ backgroundColor: "rgba(0, 0, 0, 0.7)", backdropFilter: "blur(8px)" }}
         pt={{
           root: { className: "rounded-[2rem] overflow-hidden border-0" },
           header: {
             className: "bg-navy text-white px-8 py-6 text-2xl font-black uppercase tracking-tight",
           },
-          content: { className: "p-0 overflow-y-auto bg-gray-50" },
+          content: { className: "p-0 overflow-y-auto bg-gray-50 dark:bg-gray-900" },
           closeButton: {
             className: "text-white hover:bg-white/10 rounded-xl transition-all w-10 h-10 flex items-center justify-center",
           },

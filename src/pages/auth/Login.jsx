@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import loginImg from "../../assets/images/login.png";
 import { useAuth } from "../../hooks/useAuth";
+import { useTheme } from "../../context/theme/useTheme";
 import axios from "axios";
 
 const VIEWS = {
@@ -15,6 +16,7 @@ const VIEWS = {
 
 export default function Login() {
   const { login, requestAccess, verifyToken, resetPassword, register, actionLoading } = useAuth();
+  const { dark, setDark } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -150,28 +152,55 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-white font-outfit">
-      <div className="w-full h-screen flex overflow-hidden bg-white relative z-10">
+    <div className="min-h-screen w-full flex items-center justify-center bg-white dark:bg-gray-950 font-outfit">
+      <div className="w-full h-screen flex overflow-hidden bg-white dark:bg-gray-950 relative z-10">
         {/* Lado Izquierdo: Formulario */}
-        <div className="w-full lg:w-1/2 flex flex-col p-8 md:p-16 justify-between bg-white relative z-10 border-r border-gray-50 overflow-y-auto scrollbar-hide">
+        <div className="w-full lg:w-1/2 flex flex-col p-8 md:p-16 justify-between bg-white dark:bg-gray-950 relative z-10 border-r border-gray-50 dark:border-gray-800 overflow-y-auto scrollbar-hide">
           <div className="max-w-md mx-auto w-full flex flex-col h-full justify-center py-10">
             
             {/* Header / Logo */}
-            <div className="mb-10 text-center lg:text-left">
-              <h1 className="text-6xl md:text-7xl font-black text-navy tracking-tighter">
-                Poli<span className="text-gray-400">Rank</span>
-              </h1>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-300 mt-2">
-                {view === VIEWS.LOGIN && "Acceso Institucional"}
-                {view === VIEWS.FORGOT && "Recuperación de Cuenta"}
-                {view === VIEWS.REGISTER && "Registro de Nuevo Alumno"}
-                {view === VIEWS.RESET && "Establecer nueva clave"}
-              </p>
+            <div className="mb-10 text-center lg:text-left flex items-start justify-between">
+              <div>
+                <h1 className="text-6xl md:text-7xl font-black text-navy dark:text-white tracking-tighter">
+                  Poli<span className="text-gray-400 dark:text-gray-500">Rank</span>
+                </h1>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-300 dark:text-gray-600 mt-2">
+                  {view === VIEWS.LOGIN && "Acceso Institucional"}
+                  {view === VIEWS.FORGOT && "Recuperación de Cuenta"}
+                  {view === VIEWS.REGISTER && "Registro de Nuevo Alumno"}
+                  {view === VIEWS.RESET && "Establecer nueva clave"}
+                </p>
+              </div>
+
+              {/* Dark Mode Toggle */}
+              <button
+                onClick={() => setDark(prev => !prev)}
+                className={`relative w-14 h-7 rounded-full transition-all duration-300 shrink-0 focus:outline-none mt-1 ${
+                  dark
+                    ? 'bg-gradient-to-r from-indigo-500/30 to-purple-500/30 glow-sm'
+                    : 'bg-slate-200 shadow-inner'
+                }`}
+                title={dark ? "Modo claro" : "Modo oscuro"}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white dark:bg-slate-100 shadow-md transition-all duration-300 flex items-center justify-center ${
+                  dark ? 'translate-x-[28px] shadow-[0_0_8px_rgba(99,102,241,0.4)]' : ''
+                }`}>
+                  {dark ? (
+                    <svg className="w-3.5 h-3.5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-3.5 h-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  )}
+                </span>
+              </button>
             </div>
 
             {/* Mensaje de Error */}
             {errorMsg && (
-              <div className="bg-red-50 border border-red-100 rounded-3xl p-4 mb-6 animate-shake">
+              <div className="bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 rounded-3xl p-4 mb-6 animate-shake">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-xl bg-red-500 text-white flex items-center justify-center flex-shrink-0">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -186,8 +215,8 @@ export default function Login() {
             {/* VISTA: CARGANDO / VERIFICANDO */}
             {view === VIEWS.VERIFYING && (
               <div className="text-center py-10 space-y-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-navy mx-auto"></div>
-                <p className="text-navy font-bold">Verificando enlace...</p>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-navy dark:border-t-white mx-auto"></div>
+                <p className="text-navy dark:text-gray-100 font-bold">Verificando enlace...</p>
               </div>
             )}
 
@@ -195,22 +224,22 @@ export default function Login() {
             {view === VIEWS.LOGIN && (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Correo Institucional</label>
+                  <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Correo Institucional</label>
                   <input
                     type="email"
                     name="correo"
                     placeholder="nombre.apellido@fpuna.edu.py"
-                    className="w-full bg-gray-50 border-2 border-gray-50 focus:border-navy focus:bg-white rounded-2xl py-4 px-6 text-navy font-bold transition-all outline-none text-sm"
+                    className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-50 dark:border-gray-800 focus:border-navy dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-gray-900 rounded-2xl py-4 px-6 text-navy dark:text-gray-100 font-bold transition-all outline-none text-sm"
                     value={form.correo}
                     onChange={handleChange}
                   />
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between items-center px-1">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Contraseña</label>
+                    <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Contraseña</label>
                     <button 
                       onClick={() => setView(VIEWS.FORGOT)}
-                      className="text-[10px] font-black text-navy uppercase tracking-widest hover:underline"
+                      className="text-[10px] font-black text-navy dark:text-indigo-400 uppercase tracking-widest hover:underline"
                     >
                       ¿Olvidaste tu clave?
                     </button>
@@ -219,7 +248,7 @@ export default function Login() {
                     type="password"
                     name="password"
                     placeholder="••••••••••••"
-                    className="w-full bg-gray-50 border-2 border-gray-50 focus:border-navy focus:bg-white rounded-2xl py-4 px-6 text-navy font-bold transition-all outline-none text-sm"
+                    className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-50 dark:border-gray-800 focus:border-navy dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-gray-900 rounded-2xl py-4 px-6 text-navy dark:text-gray-100 font-bold transition-all outline-none text-sm"
                     value={form.password}
                     onChange={handleChange}
                   />
@@ -227,15 +256,15 @@ export default function Login() {
                 <button
                   onClick={handleLogin}
                   disabled={actionLoading}
-                  className="w-full bg-navy text-white rounded-2xl h-16 font-black uppercase tracking-widest shadow-xl shadow-navy/20 hover:bg-dark-navy transition-all flex items-center justify-center gap-4 mt-4"
+                  className="w-full bg-navy dark:bg-indigo-600 text-white rounded-2xl h-16 font-black uppercase tracking-widest shadow-xl shadow-navy/20 dark:shadow-indigo-500/20 hover:bg-dark-navy dark:hover:bg-indigo-500 transition-all flex items-center justify-center gap-4 mt-4"
                 >
                   {actionLoading ? <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/20 border-t-white"></div> : "Entrar"}
                 </button>
                 <div className="text-center pt-4">
-                  <p className="text-xs text-gray-400 font-bold">
-                    ¿No tienes cuenta?{" "}
-                    <button onClick={() => setView(VIEWS.FORGOT)} className="text-navy hover:underline">Solicita acceso aquí</button>
-                  </p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 font-bold">
+                      ¿No tienes cuenta?{" "}
+                      <button onClick={() => setView(VIEWS.FORGOT)} className="text-navy dark:text-indigo-400 hover:underline">Solicita acceso aquí</button>
+                    </p>
                 </div>
               </div>
             )}
@@ -243,18 +272,18 @@ export default function Login() {
             {/* VISTA: SOLICITAR ACCESO (FORGOT) */}
             {view === VIEWS.FORGOT && (
               <div className="space-y-4">
-                <div className="bg-navy/[0.02] border border-navy/5 rounded-3xl p-6 mb-6">
-                  <p className="text-[11px] text-gray-500 font-bold leading-relaxed">
+                <div className="bg-navy/[0.02] dark:bg-indigo-500/5 border border-navy/5 dark:border-indigo-500/10 rounded-3xl p-6 mb-6">
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 font-bold leading-relaxed">
                     Ingresa tu correo institucional. Te enviaremos un enlace para que puedas registrarte o restablecer tu contraseña.
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Correo Institucional</label>
+                  <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Correo Institucional</label>
                   <input
                     type="email"
                     name="correo"
                     placeholder="nombre.apellido@fpuna.edu.py"
-                    className="w-full bg-gray-50 border-2 border-gray-50 focus:border-navy focus:bg-white rounded-2xl py-4 px-6 text-navy font-bold transition-all outline-none text-sm"
+                    className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-50 dark:border-gray-800 focus:border-navy dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-gray-900 rounded-2xl py-4 px-6 text-navy dark:text-gray-100 font-bold transition-all outline-none text-sm"
                     value={form.correo}
                     onChange={handleChange}
                   />
@@ -262,13 +291,13 @@ export default function Login() {
                 <button
                   onClick={handleRequestAccess}
                   disabled={actionLoading}
-                  className="w-full bg-navy text-white rounded-2xl h-16 font-black uppercase tracking-widest shadow-xl shadow-navy/20 hover:bg-dark-navy transition-all flex items-center justify-center gap-4 mt-2"
+                  className="w-full bg-navy dark:bg-indigo-600 text-white rounded-2xl h-16 font-black uppercase tracking-widest shadow-xl shadow-navy/20 dark:shadow-indigo-500/20 hover:bg-dark-navy dark:hover:bg-indigo-500 transition-all flex items-center justify-center gap-4 mt-2"
                 >
                   {actionLoading ? <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/20 border-t-white"></div> : "Enviar Enlace"}
                 </button>
                 <button 
                   onClick={() => setView(VIEWS.LOGIN)}
-                  className="w-full text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-navy transition-colors py-2"
+                  className="w-full text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest hover:text-navy dark:hover:text-indigo-400 transition-colors py-2"
                 >
                   Volver al Login
                 </button>
@@ -278,20 +307,20 @@ export default function Login() {
             {/* VISTA: ÉXITO ENVÍO EMAIL */}
             {view === VIEWS.SUCCESS_EMAIL && (
               <div className="text-center space-y-6">
-                <div className="w-20 h-20 bg-green-50 text-green-500 rounded-3xl flex items-center justify-center mx-auto shadow-xl shadow-green-100">
+                <div className="w-20 h-20 bg-green-50 dark:bg-green-950/30 text-green-500 rounded-3xl flex items-center justify-center mx-auto shadow-xl shadow-green-100 dark:shadow-green-900/20">
                   <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-xl font-black text-navy">¡Correo enviado!</h3>
-                  <p className="text-xs text-gray-400 font-bold px-10">
-                    Revisa tu bandeja de entrada (y spam) en <span className="text-navy">{form.correo}</span>.
+                  <h3 className="text-xl font-black text-navy dark:text-white">¡Correo enviado!</h3>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 font-bold px-10">
+                    Revisa tu bandeja de entrada (y spam) en <span className="text-navy dark:text-indigo-400">{form.correo}</span>.
                   </p>
                 </div>
                 <button 
                   onClick={() => setView(VIEWS.LOGIN)}
-                  className="w-full bg-navy text-white rounded-2xl h-16 font-black uppercase tracking-widest transition-all"
+                  className="w-full bg-navy dark:bg-indigo-600 text-white rounded-2xl h-16 font-black uppercase tracking-widest transition-all"
                 >
                   Volver al Login
                 </button>
@@ -301,27 +330,27 @@ export default function Login() {
             {/* VISTA: RESET PASSWORD */}
             {view === VIEWS.RESET && (
               <div className="space-y-4">
-                <div className="bg-navy/5 p-4 rounded-2xl mb-4">
-                  <p className="text-[10px] font-black text-navy uppercase text-center">Hola de nuevo, {tokenData?.correo}</p>
+                <div className="bg-navy/5 dark:bg-indigo-500/10 p-4 rounded-2xl mb-4">
+                  <p className="text-[10px] font-black text-navy dark:text-indigo-300 uppercase text-center">Hola de nuevo, {tokenData?.correo}</p>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nueva Contraseña</label>
+                  <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Nueva Contraseña</label>
                   <input
                     type="password"
                     name="password"
                     placeholder="••••••••••••"
-                    className="w-full bg-gray-50 border-2 border-gray-50 focus:border-navy focus:bg-white rounded-2xl py-4 px-6 text-navy font-bold transition-all outline-none text-sm"
+                    className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-50 dark:border-gray-800 focus:border-navy dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-gray-900 rounded-2xl py-4 px-6 text-navy dark:text-gray-100 font-bold transition-all outline-none text-sm"
                     value={form.password}
                     onChange={handleChange}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Confirmar Contraseña</label>
+                  <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Confirmar Contraseña</label>
                   <input
                     type="password"
                     name="confirmPassword"
                     placeholder="••••••••••••"
-                    className="w-full bg-gray-50 border-2 border-gray-50 focus:border-navy focus:bg-white rounded-2xl py-4 px-6 text-navy font-bold transition-all outline-none text-sm"
+                    className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-50 dark:border-gray-800 focus:border-navy dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-gray-900 rounded-2xl py-4 px-6 text-navy dark:text-gray-100 font-bold transition-all outline-none text-sm"
                     value={form.confirmPassword}
                     onChange={handleChange}
                   />
@@ -329,7 +358,7 @@ export default function Login() {
                 <button
                   onClick={handleResetPassword}
                   disabled={actionLoading}
-                  className="w-full bg-navy text-white rounded-2xl h-16 font-black uppercase tracking-widest transition-all"
+                  className="w-full bg-navy dark:bg-indigo-600 text-white rounded-2xl h-16 font-black uppercase tracking-widest transition-all"
                 >
                   {actionLoading ? "Procesando..." : "Actualizar Contraseña"}
                 </button>
@@ -339,37 +368,37 @@ export default function Login() {
             {/* VISTA: REGISTRO */}
             {view === VIEWS.REGISTER && (
               <div className="space-y-4">
-                <div className="bg-navy/5 p-4 rounded-2xl mb-2">
-                  <p className="text-[10px] font-black text-navy uppercase text-center">Registro para: {tokenData?.correo}</p>
+                <div className="bg-navy/5 dark:bg-indigo-500/10 p-4 rounded-2xl mb-2">
+                  <p className="text-[10px] font-black text-navy dark:text-indigo-300 uppercase text-center">Registro para: {tokenData?.correo}</p>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nombre Completo</label>
+                  <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Nombre Completo</label>
                   <input
                     type="text"
                     name="nombre"
                     placeholder="Ej: Juan Pérez"
-                    className="w-full bg-gray-50 border-2 border-gray-50 focus:border-navy focus:bg-white rounded-2xl py-4 px-6 text-navy font-bold transition-all outline-none text-sm"
+                    className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-50 dark:border-gray-800 focus:border-navy dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-gray-900 rounded-2xl py-4 px-6 text-navy dark:text-gray-100 font-bold transition-all outline-none text-sm"
                     value={form.nombre}
                     onChange={handleChange}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Contraseña</label>
+                    <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Contraseña</label>
                     <input
                       type="password"
                       name="password"
-                      className="w-full bg-gray-50 border-2 border-gray-50 focus:border-navy focus:bg-white rounded-2xl py-4 px-6 text-navy font-bold transition-all outline-none text-sm"
+                      className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-50 dark:border-gray-800 focus:border-navy dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-gray-900 rounded-2xl py-4 px-6 text-navy dark:text-gray-100 font-bold transition-all outline-none text-sm"
                       value={form.password}
                       onChange={handleChange}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Confirmar</label>
+                    <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Confirmar</label>
                     <input
                       type="password"
                       name="confirmPassword"
-                      className="w-full bg-gray-50 border-2 border-gray-50 focus:border-navy focus:bg-white rounded-2xl py-4 px-6 text-navy font-bold transition-all outline-none text-sm"
+                      className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-50 dark:border-gray-800 focus:border-navy dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-gray-900 rounded-2xl py-4 px-6 text-navy dark:text-gray-100 font-bold transition-all outline-none text-sm"
                       value={form.confirmPassword}
                       onChange={handleChange}
                     />
@@ -377,7 +406,7 @@ export default function Login() {
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Selecciona tu(s) carrera(s) (Máx 2)</label>
+                  <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Selecciona tu(s) carrera(s) (Máx 2)</label>
                   <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto pr-2 scrollbar-hide">
                     {availableCareers.map(c => (
                       <button
@@ -385,8 +414,8 @@ export default function Login() {
                         onClick={() => handleCareerToggle(c.id)}
                         className={`text-left p-3 rounded-xl border-2 transition-all text-xs font-bold ${
                           form.carreras.includes(c.id) 
-                          ? "border-navy bg-navy/5 text-navy" 
-                          : "border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-200"
+                          ? "border-navy dark:border-indigo-500 bg-navy/5 dark:bg-indigo-500/10 text-navy dark:text-indigo-300" 
+                          : "border-gray-50 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-gray-400 dark:text-gray-500 hover:border-gray-200 dark:hover:border-gray-600"
                         }`}
                       >
                         {c.nombre}
@@ -398,7 +427,7 @@ export default function Login() {
                 <button
                   onClick={handleRegister}
                   disabled={actionLoading}
-                  className="w-full bg-navy text-white rounded-2xl h-16 font-black uppercase tracking-widest shadow-xl shadow-navy/20 hover:bg-dark-navy transition-all mt-2"
+                  className="w-full bg-navy dark:bg-indigo-600 text-white rounded-2xl h-16 font-black uppercase tracking-widest shadow-xl shadow-navy/20 dark:shadow-indigo-500/20 hover:bg-dark-navy dark:hover:bg-indigo-500 transition-all mt-2"
                 >
                   {actionLoading ? "Creando cuenta..." : "Crear mi Cuenta"}
                 </button>
@@ -409,20 +438,20 @@ export default function Login() {
 
           {/* Footer Legal */}
           <div className="max-w-md mx-auto w-full pt-6">
-            <p className="text-[9px] text-gray-400 font-black uppercase tracking-[0.2em] leading-relaxed text-center">
-              © 2026 PoliRank • <button onClick={() => setShowTerms(true)} className="hover:text-navy transition-colors">términos y condiciones</button>
+            <p className="text-[9px] text-gray-400 dark:text-gray-600 font-black uppercase tracking-[0.2em] leading-relaxed text-center">
+              © 2026 PoliRank • <button onClick={() => setShowTerms(true)} className="hover:text-navy dark:hover:text-indigo-400 transition-colors">términos y condiciones</button>
             </p>
           </div>
         </div>
 
         {/* Lado Derecho: Visual Experience */}
-        <div className="hidden lg:block lg:w-1/2 relative h-full bg-navy">
+        <div className="hidden lg:block lg:w-1/2 relative h-full bg-navy dark:bg-gray-900">
           <img
             src={loginImg}
             alt="Campus FPUNA"
-            className="w-full h-full object-cover opacity-40 mix-blend-overlay grayscale"
+            className="w-full h-full object-cover opacity-40 dark:opacity-20 mix-blend-overlay grayscale"
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-navy/60 via-transparent to-black/80"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-navy/60 dark:from-gray-900/80 via-transparent to-black/80"></div>
           
           <div className="absolute inset-0 flex flex-col justify-center items-center p-20 text-center">
             <div className="max-w-xl space-y-8">
@@ -441,12 +470,12 @@ export default function Login() {
       {/* Modal de Términos y Condiciones */}
       {showTerms && (
         <div className="fixed inset-0 bg-navy/90 backdrop-blur-md flex items-center justify-center z-[200] p-6">
-          <div className="bg-white rounded-[3rem] max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-2xl flex flex-col animate-in fade-in zoom-in duration-300">
-            <div className="p-10 border-b border-gray-100 flex justify-between items-center">
-              <h2 className="text-3xl font-black text-navy tracking-tighter uppercase">Términos</h2>
+          <div className="bg-white dark:bg-gray-900 rounded-[3rem] max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-2xl flex flex-col animate-in fade-in zoom-in duration-300">
+            <div className="p-10 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+              <h2 className="text-3xl font-black text-navy dark:text-white tracking-tighter uppercase">Términos</h2>
               <button
                 onClick={() => setShowTerms(false)}
-                className="w-12 h-12 rounded-full bg-gray-50 text-navy flex items-center justify-center hover:bg-navy hover:text-white transition-all"
+                className="w-12 h-12 rounded-full bg-gray-50 dark:bg-gray-800 text-navy dark:text-white flex items-center justify-center hover:bg-navy dark:hover:bg-indigo-500 hover:text-white transition-all"
               >
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
@@ -456,20 +485,20 @@ export default function Login() {
 
             <div className="p-10 overflow-y-auto space-y-10 scrollbar-hide">
               <section className="space-y-4">
-                <h3 className="font-black text-navy uppercase text-xs tracking-widest">1. Naturaleza</h3>
-                <p className="text-gray-500 text-sm leading-relaxed font-bold">
+                <h3 className="font-black text-navy dark:text-white uppercase text-xs tracking-widest">1. Naturaleza</h3>
+                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed font-bold">
                   PoliRank es una plataforma educativa para estudiantes de la Facultad Politécnica (FPUNA).
                 </p>
               </section>
               <section className="space-y-4">
-                <h3 className="font-black text-navy uppercase text-xs tracking-widest">2. Responsabilidad</h3>
-                <p className="text-gray-500 text-sm leading-relaxed font-bold">
+                <h3 className="font-black text-navy dark:text-white uppercase text-xs tracking-widest">2. Responsabilidad</h3>
+                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed font-bold">
                   El contenido es generado por usuarios. PoliRank no se hace responsable de las opiniones vertidas por los alumnos.
                 </p>
               </section>
               <section className="space-y-4">
-                <h3 className="font-black text-navy uppercase text-xs tracking-widest">3. Privacidad</h3>
-                <p className="text-gray-500 text-sm leading-relaxed font-bold">
+                <h3 className="font-black text-navy dark:text-white uppercase text-xs tracking-widest">3. Privacidad</h3>
+                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed font-bold">
                   Tus datos son utilizados exclusivamente para la funcionalidad de la plataforma. Tu identidad es protegida en las reseñas públicas.
                 </p>
               </section>

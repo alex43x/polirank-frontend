@@ -9,15 +9,15 @@ const TabButton = ({ active, onClick, icon, label, count }) => (
     onClick={onClick}
     className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-wider transition-all duration-200 active:scale-95 ${
       active
-        ? "bg-navy text-white shadow-lg shadow-navy/20"
-        : "bg-white text-gray-400 hover:text-navy hover:bg-gray-50 border border-gray-100"
+        ? "bg-navy dark:bg-indigo-600 text-white shadow-lg shadow-navy/20 dark:shadow-indigo-500/20"
+        : "bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:text-navy dark:hover:text-indigo-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-100 dark:border-gray-700"
     }`}
   >
     {icon}
     <span>{label}</span>
     {count !== undefined && (
       <span className={`px-2 py-0.5 rounded-lg text-[10px] ${
-        active ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500"
+        active ? "bg-white/20 text-white" : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
       }`}>
         {count}
       </span>
@@ -46,19 +46,19 @@ const Toast = ({ toast, onClose }) => {
 };
 
 const LoadingState = () => (
-  <div className="flex flex-col justify-center items-center py-32 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm">
-    <div className="animate-spin rounded-full h-14 w-14 border-t-4 border-b-4 border-blue-600"></div>
-    <p className="mt-4 text-gray-500 font-bold animate-pulse">Cargando...</p>
+  <div className="flex flex-col justify-center items-center py-32 bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm">
+    <div className="animate-spin rounded-full h-14 w-14 border-t-4 border-b-4 border-blue-600 dark:border-indigo-400"></div>
+    <p className="mt-4 text-gray-500 dark:text-gray-400 font-bold animate-pulse">Cargando...</p>
   </div>
 );
 
 const EmptyState = ({ icon, title, message }) => (
-  <div className="text-center py-20 bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/40 max-w-4xl mx-auto p-8">
-    <div className="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-sm border border-emerald-100">
+  <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-200/40 dark:shadow-black/10 max-w-4xl mx-auto p-8">
+    <div className="w-20 h-20 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-sm border border-emerald-100 dark:border-emerald-900/50">
       {icon}
     </div>
-    <h3 className="text-2xl font-black text-navy uppercase tracking-tight mb-2">{title}</h3>
-    <p className="text-gray-500 font-medium max-w-md mx-auto leading-relaxed">{message}</p>
+    <h3 className="text-2xl font-black text-navy dark:text-white uppercase tracking-tight mb-2">{title}</h3>
+    <p className="text-gray-500 dark:text-gray-400 font-medium max-w-md mx-auto leading-relaxed">{message}</p>
   </div>
 );
 
@@ -72,46 +72,46 @@ function ReportCard({ report, onApprove, onReject, isProcessing }) {
   });
 
   return (
-    <div className="bg-white border border-gray-100 rounded-[2.5rem] shadow-xl shadow-gray-200/30 p-6 md:p-8 hover:shadow-2xl hover:border-blue-100 transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-[2.5rem] shadow-xl shadow-gray-200/30 dark:shadow-black/10 p-6 md:p-8 hover:shadow-2xl hover:border-blue-100 dark:hover:border-indigo-500/30 transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
       <div className="absolute top-0 left-0 w-2 h-full bg-rose-500 rounded-l-[2.5rem]"></div>
 
       <div>
         {/* Header: comment author + date */}
         <div className="flex justify-between items-start mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center font-black uppercase text-base">
+            <div className="w-11 h-11 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-xl flex items-center justify-center font-black uppercase text-base">
               {commentAuthor?.nombre?.charAt(0) || "?"}
             </div>
             <div>
-              <h4 className="font-black text-navy leading-tight text-sm">
+              <h4 className="font-black text-navy dark:text-white leading-tight text-sm">
                 {commentAuthor?.nombre || "Usuario"}
               </h4>
-              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider mt-0.5">
                 {commentAuthor?.correo || ""}
               </p>
             </div>
           </div>
-          <span className="text-[10px] text-gray-400 font-bold bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-1 uppercase whitespace-nowrap">
+          <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-lg px-2.5 py-1 uppercase whitespace-nowrap">
             {createdDate}
           </span>
         </div>
 
         {/* Comment text */}
         <div className="mb-5">
-          <span className="text-[9px] text-rose-600 font-black uppercase tracking-widest block mb-1">
+          <span className="text-[9px] text-rose-600 dark:text-rose-400 font-black uppercase tracking-widest block mb-1">
             Comentario Reportado
           </span>
-          <div className="bg-rose-50/20 border border-rose-100/50 p-5 rounded-2xl relative">
-            <span className="absolute -top-3 left-4 text-3xl font-serif text-rose-300 leading-none">"</span>
+          <div className="bg-rose-50/20 dark:bg-rose-950/20 border border-rose-100/50 dark:border-rose-900/50 p-5 rounded-2xl relative">
+            <span className="absolute -top-3 left-4 text-3xl font-serif text-rose-300 dark:text-rose-700 leading-none">"</span>
             {isBanned ? (
-              <p className="text-gray-400 italic font-bold flex items-center gap-2 relative z-10">
+              <p className="text-gray-400 dark:text-gray-500 italic font-bold flex items-center gap-2 relative z-10">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                 </svg>
                 Comentario ya baneado
               </p>
             ) : (
-              <p className="text-gray-700 font-semibold italic text-sm leading-relaxed relative z-10">
+              <p className="text-gray-700 dark:text-gray-300 font-semibold italic text-sm leading-relaxed relative z-10">
                 {commentText}
               </p>
             )}
@@ -119,23 +119,23 @@ function ReportCard({ report, onApprove, onReject, isProcessing }) {
         </div>
 
         {/* Reporter info */}
-        <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4 mb-4">
+        <div className="bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-2xl p-4 mb-4">
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center font-black text-xs shrink-0">
+            <div className="w-8 h-8 bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 rounded-lg flex items-center justify-center font-black text-xs shrink-0">
               {reporter?.nombre?.charAt(0) || "?"}
             </div>
             <div className="min-w-0">
-              <span className="text-[8px] text-gray-400 font-black uppercase tracking-widest block mb-0.5">
+              <span className="text-[8px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest block mb-0.5">
                 Reportado por
               </span>
-              <span className="font-bold text-navy text-xs block truncate">
+              <span className="font-bold text-navy dark:text-white text-xs block truncate">
                 {reporter?.nombre || "Anónimo"}
               </span>
-              <span className="text-[9px] text-gray-400 font-bold block mt-0.5">
-                Motivo: <span className="text-amber-600 uppercase">{report.reason_type}</span>
+              <span className="text-[9px] text-gray-400 dark:text-gray-500 font-bold block mt-0.5">
+                Motivo: <span className="text-amber-600 dark:text-amber-400 uppercase">{report.reason_type}</span>
               </span>
               {report.reason_detail && (
-                <p className="text-[10px] text-gray-500 font-medium mt-1 leading-relaxed bg-white rounded-xl p-2.5 border border-gray-100">
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium mt-1 leading-relaxed bg-white dark:bg-gray-800 rounded-xl p-2.5 border border-gray-100 dark:border-gray-700">
                   {report.reason_detail}
                 </p>
               )}
@@ -145,11 +145,11 @@ function ReportCard({ report, onApprove, onReject, isProcessing }) {
       </div>
 
       {/* Actions */}
-      <div className="flex gap-4 border-t border-gray-100 pt-6 mt-2">
+      <div className="flex gap-4 border-t border-gray-100 dark:border-gray-700 pt-6 mt-2">
         <button
           onClick={() => onReject(report.id)}
           disabled={isProcessing}
-          className="flex-1 flex items-center justify-center gap-2 bg-white border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-600 px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-wider transition-all duration-200 active:scale-95 disabled:opacity-40"
+          className="flex-1 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-wider transition-all duration-200 active:scale-95 disabled:opacity-40"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
@@ -184,49 +184,49 @@ function ReviewCard({ review, onBan, isProcessing }) {
   if (!comentario?.texto && !alreadyBanned) return null;
 
   return (
-    <div className="bg-white border border-gray-100 rounded-[2.5rem] shadow-xl shadow-gray-200/30 p-6 md:p-8 hover:shadow-2xl hover:border-blue-100 transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-[2.5rem] shadow-xl shadow-gray-200/30 dark:shadow-black/10 p-6 md:p-8 hover:shadow-2xl hover:border-blue-100 dark:hover:border-indigo-500/30 transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
       <div className={`absolute top-0 left-0 w-2 h-full rounded-l-[2.5rem] ${
-        alreadyBanned ? "bg-gray-400" : "bg-blue-600"
+        alreadyBanned ? "bg-gray-400 dark:bg-gray-500" : "bg-blue-600 dark:bg-indigo-500"
       }`}></div>
 
       <div>
         <div className="flex justify-between items-start mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-black uppercase text-base">
+            <div className="w-11 h-11 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center font-black uppercase text-base">
               {authorName.charAt(0)}
             </div>
             <div>
-              <h4 className="font-black text-navy leading-tight text-sm">{authorName}</h4>
-              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">
+              <h4 className="font-black text-navy dark:text-white leading-tight text-sm">{authorName}</h4>
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider mt-0.5">
                 {review.alumno?.correo || ""}
               </p>
             </div>
           </div>
-          <span className="text-[10px] text-gray-400 font-bold bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-1 uppercase whitespace-nowrap">
+          <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-lg px-2.5 py-1 uppercase whitespace-nowrap">
             {dateStr}
           </span>
         </div>
 
-        <div className="bg-[#F8FAFC] border border-gray-100 rounded-2xl p-4 mb-5">
+        <div className="bg-[#F8FAFC] dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-2xl p-4 mb-5">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <span className="text-[8px] text-gray-400 font-black uppercase tracking-widest block mb-0.5">Asignatura</span>
-              <span className="font-extrabold text-navy text-xs uppercase truncate block">{courseName}</span>
+              <span className="text-[8px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest block mb-0.5">Asignatura</span>
+              <span className="font-extrabold text-navy dark:text-white text-xs uppercase truncate block">{courseName}</span>
             </div>
             <div>
-              <span className="text-[8px] text-gray-400 font-black uppercase tracking-widest block mb-0.5">Docente</span>
-              <span className="font-extrabold text-navy text-xs uppercase truncate block">{teacherName}</span>
+              <span className="text-[8px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest block mb-0.5">Docente</span>
+              <span className="font-extrabold text-navy dark:text-white text-xs uppercase truncate block">{teacherName}</span>
             </div>
           </div>
         </div>
 
         <div className="mb-4">
-          <span className="text-[9px] text-blue-600 font-black uppercase tracking-widest block mb-1">Comentario</span>
+          <span className="text-[9px] text-blue-600 dark:text-blue-400 font-black uppercase tracking-widest block mb-1">Comentario</span>
           <div className={`p-5 rounded-2xl relative ${
-            alreadyBanned ? "bg-gray-50 border border-gray-100" : "bg-blue-50/20 border border-blue-100/50"
+            alreadyBanned ? "bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700" : "bg-blue-50/20 dark:bg-blue-950/20 border border-blue-100/50 dark:border-blue-900/50"
           }`}>
             {alreadyBanned ? (
-              <p className="text-gray-400 italic font-bold flex items-center gap-2">
+              <p className="text-gray-400 dark:text-gray-500 italic font-bold flex items-center gap-2">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                 </svg>
@@ -234,24 +234,24 @@ function ReviewCard({ review, onBan, isProcessing }) {
               </p>
             ) : (
               <>
-                <span className="absolute -top-3 left-4 text-3xl font-serif text-blue-300 leading-none">"</span>
-                <p className="text-gray-700 font-semibold italic text-sm leading-relaxed relative z-10 break-words">{comentario.texto}</p>
+                <span className="absolute -top-3 left-4 text-3xl font-serif text-blue-300 dark:text-blue-700 leading-none">"</span>
+                <p className="text-gray-700 dark:text-gray-300 font-semibold italic text-sm leading-relaxed relative z-10 break-words">{comentario.texto}</p>
               </>
             )}
           </div>
         </div>
       </div>
 
-      <div className="flex gap-4 border-t border-gray-100 pt-6 mt-2">
+      <div className="flex gap-4 border-t border-gray-100 dark:border-gray-700 pt-6 mt-2">
         {alreadyBanned ? (
-          <div className="flex-1 text-center py-3 rounded-2xl bg-gray-50 text-gray-400 font-black text-xs uppercase tracking-wider">
+          <div className="flex-1 text-center py-3 rounded-2xl bg-gray-50 dark:bg-gray-900 text-gray-400 dark:text-gray-500 font-black text-xs uppercase tracking-wider">
             Ya baneado
           </div>
         ) : (
           <button
             onClick={() => onBan(comentario.id, review.id)}
             disabled={isProcessing}
-            className="flex-1 flex items-center justify-center gap-2 bg-red-50 hover:bg-red-500 hover:text-white text-red-600 border-2 border-red-100 hover:border-red-200 px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-wider transition-all duration-200 active:scale-95 disabled:opacity-40"
+            className="flex-1 flex items-center justify-center gap-2 bg-red-50 dark:bg-red-950/30 hover:bg-red-500 dark:hover:bg-red-600 hover:text-white text-red-600 dark:text-red-400 border-2 border-red-100 dark:border-red-900/50 hover:border-red-200 dark:hover:border-red-500 px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-wider transition-all duration-200 active:scale-95 disabled:opacity-40"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
@@ -395,27 +395,27 @@ export default function AdminPanel() {
   const totalPages = reviewsData.meta?.totalPages || 1;
 
   return (
-    <div className="min-h-screen pb-16 bg-[#F8FAFC]">
+    <div className="min-h-screen pb-16 bg-[#F8FAFC] dark:bg-gray-950">
       <Toast toast={toast} onClose={() => setToast(null)} />
 
       <div className="max-w-[1600px] mx-auto px-4 md:px-8 pt-8">
         {/* Header */}
-        <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 p-6 md:p-8 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-200/50 dark:shadow-black/10 p-6 md:p-8 mb-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-sm">
+              <div className="w-12 h-12 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center shadow-sm">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
               <div>
-                <h1 className="text-2xl md:text-4xl font-black text-navy tracking-tight">Panel de Administración</h1>
-                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">Moderación de reseñas escritas</p>
+                <h1 className="text-2xl md:text-4xl font-black text-navy dark:text-white tracking-tight">Panel de Administración</h1>
+                <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-1">Moderación de reseñas escritas</p>
               </div>
             </div>
             <button
               onClick={() => navigate("/dashboard")}
-              className="bg-navy hover:bg-dark-navy text-white px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all duration-200 active:scale-95 shadow-md shadow-navy/10"
+              className="bg-navy dark:bg-indigo-600 hover:bg-dark-navy dark:hover:bg-indigo-500 text-white px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all duration-200 active:scale-95 shadow-md shadow-navy/10 dark:shadow-indigo-500/20"
             >
               Volver al Dashboard
             </button>
@@ -485,50 +485,50 @@ export default function AdminPanel() {
                     });
 
                     return (
-                      <div key={review.id} className="bg-white border border-gray-100 rounded-[2.5rem] shadow-xl shadow-gray-200/30 p-6 md:p-8 hover:shadow-2xl hover:border-blue-100 transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
+                      <div key={review.id} className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-[2.5rem] shadow-xl shadow-gray-200/30 dark:shadow-black/10 p-6 md:p-8 hover:shadow-2xl hover:border-blue-100 dark:hover:border-indigo-500/30 transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-2 h-full bg-amber-500 rounded-l-[2.5rem]"></div>
 
                         <div>
                           <div className="flex justify-between items-start mb-6">
                             <div className="flex items-center gap-3">
-                              <div className="w-11 h-11 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center font-black uppercase text-base">
+                              <div className="w-11 h-11 bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center font-black uppercase text-base">
                                 {authorName.charAt(0)}
                               </div>
                               <div>
-                                <h4 className="font-black text-navy leading-tight text-sm">{authorName}</h4>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">{review.alumno?.correo || ""}</p>
+                                <h4 className="font-black text-navy dark:text-white leading-tight text-sm">{authorName}</h4>
+                                <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider mt-0.5">{review.alumno?.correo || ""}</p>
                               </div>
                             </div>
-                            <span className="text-[10px] text-gray-400 font-bold bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-1 uppercase whitespace-nowrap">{dateStr}</span>
+                            <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-lg px-2.5 py-1 uppercase whitespace-nowrap">{dateStr}</span>
                           </div>
 
-                          <div className="bg-[#F8FAFC] border border-gray-100 rounded-2xl p-4 mb-6">
+                          <div className="bg-[#F8FAFC] dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-2xl p-4 mb-6">
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <span className="text-[8px] text-gray-400 font-black uppercase tracking-widest block mb-0.5">Asignatura</span>
-                                <span className="font-extrabold text-navy text-xs uppercase truncate block">{courseName}</span>
+                                <span className="text-[8px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest block mb-0.5">Asignatura</span>
+                                <span className="font-extrabold text-navy dark:text-white text-xs uppercase truncate block">{courseName}</span>
                               </div>
                               <div>
-                                <span className="text-[8px] text-gray-400 font-black uppercase tracking-widest block mb-0.5">Docente</span>
-                                <span className="font-extrabold text-navy text-xs uppercase truncate block">{teacherName}</span>
+                                <span className="text-[8px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest block mb-0.5">Docente</span>
+                                <span className="font-extrabold text-navy dark:text-white text-xs uppercase truncate block">{teacherName}</span>
                               </div>
                             </div>
                           </div>
 
                           <div className="mb-6">
-                            <span className="text-[9px] text-amber-600 font-black uppercase tracking-widest block mb-1">Comentario pendiente</span>
-                            <div className="bg-amber-50/20 border border-amber-100/50 p-5 rounded-2xl relative">
-                              <span className="absolute -top-3 left-4 text-3xl font-serif text-amber-300 leading-none">"</span>
-                              <p className="text-gray-700 font-semibold italic text-sm leading-relaxed relative z-10">{review.comentario?.texto}</p>
+                            <span className="text-[9px] text-amber-600 dark:text-amber-400 font-black uppercase tracking-widest block mb-1">Comentario pendiente</span>
+                            <div className="bg-amber-50/20 dark:bg-amber-950/20 border border-amber-100/50 dark:border-amber-900/50 p-5 rounded-2xl relative">
+                              <span className="absolute -top-3 left-4 text-3xl font-serif text-amber-300 dark:text-amber-700 leading-none">"</span>
+                              <p className="text-gray-700 dark:text-gray-300 font-semibold italic text-sm leading-relaxed relative z-10">{review.comentario?.texto}</p>
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex gap-4 border-t border-gray-100 pt-6 mt-2">
+                        <div className="flex gap-4 border-t border-gray-100 dark:border-gray-700 pt-6 mt-2">
                           <button
                             onClick={() => handleRejectPending(review.id)}
                             disabled={processing === `reject-${review.id}`}
-                            className="flex-1 flex items-center justify-center gap-2 bg-white border-2 border-rose-100 hover:border-rose-200 hover:bg-rose-50/50 text-rose-600 px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-wider transition-all duration-200 active:scale-95 disabled:opacity-40"
+                            className="flex-1 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border-2 border-rose-100 dark:border-rose-900/50 hover:border-rose-200 dark:hover:border-rose-700 hover:bg-rose-50/50 dark:hover:bg-rose-950/20 text-rose-600 dark:text-rose-400 px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-wider transition-all duration-200 active:scale-95 disabled:opacity-40"
                           >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -554,10 +554,10 @@ export default function AdminPanel() {
                 {pendingData.meta?.totalPages > 1 && (
                   <div className="flex justify-center items-center gap-4 pt-8">
                     <button disabled={pendingPage === 1} onClick={() => setPendingPage((p) => Math.max(1, p - 1))}
-                      className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:text-navy disabled:opacity-40 transition-all font-bold">«</button>
-                    <span className="text-xs font-black text-navy uppercase tracking-wider">Página {pendingPage} de {pendingData.meta?.totalPages}</span>
+                      className="w-10 h-10 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-navy dark:hover:text-white disabled:opacity-40 transition-all font-bold">«</button>
+                    <span className="text-xs font-black text-navy dark:text-white uppercase tracking-wider">Página {pendingPage} de {pendingData.meta?.totalPages}</span>
                     <button disabled={pendingPage === pendingData.meta?.totalPages} onClick={() => setPendingPage((p) => Math.min(pendingData.meta?.totalPages, p + 1))}
-                      className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:text-navy disabled:opacity-40 transition-all font-bold">»</button>
+                      className="w-10 h-10 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-navy dark:hover:text-white disabled:opacity-40 transition-all font-bold">»</button>
                   </div>
                 )}
               </>
@@ -634,17 +634,17 @@ export default function AdminPanel() {
                     <button
                       disabled={page === 1}
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:text-navy disabled:opacity-40 transition-all font-bold"
+                      className="w-10 h-10 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-navy dark:hover:text-white disabled:opacity-40 transition-all font-bold"
                     >
                       «
                     </button>
-                    <span className="text-xs font-black text-navy uppercase tracking-wider">
+                    <span className="text-xs font-black text-navy dark:text-white uppercase tracking-wider">
                       Página {page} de {totalPages}
                     </span>
                     <button
                       disabled={page === totalPages}
                       onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                      className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:text-navy disabled:opacity-40 transition-all font-bold"
+                      className="w-10 h-10 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-navy dark:hover:text-white disabled:opacity-40 transition-all font-bold"
                     >
                       »
                     </button>

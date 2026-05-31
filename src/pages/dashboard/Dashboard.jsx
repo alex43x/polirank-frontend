@@ -258,18 +258,18 @@ export default function Dashboard() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-0 shrink-0">
             <span className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] leading-none mb-1 block">Dashboard</span>
-            <h1 className="text-4xl md:text-5xl font-black text-navy leading-none tracking-tighter">
+            <h1 className="text-4xl md:text-5xl font-black text-navy dark:text-gray-100 leading-none tracking-tighter">
               Principal
             </h1>
             <p className="text-sm md:text-base text-gray-400 font-medium pt-0.5">
-              Hola, <span className="text-navy font-bold">{user?.nombre}</span>
+              Hola, <span className="text-navy dark:text-gray-100 font-bold">{user?.nombre}</span>
             </p>
           </div>
 
           {/* Bloque Central: Stats + Switcher */}
           <div className="flex flex-col items-center gap-3 flex-1 lg:max-w-xl">
             {/* Stats Compactos Arriba */}
-            <div className="flex items-center gap-6 text-[10px] font-black text-gray-400 uppercase tracking-widest bg-white/50 px-4 py-1.5 rounded-full border border-gray-100 shadow-sm">
+            <div className="flex items-center gap-6 text-[10px] font-black text-gray-400 uppercase tracking-widest bg-white/50 dark:bg-gray-800/50 px-4 py-1.5 rounded-full border border-gray-100 dark:border-gray-700 shadow-sm">
                 <div className="flex items-center gap-2">
                    <span>Materias:</span>
                    <span className="text-navy text-xs">{total}</span>
@@ -285,7 +285,7 @@ export default function Dashboard() {
 
             {/* Selector de Carreras tipo "Tabs" */}
             {user?.matriculaciones && user.matriculaciones.length > 1 && (
-              <div className="bg-gray-100/50 p-1 rounded-2xl flex flex-wrap gap-1 border border-gray-200/50 h-fit">
+              <div className="bg-gray-100/50 dark:bg-gray-800/50 p-1 rounded-2xl flex flex-wrap gap-1 border border-gray-200/50 dark:border-gray-700 h-fit">
                 {user.matriculaciones.map((matriculacion) => (
                   <button
                     key={matriculacion.id}
@@ -293,8 +293,8 @@ export default function Dashboard() {
                     disabled={isChangingCareer}
                     className={`px-6 py-2 rounded-xl font-bold text-xs transition-all duration-300 ${
                       selectedCareer?.id === matriculacion.carrera.id
-                        ? 'bg-white text-navy shadow-lg shadow-navy/5'
-                        : 'text-gray-400 hover:text-navy hover:bg-white/50'
+                        ? 'bg-white dark:bg-gray-800 text-navy dark:text-white shadow-lg shadow-navy/5'
+                        : 'text-gray-400 dark:text-gray-500 hover:text-navy dark:hover:text-white hover:bg-white/50 dark:hover:bg-gray-800/50'
                     }`}
                   >
                     {matriculacion.carrera.nombre}
@@ -304,41 +304,27 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* Admin: botón a moderación */}
-          {user?.rol?.nombre === "ADMIN" && (
-            <button
-              onClick={() => navigate("/admin")}
-              className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200/50 px-5 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-wider transition-all duration-200 active:scale-95 shadow-sm shrink-0"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              Moderación
-            </button>
-          )}
-
           {/* Espacio para equilibrio (Oculto en móvil) */}
           <div className="hidden md:block w-[140px] lg:w-[180px]"></div>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-0.5 border-b border-gray-100 pb-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-0.5 border-b border-gray-100 dark:border-gray-700 pb-2">
           <div className="flex items-baseline gap-2">
-            <h2 className="text-[15px] md:text-xs font-black text-navy uppercase tracking-widest">
+            <h2 className="text-[15px] md:text-xs font-black text-navy dark:text-gray-100 uppercase tracking-widest">
               {searchMode === 'subjects' ? 'Asignaturas' : 'Docentes'}
             </h2>
             {searchMode === 'subjects' && (
-              <span className="text-gray-400 font-bold bg-gray-100 px-3 py-0.5 rounded-full text-[15px] lowercase italic">
+              <span className="text-gray-400 font-bold bg-gray-100 dark:bg-gray-800 px-3 py-0.5 rounded-full text-[15px] lowercase italic">
                 {selectedCareer?.nombre}
               </span>
             )}
           </div>
 
-          <div className="bg-gray-100 p-1 rounded-xl flex gap-1">
+          <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex gap-1">
             <button
               onClick={() => { setSearchMode('subjects'); }}
               className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
-                searchMode === 'subjects' ? 'bg-white text-navy shadow-sm' : 'text-gray-400 hover:text-navy'
+                searchMode === 'subjects' ? 'bg-white dark:bg-gray-700 text-navy dark:text-white shadow-sm' : 'text-gray-400 dark:text-gray-500 hover:text-navy dark:hover:text-white'
               }`}
             >
               Materias
@@ -346,7 +332,7 @@ export default function Dashboard() {
             <button
               onClick={() => { setSearchMode('teachers'); }}
               className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
-                searchMode === 'teachers' ? 'bg-white text-navy shadow-sm' : 'text-gray-400 hover:text-navy'
+                searchMode === 'teachers' ? 'bg-white dark:bg-gray-700 text-navy dark:text-white shadow-sm' : 'text-gray-400 dark:text-gray-500 hover:text-navy dark:hover:text-white'
               }`}
             >
               Profesores
@@ -356,11 +342,11 @@ export default function Dashboard() {
       </header>
 
       {/* Barra de Búsqueda y Filtros Premium */}
-      <section className="bg-white p-4 md:p-6 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-navy/5 space-y-6">
+      <section className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-navy/5 dark:glow space-y-6">
         <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center">
           {/* Input de Búsqueda con Icono (Flex Layout para evitar solapamiento) */}
-          <div className="flex-1 flex items-center bg-gray-50 border-2 border-transparent focus-within:border-navy focus-within:bg-white rounded-2xl px-5 transition-all group">
-            <div className="text-gray-400 group-focus-within:text-navy transition-colors shrink-0">
+          <div className="flex-1 flex items-center bg-gray-50 dark:bg-gray-900/50 border-2 border-transparent focus-within:border-navy dark:focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-gray-800 rounded-2xl px-5 transition-all group">
+            <div className="text-gray-400 dark:text-gray-500 group-focus-within:text-navy dark:group-focus-within:text-blue-400 transition-colors shrink-0">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -371,7 +357,7 @@ export default function Dashboard() {
               value={localFilters.search}
               onChange={handleSearchChange}
               disabled={isChangingCareer}
-              className="w-full bg-transparent border-none py-4 pl-3 pr-2 font-bold text-navy transition-all outline-none md:text-lg focus:ring-0"
+              className="w-full bg-transparent border-none py-4 pl-3 pr-2 font-bold text-navy dark:text-gray-100 transition-all outline-none md:text-lg focus:ring-0"
             />
           </div>
 
@@ -385,11 +371,11 @@ export default function Dashboard() {
               onChange={handleDeptoChange}
               disabled={isChangingCareer}
               showClear
-              className="lg:w-80 h-16 border-2 border-gray-50 focus:border-navy rounded-2xl bg-gray-50 transition-all font-bold text-navy"
+              className="lg:w-80 h-16 border-2 border-gray-50 dark:border-gray-700 focus:border-navy rounded-2xl bg-gray-50 dark:bg-gray-900/50 transition-all font-bold text-navy dark:text-gray-100"
               pt={{
                 input: { className: "px-6 py-4 flex items-center text-sm md:text-base" },
-                panel: { className: "bg-white shadow-2xl rounded-2xl mt-4 border-0 overflow-hidden ring-1 ring-black/5" },
-                item: { className: "p-4 font-bold text-gray-500 hover:bg-navy hover:text-white transition-colors" }
+                panel: { className: "bg-white dark:bg-gray-800 shadow-2xl rounded-2xl mt-4 border-0 dark:border dark:border-gray-700 overflow-hidden ring-1 ring-black/5" },
+                item: { className: "p-4 font-bold text-gray-500 dark:text-gray-400 hover:bg-navy hover:text-white dark:hover:bg-gray-700 transition-colors" }
               }}
             />
           )}
@@ -406,7 +392,7 @@ export default function Dashboard() {
                 className={`px-6 py-2.5 rounded-xl font-bold text-xs md:text-sm transition-all ${
                   localFilters.semester === null 
                     ? "bg-navy text-white shadow-lg shadow-navy/20" 
-                    : "bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-navy"
+                      : "bg-gray-50 dark:bg-gray-900/50 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-navy dark:hover:text-white"
                 }`}
                 onClick={() => handleSemesterChange(null)}
               >
@@ -418,7 +404,7 @@ export default function Dashboard() {
                   className={`w-11 h-11 rounded-xl font-black text-sm transition-all flex items-center justify-center ${
                     localFilters.semester === i + 1
                       ? "bg-navy text-white shadow-lg shadow-navy/20 scale-110"
-                      : "bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-navy"
+                    : "bg-gray-50 dark:bg-gray-900/50 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-navy dark:hover:text-white"
                   }`}
                   onClick={() => handleSemesterChange(i + 1)}
                 >
@@ -433,8 +419,8 @@ export default function Dashboard() {
       {/* Grid de Resultados */}
       <section className="space-y-6">
         <div className="flex items-center justify-between px-2">
-           <p className="text-sm font-bold text-gray-400">
-             Mostrando <span className="text-navy">
+           <p className="text-sm font-bold text-gray-400 dark:text-gray-500">
+              Mostrando <span className="text-navy dark:text-gray-100">
                {searchMode === 'subjects' ? subjects.length : teachers.length}
              </span> de <span className="text-navy">
                {searchMode === 'subjects' ? total : teachersTotal}
@@ -445,7 +431,7 @@ export default function Dashboard() {
         {subjectsLoading || teachersLoading || isChangingCareer ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="h-48 bg-gray-100 rounded-3xl border border-gray-50"></div>
+              <div key={i} className="h-48 bg-gray-100 dark:bg-gray-800 rounded-3xl border border-gray-50 dark:border-gray-700"></div>
             ))}
           </div>
         ) : searchMode === 'subjects' ? (
@@ -495,7 +481,7 @@ export default function Dashboard() {
                   className={`w-11 h-11 rounded-2xl font-black text-sm transition-all ${
                     currentPage === pageNum
                       ? 'bg-navy text-white shadow-xl shadow-navy/20 scale-110'
-                      : 'bg-white text-gray-400 hover:text-navy hover:bg-gray-100'
+                      : 'bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:text-navy dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
                   }`}
                 >
                   {pageNum}
@@ -522,13 +508,13 @@ export default function Dashboard() {
 // Componente auxiliar para mostrar cuando no hay resultados
 function NoResults({ message }) {
   return (
-    <div className="flex flex-col items-center justify-center py-24 bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-200 text-center">
-      <div className="bg-white p-6 rounded-full shadow-lg mb-6 text-gray-200">
+    <div className="flex flex-col items-center justify-center py-24 bg-gray-50 dark:bg-gray-800/50 rounded-[3rem] border-2 border-dashed border-gray-200 dark:border-gray-700 text-center">
+      <div className="bg-white dark:bg-gray-700 p-6 rounded-full shadow-lg mb-6 text-gray-200 dark:text-gray-600">
         <svg className="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       </div>
-      <h3 className="text-2xl font-black text-navy mb-2">Sin resultados</h3>
+      <h3 className="text-2xl font-black text-navy dark:text-gray-100 mb-2">Sin resultados</h3>
       <p className="text-gray-400 max-w-xs mx-auto">{message}</p>
     </div>
   );

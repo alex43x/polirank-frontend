@@ -222,6 +222,18 @@ export const ReviewProvider = ({ children }) => {
     }
   };
 
+  const reportComentario = async (reviewId, { reason_type, reason_detail }) => {
+    setLoading(true);
+    try {
+      const { data } = await api.post(`/reviews/${reviewId}/comentario/reporte`, { reason_type, reason_detail });
+      return data.data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const banComment = async (comentarioId) => {
     setLoading(true);
     try {
@@ -260,6 +272,7 @@ export const ReviewProvider = ({ children }) => {
         fetchPendingReports,
         approveReport,
         rejectReport,
+        reportComentario,
         banComment,
       }}
     >

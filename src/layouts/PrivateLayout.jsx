@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { useTheme } from "../context/theme/useTheme";
 
 export default function PrivateLayout() {
   const { logout, user, isGuest, profileData, getProfile } = useAuth();
+  const { dark, setDark } = useTheme();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("reviews");
@@ -34,7 +36,7 @@ export default function PrivateLayout() {
   const totalContributions = reviewsList.length + triesList.length;
 
   let rankName = "Observador";
-  let rankColor = "bg-slate-50 text-slate-500 border-slate-200/60";
+  let rankColor = "bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 border-slate-200/60 dark:border-slate-700";
   let rankIcon = (
     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -44,7 +46,7 @@ export default function PrivateLayout() {
 
   if (totalContributions >= 20) {
     rankName = "Maestro PoliRank";
-    rankColor = "bg-gradient-to-br from-orange-50 to-amber-50 text-orange-600 border-orange-200/50 shadow-md shadow-orange-100/50";
+    rankColor = "bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 text-orange-600 dark:text-orange-400 border-orange-200/50 dark:border-orange-900/50 shadow-md shadow-orange-100/50 dark:shadow-orange-900/20";
     rankIcon = (
       <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
         <path d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-.562-.317 16.404 16.404 0 01-1.582-1.115c-1.1-.889-2.433-2.156-3.476-3.82C2.365 9.045 1.5 6.87 1.5 5.125c0-1.777.888-2.84 1.672-3.447A4.66 4.66 0 016.25.75c1.337 0 2.556.538 3.75 1.588C11.194 1.288 12.413.75 13.75.75a4.66 4.66 0 013.078.928c.784.607 1.672 1.67 1.672 3.447 0 1.745-.864 3.92-2.473 5.825-1.043 1.664-2.376 2.931-3.476 3.82a16.404 16.404 0 01-2.144 1.432l-.019.01-.005.003-.001.001a.507.507 0 01-.38 0l-.001-.001z" />
@@ -52,7 +54,7 @@ export default function PrivateLayout() {
     );
   } else if (totalContributions >= 12) {
     rankName = "Leyenda Académica";
-    rankColor = "bg-purple-50 text-purple-600 border-purple-200/50 shadow-sm shadow-purple-100/50";
+    rankColor = "bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 border-purple-200/50 dark:border-purple-900/50 shadow-sm shadow-purple-100/50 dark:shadow-purple-900/20";
     rankIcon = (
       <svg className="w-3.5 h-3.5 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
         <path fillRule="evenodd" d="M5 2a1 1 0 011.1-.1l3.9 2.22 3.9-2.22a1 1 0 011.1.1l3.9 2.22c.4.2.6.6.6 1.1v9c0 .5-.2.9-.6 1.1l-3.9 2.22a1 1 0 01-1.1-.1l-3.9-2.22-3.9 2.22a1 1 0 01-1.1-.1L1.1 14.3c-.4-.2-.6-.6-.6-1.1v-9c0-.5.2-.9.6-1.1L5 2zm2.5 4.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm5 0a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" clipRule="evenodd" />
@@ -60,7 +62,7 @@ export default function PrivateLayout() {
     );
   } else if (totalContributions >= 5) {
     rankName = "Héroe PoliRank";
-    rankColor = "bg-amber-50 text-amber-600 border-amber-200/50 shadow-sm shadow-amber-100/50";
+    rankColor = "bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 border-amber-200/50 dark:border-amber-900/50 shadow-sm shadow-amber-100/50 dark:shadow-amber-900/20";
     rankIcon = (
       <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.961 0 1.36 1.243.58 1.8l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -68,7 +70,7 @@ export default function PrivateLayout() {
     );
   } else if (totalContributions >= 1) {
     rankName = "Colaborador";
-    rankColor = "bg-blue-50 text-blue-600 border-blue-200/50 shadow-sm shadow-blue-100/50";
+    rankColor = "bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border-blue-200/50 dark:border-blue-900/50 shadow-sm shadow-blue-100/50 dark:shadow-blue-900/20";
     rankIcon = (
       <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
         <path fillRule="evenodd" d="M6.267 3.455a.75.75 0 00-.708-.523H4.75A2.75 2.75 0 002 5.682v9.636a2.75 2.75 0 002.75 2.75h10.5a2.75 2.75 0 002.75-2.75v-9.636A2.75 2.75 0 0015.25 2.93h-.809a.75.75 0 00-.707.523L13.12 5H6.88L6.267 3.455zM5 9a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
@@ -83,9 +85,9 @@ export default function PrivateLayout() {
   };
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-[#F8FAFC]">
+    <div className="flex flex-col h-screen overflow-hidden bg-[#F8FAFC] dark:bg-gray-950">
       {/* Navbar Premium */}
-      <header className="w-full bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-[100] transition-all duration-300">
+      <header className="w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 sticky top-0 z-[100] transition-all duration-300 dark:glow-sm">
         <div className="max-w-[1600px] mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
           
           {/* Logo & Info */}
@@ -107,55 +109,96 @@ export default function PrivateLayout() {
             <span className="hidden sm:inline text-[10px] font-black uppercase tracking-widest">Tutorial</span>
           </button>
 
+          {/* Admin: Moderación (solo ADMIN) */}
+          {user?.rol?.nombre === "ADMIN" && (
+            <button
+              onClick={() => navigate("/admin")}
+              className="flex items-center gap-1.5 text-gray-400 hover:text-indigo-600 transition-all duration-200 active:scale-95"
+              title="Moderación"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span className="hidden sm:inline text-[10px] font-black uppercase tracking-widest">Admin</span>
+            </button>
+          )}
+
           {/* User Actions */}
           <div className="flex items-center gap-3 md:gap-6">
+            
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={() => setDark(prev => !prev)}
+              className={`relative w-14 h-7 rounded-full transition-all duration-300 shrink-0 focus:outline-none ${
+                dark
+                  ? 'bg-gradient-to-r from-indigo-500/30 to-purple-500/30 glow-sm'
+                  : 'bg-slate-200 shadow-inner'
+              }`}
+              title={dark ? "Modo claro" : "Modo oscuro"}
+            >
+              {/* Knob */}
+              <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white dark:bg-slate-100 shadow-md transition-all duration-300 flex items-center justify-center ${
+                dark ? 'translate-x-[28px] shadow-[0_0_8px_rgba(99,102,241,0.4)]' : ''
+              }`}>
+                {dark ? (
+                  <svg className="w-3.5 h-3.5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                ) : (
+                  <svg className="w-3.5 h-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                )}
+              </span>
+            </button>
             
             {/* Perfil Mini con Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-3 pr-2 sm:pr-6 sm:border-r border-gray-100 hover:opacity-90 active:scale-95 transition-all duration-200 group focus:outline-none"
+                className="flex items-center gap-3 pr-2 sm:pr-6 sm:border-r border-gray-100 dark:border-gray-700 hover:opacity-90 active:scale-95 transition-all duration-200 group focus:outline-none"
               >
                 <div className="hidden sm:flex flex-col items-end">
-                  <span className="text-xs font-black text-navy uppercase tracking-widest leading-none mb-1 group-hover:text-blue-600 transition-colors">
+                  <span className="text-xs font-black text-navy dark:text-white uppercase tracking-widest leading-none mb-1 group-hover:text-blue-600 transition-colors">
                     {user?.nombre || "Usuario"}
                   </span>
-                  <span className="text-[10px] font-bold text-gray-400 leading-none">
+                  <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 leading-none">
                     {isGuest ? "Modo Lectura" : (user?.rol?.nombre || "Estudiante")}
                   </span>
                 </div>
                 
-                <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center overflow-hidden relative group-hover:border-navy/20 transition-all">
+                <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 flex items-center justify-center overflow-hidden relative group-hover:border-navy/20 transition-all">
                   {isGuest ? (
-                    <svg className="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-5 h-5 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                   ) : (
-                    <div className="w-full h-full bg-navy/5 flex items-center justify-center text-navy font-black text-sm uppercase">
+                    <div className="w-full h-full bg-navy/5 dark:bg-gray-700 flex items-center justify-center text-navy dark:text-white font-black text-sm uppercase">
                       {user?.nombre?.charAt(0)}
                     </div>
                   )}
 
                   {/* Pequeño punto indicador verde si hay aportes */}
                   {!isGuest && totalContributions > 0 && (
-                    <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white"></span>
+                    <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></span>
                   )}
                 </div>
               </button>
 
               {/* Menú Desplegable Premium */}
               {isOpen && (
-                <div className="absolute right-2 sm:right-0 mt-3 w-[calc(100vw-32px)] sm:w-[360px] max-w-[360px] bg-white border border-gray-100 shadow-2xl rounded-3xl z-[150] overflow-hidden transition-all duration-300 top-12 animate-in fade-in slide-in-from-top-3">
+                <div className="absolute right-2 sm:right-0 mt-3 w-[calc(100vw-32px)] sm:w-[360px] max-w-[360px] bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-2xl rounded-3xl z-[150] overflow-hidden transition-all duration-300 top-12 animate-in fade-in slide-in-from-top-3">
                   {isGuest ? (
                     /* Contenido para Invitado */
                     <div className="p-6 text-center">
-                      <div className="w-12 h-12 bg-navy/5 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                        <svg className="w-6 h-6 text-navy" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="w-12 h-12 bg-navy/5 dark:bg-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                        <svg className="w-6 h-6 text-navy dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                         </svg>
                       </div>
-                      <h4 className="text-sm font-black text-navy uppercase tracking-tight mb-1">Modo Lectura</h4>
-                      <p className="text-[11px] text-gray-400 font-bold leading-normal mb-4">
+                      <h4 className="text-sm font-black text-navy dark:text-white uppercase tracking-tight mb-1">Modo Lectura</h4>
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500 font-bold leading-normal mb-4">
                         Inicia sesión con tu cuenta de PoliRank para valorar docentes y registrar intentos en el Chipitómetro.
                       </p>
                       <button
@@ -163,7 +206,7 @@ export default function PrivateLayout() {
                           setIsOpen(false);
                           navigate("/");
                         }}
-                        className="w-full bg-navy text-white py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] shadow-lg shadow-navy/20 hover:bg-dark-navy transition-all active:scale-95"
+                        className="w-full bg-navy dark:bg-indigo-600 text-white py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] shadow-lg shadow-navy/20 dark:shadow-indigo-500/20 hover:bg-dark-navy dark:hover:bg-indigo-500 transition-all active:scale-95"
                       >
                         Iniciar sesión
                       </button>
@@ -172,16 +215,16 @@ export default function PrivateLayout() {
                     /* Contenido para Estudiante Autenticado */
                     <div className="flex flex-col">
                       {/* Cabecera */}
-                      <div className="p-5 border-b border-gray-50 bg-gray-50/30">
+                      <div className="p-5 border-b border-gray-50 dark:border-gray-700 bg-gray-50/30 dark:bg-gray-900/50">
                         <div className="flex items-center gap-3 mb-3">
-                          <div className="w-11 h-11 rounded-xl bg-navy text-white flex items-center justify-center font-black text-base uppercase shadow-lg shadow-navy/15">
+                          <div className="w-11 h-11 rounded-xl bg-navy dark:bg-indigo-600 text-white flex items-center justify-center font-black text-base uppercase shadow-lg shadow-navy/15">
                             {user?.nombre?.charAt(0)}
                           </div>
                           <div className="min-w-0">
-                            <h4 className="font-black text-navy text-sm uppercase tracking-tight truncate leading-tight">
+                            <h4 className="font-black text-navy dark:text-white text-sm uppercase tracking-tight truncate leading-tight">
                               {user?.nombre}
                             </h4>
-                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wide truncate mt-0.5">
+                            <p className="text-[9px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wide truncate mt-0.5">
                               {user?.matriculaciones?.[0]?.carrera?.nombre || "Estudiante"}
                             </p>
                           </div>
@@ -193,37 +236,21 @@ export default function PrivateLayout() {
                             {rankIcon}
                             <span className="text-[9px] font-black uppercase tracking-widest leading-none">{rankName}</span>
                           </div>
-                          <span className="text-[9px] font-bold opacity-80 uppercase px-1.5 py-0.5 rounded-lg border border-current bg-white/50">
+                          <span className="text-[9px] font-bold opacity-80 uppercase px-1.5 py-0.5 rounded-lg border border-current bg-white/50 dark:bg-black/20">
                             {totalContributions} {totalContributions === 1 ? "aporte" : "aportes"}
                           </span>
                         </div>
 
-                        {/* Panel de administración si es ADMIN */}
-                        {user?.rol?.nombre === "ADMIN" && (
-                          <button
-                            onClick={() => {
-                              setIsOpen(false);
-                              navigate("/admin");
-                            }}
-                            className="mt-3 w-full bg-blue-50 hover:bg-blue-100 text-blue-600 py-2.5 px-4 rounded-xl font-bold uppercase tracking-wider text-[10px] text-center transition-all duration-200 active:scale-95 border border-blue-200/50 flex items-center justify-center gap-2"
-                          >
-                            <svg className="w-3.5 h-3.5 animate-spin-slow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            Panel de Administración
-                          </button>
-                        )}
                       </div>
 
                       {/* Selector de Pestañas */}
-                      <div className="flex border-b border-gray-50 p-1 bg-gray-50/20">
+                      <div className="flex border-b border-gray-50 dark:border-gray-700 p-1 bg-gray-50/20 dark:bg-gray-900">
                         <button
                           onClick={() => setActiveTab("reviews")}
                           className={`flex-1 py-3 text-center rounded-xl font-black text-[9px] uppercase tracking-wider transition-all duration-200 ${
                             activeTab === "reviews"
-                              ? "bg-navy text-white shadow-md shadow-navy/15"
-                              : "text-gray-400 hover:text-navy hover:bg-gray-50"
+                              ? "bg-navy dark:bg-indigo-600 text-white shadow-md shadow-navy/15"
+                              : "text-gray-400 dark:text-gray-500 hover:text-navy dark:hover:text-indigo-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                           }`}
                         >
                           Mis Reseñas ({reviewsList.length})
@@ -232,8 +259,8 @@ export default function PrivateLayout() {
                           onClick={() => setActiveTab("tries")}
                           className={`flex-1 py-3 text-center rounded-xl font-black text-[9px] uppercase tracking-wider transition-all duration-200 ${
                             activeTab === "tries"
-                              ? "bg-navy text-white shadow-md shadow-navy/15"
-                              : "text-gray-400 hover:text-navy hover:bg-gray-50"
+                              ? "bg-navy dark:bg-indigo-600 text-white shadow-md shadow-navy/15"
+                              : "text-gray-400 dark:text-gray-500 hover:text-navy dark:hover:text-indigo-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                           }`}
                         >
                           Mis Intentos ({triesList.length})
@@ -245,11 +272,11 @@ export default function PrivateLayout() {
                         {activeTab === "reviews" ? (
                           reviewsList.length === 0 ? (
                             <div className="py-8 text-center px-4">
-                              <svg className="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <svg className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.907c.961 0 1.36 1.243.58 1.8l-3.968 2.88a1 1 0 00-.364 1.118l1.52 4.674c.3.922-.755 1.688-1.538 1.118l-3.971-2.88a1 1 0 00-1.178 0l-3.97 2.88c-.784.57-1.838-.197-1.539-1.118l1.52-4.674a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h4.908a1 1 0 00.951-.69l1.519-4.674z" />
                               </svg>
-                              <p className="text-[11px] text-gray-400 font-bold">Aún no tienes reseñas</p>
-                              <p className="text-[9px] text-gray-300 font-bold mt-0.5 leading-normal">
+                              <p className="text-[11px] text-gray-400 dark:text-gray-500 font-bold">Aún no tienes reseñas</p>
+                              <p className="text-[9px] text-gray-300 dark:text-gray-600 font-bold mt-0.5 leading-normal">
                                 Valora a un docente desde la página de su materia.
                               </p>
                             </div>
@@ -269,17 +296,17 @@ export default function PrivateLayout() {
                                       navigate(`/reviews/${subjectId}`, { state: { subjectName } });
                                     }
                                   }}
-                                  className="w-full text-left p-3 rounded-2xl border border-gray-50 hover:border-navy/10 hover:bg-slate-50/50 transition-all flex items-center justify-between gap-3 group/item"
+                                  className="w-full text-left p-3 rounded-2xl border border-gray-50 dark:border-gray-700 hover:border-navy/10 dark:hover:border-indigo-500/30 hover:bg-slate-50/50 dark:hover:bg-gray-800/50 transition-all flex items-center justify-between gap-3 group/item"
                                 >
                                   <div className="min-w-0">
-                                    <h5 className="font-black text-navy text-[11px] uppercase tracking-tight truncate group-hover/item:text-blue-600 transition-colors leading-tight">
+                                    <h5 className="font-black text-navy dark:text-white text-[11px] uppercase tracking-tight truncate group-hover/item:text-blue-600 dark:group-hover/item:text-indigo-400 transition-colors leading-tight">
                                       {subjectName}
                                     </h5>
-                                    <p className="text-[9px] text-gray-400 font-bold truncate mt-0.5">
+                                    <p className="text-[9px] text-gray-400 dark:text-gray-500 font-bold truncate mt-0.5">
                                       {teacherName}
                                     </p>
                                   </div>
-                                  <span className="shrink-0 px-2 py-0.5 bg-amber-50 text-amber-600 border border-amber-100 rounded-lg text-[9px] font-black flex items-center gap-0.5">
+                                  <span className="shrink-0 px-2 py-0.5 bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-900/50 rounded-lg text-[9px] font-black flex items-center gap-0.5">
                                     ★ {avgScore}
                                   </span>
                                 </button>
@@ -289,11 +316,11 @@ export default function PrivateLayout() {
                         ) : (
                           triesList.length === 0 ? (
                             <div className="py-8 text-center px-4">
-                              <svg className="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <svg className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                               </svg>
-                              <p className="text-[11px] text-gray-400 font-bold">Sin intentos registrados</p>
-                              <p className="text-[9px] text-gray-300 font-bold mt-0.5 leading-normal">
+                              <p className="text-[11px] text-gray-400 dark:text-gray-500 font-bold">Sin intentos registrados</p>
+                              <p className="text-[9px] text-gray-300 dark:text-gray-600 font-bold mt-0.5 leading-normal">
                                 Reporta tus semestres cursados en el Chipitómetro.
                               </p>
                             </div>
@@ -311,17 +338,17 @@ export default function PrivateLayout() {
                                       navigate(`/reviews/${subjectId}`, { state: { subjectName } });
                                     }
                                   }}
-                                  className="w-full text-left p-3 rounded-2xl border border-gray-50 hover:border-navy/10 hover:bg-slate-50/50 transition-all flex items-center justify-between gap-3 group/item"
+                                  className="w-full text-left p-3 rounded-2xl border border-gray-50 dark:border-gray-700 hover:border-navy/10 dark:hover:border-indigo-500/30 hover:bg-slate-50/50 dark:hover:bg-gray-800/50 transition-all flex items-center justify-between gap-3 group/item"
                                 >
                                   <div className="min-w-0">
-                                    <h5 className="font-black text-navy text-[11px] uppercase tracking-tight truncate group-hover/item:text-blue-600 transition-colors leading-tight">
+                                    <h5 className="font-black text-navy dark:text-white text-[11px] uppercase tracking-tight truncate group-hover/item:text-blue-600 dark:group-hover/item:text-indigo-400 transition-colors leading-tight">
                                       {subjectName}
                                     </h5>
-                                    <p className="text-[9px] text-gray-400 font-bold mt-0.5">
+                                    <p className="text-[9px] text-gray-400 dark:text-gray-500 font-bold mt-0.5">
                                       Chipitómetro
                                     </p>
                                   </div>
-                                  <span className="shrink-0 px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-lg text-[9px] font-black uppercase tracking-wider">
+                                  <span className="shrink-0 px-2 py-0.5 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/50 rounded-lg text-[9px] font-black uppercase tracking-wider">
                                     {tryItem.valor === 1 ? "1 intento" : `${tryItem.valor} intentos`}
                                   </span>
                                 </button>
@@ -332,14 +359,14 @@ export default function PrivateLayout() {
                       </div>
 
                       {/* Footer de menú */}
-                      <div className="p-4 border-t border-gray-50 bg-gray-50/20 flex items-center justify-between">
+                      <div className="p-4 border-t border-gray-50 dark:border-gray-700 bg-gray-50/20 dark:bg-gray-900/50 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => {
                               setIsOpen(false);
                               navigate("/tutorial");
                             }}
-                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gray-100/80 text-gray-400 hover:text-navy hover:bg-gray-100 font-black text-[9px] uppercase tracking-widest transition-all duration-200 active:scale-95"
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gray-100/80 dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:text-navy dark:hover:text-indigo-300 hover:bg-gray-100 dark:hover:bg-gray-700 font-black text-[9px] uppercase tracking-widest transition-all duration-200 active:scale-95"
                             title="Tutorial"
                           >
                             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -347,7 +374,7 @@ export default function PrivateLayout() {
                             </svg>
                             <span className="hidden sm:inline">Tutorial</span>
                           </button>
-                          <span className="text-[8px] font-bold uppercase tracking-widest text-gray-300">
+                          <span className="text-[8px] font-bold uppercase tracking-widest text-gray-300 dark:text-gray-600">
                             v1.0
                           </span>
                         </div>
@@ -356,7 +383,7 @@ export default function PrivateLayout() {
                             setIsOpen(false);
                             logout();
                           }}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white font-black text-[9px] uppercase tracking-widest transition-all duration-200 active:scale-95"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-50 dark:bg-red-950/30 text-red-500 dark:text-red-400 hover:bg-red-500 dark:hover:bg-red-600 hover:text-white font-black text-[9px] uppercase tracking-widest transition-all duration-200 active:scale-95"
                         >
                           <span>Salir</span>
                           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -376,8 +403,8 @@ export default function PrivateLayout() {
               className={`
                 group relative hidden md:flex items-center gap-2 h-11 px-6 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all duration-300 active:scale-95
                 ${isGuest 
-                  ? "bg-navy text-white shadow-xl shadow-navy/20 hover:bg-dark-navy" 
-                  : "bg-red-50 text-red-500 hover:bg-red-500 hover:text-white"
+                  ? "bg-navy dark:bg-indigo-600 text-white shadow-xl shadow-navy/20 dark:shadow-indigo-500/20 hover:bg-dark-navy dark:hover:bg-indigo-500" 
+                  : "bg-red-50 dark:bg-red-950/30 text-red-500 dark:text-red-400 hover:bg-red-500 dark:hover:bg-red-600 hover:text-white"
                 }
               `}
             >

@@ -6,6 +6,18 @@
 @import "@fontsource/inter/800.css";
 @import "@fontsource/inter/900.css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+@utility glow-sm {
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.1), 0 0 24px rgba(99, 102, 241, 0.04);
+}
+@utility glow {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.12), 0 0 40px rgba(99, 102, 241, 0.05);
+}
+@utility glow-lg {
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.15), 0 0 60px rgba(99, 102, 241, 0.06);
+}
+
 @theme {
   --font-family-sans: 'Inter', sans-serif;
   --color-navy: #36507D;
@@ -29,7 +41,7 @@ input[type="email"],
 input[type="password"],
 input[type="number"],
 input[type="tel"] {
-  @apply border rounded-md border-[#e0e0e0] font-medium bg-neutral-50;
+  @apply border rounded-md border-[#e0e0e0] font-medium bg-neutral-50 dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700;
 }
 
 @keyframes shake {

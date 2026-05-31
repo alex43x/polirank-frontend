@@ -25,7 +25,7 @@ export default function TeacherCard({
         border-2 shadow-sm
         ${selected
           ? "bg-navy text-white border-navy scale-[1.02] shadow-xl"
-          : "bg-white text-navy border-gray-100 hover:border-navy hover:shadow-lg"}
+          : "bg-white dark:bg-gray-800 text-navy dark:text-gray-100 border-gray-100 dark:border-gray-700 hover:border-navy dark:hover:border-indigo-400 hover:shadow-lg dark:hover:glow-sm"}
       `}
     >
       {position === 1 && (
@@ -37,22 +37,22 @@ export default function TeacherCard({
       <div className="flex items-start gap-3">
         <div className={`
           flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center font-black text-[10px] tracking-tighter
-          ${selected ? "bg-white/10 text-white" : "bg-blue-50 text-navy"}
+          ${selected ? "bg-white/10 text-white" : "bg-blue-50 dark:bg-gray-700 text-navy dark:text-gray-100"}
         `}>
           {avatarText}
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className={`text-sm font-black leading-tight mb-1.5 truncate ${selected ? "text-white" : "text-navy"}`}>
+          <h3 className={`text-sm font-black leading-tight mb-1.5 truncate ${selected ? "text-white" : "text-navy dark:text-gray-100"}`}>
             {teacher.nombre}
           </h3>
           
           <div className="flex items-center justify-between gap-2 mb-1.5">
-            <span className={`text-[8px] font-black uppercase tracking-tighter ${selected ? "text-blue-200" : "text-gray-400"}`}>
+            <span className={`text-[8px] font-black uppercase tracking-tighter ${selected ? "text-blue-200" : "text-gray-400 dark:text-gray-500"}`}>
               {reviews} RESEÑAS
             </span>
-            <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${selected ? "bg-white/20" : "bg-navy/5"}`}>
-              <span className={selected ? "text-white" : "text-navy"}>{score.toFixed(2)}</span>
+            <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${selected ? "bg-white/20" : "bg-navy/5 dark:bg-gray-700"}`}>
+              <span className={selected ? "text-white" : "text-navy dark:text-gray-100"}>{score.toFixed(2)}</span>
             </div>
           </div>
           
@@ -60,7 +60,7 @@ export default function TeacherCard({
             {[1, 2, 3, 4, 5].map((star) => (
               <svg 
                 key={star} 
-                className={`w-2.5 h-2.5 ${star <= Math.round(score) ? (selected ? "text-yellow-300" : "text-navy") : (selected ? "text-white/20" : "text-gray-100")}`} 
+                className={`w-2.5 h-2.5 ${star <= Math.round(score) ? (selected ? "text-yellow-300" : "text-navy dark:text-gray-100") : (selected ? "text-white/20" : "text-gray-100 dark:text-gray-600")}`} 
                 fill="currentColor" 
                 viewBox="0 0 20 20"
               >
