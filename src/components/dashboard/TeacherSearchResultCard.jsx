@@ -32,12 +32,9 @@ export default function TeacherSearchResultCard({ teacher }) {
         </div>
       </div>
 
-      <div className="mt-auto space-y-4">
+      <div className="mt-auto">
         <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-2xl group-hover:bg-blue-50/50 dark:group-hover:bg-indigo-950/40 transition-colors">
-          <div className="flex flex-col">
-            <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter mb-0.5">Contacto</span>
-            <span className="text-xs font-bold text-navy dark:text-gray-200 truncate max-w-[150px]">{teacher.correo}</span>
-          </div>
+          <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Ver reseñas →</span>
           <div className="w-8 h-8 rounded-xl bg-white dark:bg-gray-700 flex items-center justify-center text-navy dark:text-gray-200 shadow-sm group-hover:scale-110 transition-transform">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />

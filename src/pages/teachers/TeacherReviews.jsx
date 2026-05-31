@@ -225,8 +225,6 @@ export default function TeacherReviews() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="px-2 py-0.5 bg-blue-50 dark:bg-gray-700 text-navy dark:text-gray-100 text-[9px] font-black rounded uppercase tracking-widest">Docente</span>
-                    <div className="h-1 w-1 bg-gray-300 rounded-full"></div>
-                    <span className="text-gray-400 dark:text-gray-500 text-[9px] font-bold uppercase tracking-widest break-words leading-tight">{teacherData?.correo}</span>
                   </div>
                   <h1 className="text-2xl md:text-3xl lg:text-5xl font-black text-navy dark:text-gray-100 tracking-tight leading-tight break-words">
                     {teacherData?.nombre || "Docente"}
