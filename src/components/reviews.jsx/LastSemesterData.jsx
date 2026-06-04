@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { ProgressBar } from "primereact/progressbar";
 import { Chart } from "primereact/chart";
 
@@ -6,6 +7,18 @@ export default function LastSemesterData({
   lastSemesterData,
   teacherName = "Profesor/a",
 }) {
+  const [tooltip, setTooltip] = useState({ text: "", x: 0, y: 0, show: false });
+  const showTooltip = (text, e) => setTooltip({ text, x: e.clientX, y: e.clientY, show: true });
+  const hideTooltip = () => setTooltip((prev) => ({ ...prev, show: false }));
+  const tooltipEl = tooltip.show && createPortal(
+    <div className="fixed pointer-events-none z-[9999]" style={{ left: tooltip.x + 16, top: tooltip.y - 10 }}>
+      <div className="bg-navy dark:bg-indigo-600 text-white text-[10px] font-bold leading-relaxed p-3 rounded-2xl shadow-xl text-center whitespace-nowrap">
+        {tooltip.text}
+      </div>
+    </div>,
+    document.body,
+  );
+
   // Función para obtener las iniciales
   const getInitials = (text) => {
     return text
@@ -194,6 +207,29 @@ export default function LastSemesterData({
       return <div className="flex gap-1">{stars}</div>;
   };
 
+  const getAspectDescription = (name) => {
+    const descMap = [
+      ["conocimiento", "dominio", "Eval\u00FAa qu\u00E9 tan bien el docente conoce y maneja los temas de la materia."],
+      ["explicaci\u00F3n", "claridad", "Valora qu\u00E9 tan claro y comprensible es el docente al explicar los conceptos."],
+      ["flexibilidad", "Mide la capacidad del docente para adaptarse a las necesidades de los estudiantes."],
+      ["examen", "evaluaci\u00F3n", "Eval\u00FAa si los ex\u00E1menes y evaluaciones son justos y acordes a lo ense\u00F1ado."],
+      ["puntualidad", "hora", "Valora la puntualidad del docente en clases y entrega de calificaciones."],
+      ["respeto", "amabilidad", "trato", "Mide el respeto, la cordialidad y la disposici\u00F3n del docente hacia los estudiantes."],
+      ["accesible", "disponibilidad", "Eval\u00FAa qu\u00E9 tan accesible es el docente fuera de clase para consultas y apoyo."],
+      ["material", "Valora la calidad y utilidad del material proporcionado por el docente."],
+      ["facilidad", "Eval\u00FAa qu\u00E9 tan f\u00E1cil o dif\u00EDcil es aprobar la materia con este docente."],
+    ];
+    const key = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    for (const row of descMap) {
+      const desc = row[row.length - 1];
+      for (let i = 0; i < row.length - 1; i++) {
+        const k = row[i].normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        if (key.includes(k) || k.includes(key)) return desc;
+      }
+    }
+    return "Descripci\u00F3n no disponible";
+  };
+
   const renderAspectName = (name) => {
     const parts = name.split("/");
     return parts.map((part, i) => (
@@ -262,12 +298,14 @@ export default function LastSemesterData({
                   otherRatings.map(([criterio, valor], index) => {
                     const color = valor >= 4 ? "navy" : valor >= 3 ? "blue-600" : "slate-400";
                     return (
-                      <div key={index} className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-6 rounded-[2rem] shadow-sm hover:border-navy/20 transition-all group hover:shadow-md">
+                      <div key={index} className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-6 rounded-[2rem] shadow-sm hover:border-navy/20 transition-all group hover:shadow-md relative"
+                           onMouseMove={(e) => showTooltip(getAspectDescription(criterio), e)}
+                           onMouseLeave={hideTooltip}>
                         <div className="flex items-start gap-4 mb-5">
-                          <div className="p-3 bg-navy/5 dark:bg-gray-700 text-navy dark:text-gray-100 rounded-2xl group-hover:bg-navy group-hover:text-white transition-all duration-300">
-                             {getAspectIcon(criterio)}
-                          </div>
-                          <div className="flex-1 min-w-0">
+                           <div className="p-3 bg-navy/5 dark:bg-gray-700 text-navy dark:text-gray-100 rounded-2xl group-hover:bg-navy group-hover:text-white transition-all duration-300">
+                              {getAspectIcon(criterio)}
+                           </div>
+                           <div className="flex-1 min-w-0">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 md:gap-4 mb-3">
                                 <h4 className="text-sm md:text-base font-black text-navy dark:text-gray-100 leading-tight break-words">{renderAspectName(criterio)}</h4>
                                <div className="bg-navy text-white px-3 py-1 rounded-xl text-[11px] font-black tracking-widest shadow-sm self-start">
@@ -303,14 +341,16 @@ export default function LastSemesterData({
             <div className="space-y-8 order-1 xl:order-2">
               {/* Facilidad para aprobar destacada vertical */}
               {facilidadRating && (
-                <div className="bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-gray-800 dark:to-gray-800 p-8 md:p-10 rounded-[2.5rem] border border-blue-100 dark:border-gray-700 shadow-sm flex flex-col items-center text-center gap-8">
+                <div className="bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-gray-800 dark:to-gray-800 p-8 md:p-10 rounded-[2.5rem] border border-blue-100 dark:border-gray-700 shadow-sm flex flex-col items-center text-center gap-8 relative group"
+                     onMouseMove={(e) => showTooltip(getAspectDescription("Facilidad"), e)}
+                     onMouseLeave={hideTooltip}>
                   <div className="flex flex-col items-center gap-4">
-                    <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm text-navy dark:text-gray-100">
-                      <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                    </div>
-                    <div>
+                      <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm text-navy dark:text-gray-100 relative">
+                        <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                      </div>
+                     <div>
                       <h4 className="text-2xl font-black text-navy dark:text-gray-100 leading-tight">Facilidad para Aprobar</h4>
                       <p className="text-gray-500 dark:text-gray-400 text-[11px] uppercase font-bold tracking-widest leading-relaxed mt-2 mx-auto max-w-xs">Percepción de dificultad basada en reseñas de alumnos</p>
                     </div>
@@ -350,6 +390,8 @@ export default function LastSemesterData({
               </div>
             </div>
           </div>
+
+          {tooltipEl}
         </>
       ) : (
         <div className="flex flex-col items-center justify-center py-24 bg-gray-50 dark:bg-gray-900 rounded-[3rem] border-2 border-dashed border-gray-200 dark:border-gray-700 text-center">

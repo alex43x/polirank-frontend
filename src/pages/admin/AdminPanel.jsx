@@ -142,7 +142,6 @@ function ReportCard({ report, onApprove, onReject, isProcessing }) {
             </div>
           </div>
         </div>
-      </div>
 
       {/* Actions */}
       <div className="flex gap-4 border-t border-gray-100 dark:border-gray-700 pt-6 mt-2">
@@ -167,11 +166,173 @@ function ReportCard({ report, onApprove, onReject, isProcessing }) {
           Aprobar & Banear
         </button>
       </div>
+      </div>
     </div>
   );
 }
 
-function ReviewCard({ review, onBan, isProcessing }) {
+function ReviewDetailModal({ review, onClose }) {
+  if (!review) return null;
+
+  const aspectLabels = {
+    "dominio_tema": "Dominio del Tema",
+    "claridad": "Claridad",
+    "didactica": "Didáctica",
+    "evaluacion": "Evaluación",
+    "trato_respetuoso": "Trato Respetuoso",
+    "accesibilidad": "Accesibilidad",
+    "exigencia": "Exigencia",
+    "utilidad": "Utilidad",
+    "recomendacion": "Recomendación",
+  };
+
+  const aspectColors = {
+    "dominio_tema": { bg: "bg-blue-50 dark:bg-blue-950/30", text: "text-blue-600 dark:text-blue-400" },
+    "claridad": { bg: "bg-emerald-50 dark:bg-emerald-950/30", text: "text-emerald-600 dark:text-emerald-400" },
+    "didactica": { bg: "bg-violet-50 dark:bg-violet-950/30", text: "text-violet-600 dark:text-violet-400" },
+    "evaluacion": { bg: "bg-amber-50 dark:bg-amber-950/30", text: "text-amber-600 dark:text-amber-400" },
+    "trato_respetuoso": { bg: "bg-rose-50 dark:bg-rose-950/30", text: "text-rose-600 dark:text-rose-400" },
+    "accesibilidad": { bg: "bg-cyan-50 dark:bg-cyan-950/30", text: "text-cyan-600 dark:text-cyan-400" },
+    "exigencia": { bg: "bg-orange-50 dark:bg-orange-950/30", text: "text-orange-600 dark:text-orange-400" },
+    "utilidad": { bg: "bg-teal-50 dark:bg-teal-950/30", text: "text-teal-600 dark:text-teal-400" },
+    "recomendacion": { bg: "bg-indigo-50 dark:bg-indigo-950/30", text: "text-indigo-600 dark:text-indigo-400" },
+  };
+
+  const renderStars = (val) => (
+    <div className="flex gap-0.5">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <svg key={star} className={`w-4 h-4 ${star <= val ? "text-amber-400" : "text-gray-200 dark:text-gray-600"}`} fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        </svg>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      <div
+        className="relative bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-100 dark:border-gray-700"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 rounded-t-[2.5rem] p-6 flex items-start justify-between z-10">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center font-black uppercase text-lg">
+              {review.alumno?.nombre?.charAt(0) || "?"}
+            </div>
+            <div>
+              <h3 className="font-black text-navy dark:text-white text-lg">Reseña Detallada</h3>
+              <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider mt-0.5">
+                {review.curso?.seccion?.materia?.nombre || "Materia"} — {review.curso?.seccion?.docente?.nombre || "Docente"}
+              </p>
+            </div>
+          </div>
+          <button onClick={onClose} className="w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-navy dark:hover:text-white transition-all shrink-0">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="p-6 space-y-6">
+          {/* Metadata */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-4 border border-gray-100 dark:border-gray-700">
+              <span className="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest block mb-1">Autor</span>
+              <span className="font-extrabold text-navy dark:text-white text-xs block truncate">{review.alumno?.nombre || "Anónimo"}</span>
+              <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold block truncate">{review.alumno?.correo || ""}</span>
+            </div>
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-4 border border-gray-100 dark:border-gray-700">
+              <span className="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest block mb-1">Materia</span>
+              <span className="font-extrabold text-navy dark:text-white text-xs block truncate">{review.curso?.seccion?.materia?.nombre || "—"}</span>
+            </div>
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-4 border border-gray-100 dark:border-gray-700">
+              <span className="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest block mb-1">Docente</span>
+              <span className="font-extrabold text-navy dark:text-white text-xs block truncate">{review.curso?.seccion?.docente?.nombre || "—"}</span>
+            </div>
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-4 border border-gray-100 dark:border-gray-700">
+              <span className="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest block mb-1">Periodo</span>
+              <span className="font-extrabold text-navy dark:text-white text-xs block truncate">{review.curso?.periodo || "—"} {review.curso?.year || ""}</span>
+            </div>
+          </div>
+
+          {/* Ratings */}
+          <div>
+            <span className="text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest block mb-3">Valoraciones</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {(review.detalles || []).map((d) => {
+                const colors = aspectColors[d.aspecto?.id] || { bg: "bg-gray-50 dark:bg-gray-900", text: "text-gray-600 dark:text-gray-400" };
+                return (
+                  <div key={d.aspecto?.id} className={`${colors.bg} border border-gray-100 dark:border-gray-700 rounded-2xl p-4 flex items-center justify-between`}>
+                    <span className={`text-[11px] font-black uppercase tracking-wider ${colors.text}`}>
+                      {aspectLabels[d.aspecto?.id] || d.aspecto?.nombre || "?"}
+                    </span>
+                    {renderStars(d.valor)}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Comment */}
+          <div>
+            <span className="text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest block mb-2">Comentario</span>
+            <div className={`p-5 rounded-2xl border ${review.comentario?.is_banned ? "bg-gray-50 dark:bg-gray-900 border-gray-100 dark:border-gray-700" : "bg-blue-50/20 dark:bg-blue-950/20 border-blue-100/50 dark:border-blue-900/50"}`}>
+              {review.comentario?.is_banned ? (
+                <p className="text-gray-400 dark:text-gray-500 italic font-bold flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                  </svg>
+                  Comentario baneado
+                </p>
+              ) : (
+                <>
+                  <span className="text-3xl font-serif text-blue-300 dark:text-blue-700 leading-none block -mb-4">"</span>
+                  <p className="text-gray-700 dark:text-gray-300 font-semibold italic text-sm leading-relaxed break-words">{review.comentario?.texto}</p>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="flex gap-4">
+            <div className="flex-1 bg-gray-50 dark:bg-gray-900 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 text-center">
+              <span className="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest block mb-1">Votos Positivos</span>
+              <span className="font-black text-emerald-600 dark:text-emerald-400 text-xl">{review.comentario?.votosPositivos || 0}</span>
+            </div>
+            <div className="flex-1 bg-gray-50 dark:bg-gray-900 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 text-center">
+              <span className="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest block mb-1">Votos Negativos</span>
+              <span className="font-black text-rose-600 dark:text-rose-400 text-xl">{review.comentario?.votosNegativos || 0}</span>
+            </div>
+            <div className="flex-1 bg-gray-50 dark:bg-gray-900 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 text-center">
+              <span className="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest block mb-1">Puntuación</span>
+              <span className="font-black text-navy dark:text-white text-xl">{review.comentario?.puntuacion || 0}</span>
+            </div>
+          </div>
+
+          {/* Status badges */}
+          <div className="flex flex-wrap gap-2">
+            {review.comentario?.is_banned && (
+              <span className="px-3 py-1.5 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-xl font-black text-[10px] uppercase tracking-wider border border-rose-100 dark:border-rose-900/50">Baneado</span>
+            )}
+            {review.comentario?.bajo_moderacion && (
+              <span className="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 rounded-xl font-black text-[10px] uppercase tracking-wider border border-amber-100 dark:border-amber-900/50">En moderación</span>
+            )}
+            {review.comentario?.aprobado && (
+              <span className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 rounded-xl font-black text-[10px] uppercase tracking-wider border border-emerald-100 dark:border-emerald-900/50">Aprobado</span>
+            )}
+            {!review.comentario?.is_banned && !review.comentario?.bajo_moderacion && !review.comentario?.aprobado && (
+              <span className="px-3 py-1.5 bg-yellow-50 dark:bg-yellow-950/30 text-yellow-600 dark:text-yellow-400 rounded-xl font-black text-[10px] uppercase tracking-wider border border-yellow-100 dark:border-yellow-900/50">Sin estado</span>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ReviewCard({ review, onBan, isProcessing, onViewDetail }) {
   const authorName = review.alumno?.nombre || "Anónimo";
   const courseName = review.curso?.seccion?.materia?.nombre || "Materia";
   const teacherName = review.curso?.seccion?.docente?.nombre || "Docente";
@@ -243,6 +404,16 @@ function ReviewCard({ review, onBan, isProcessing }) {
       </div>
 
       <div className="flex gap-4 border-t border-gray-100 dark:border-gray-700 pt-6 mt-2">
+        <button
+          onClick={() => onViewDetail(review)}
+          className="w-11 h-11 rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-navy dark:hover:text-white transition-all shrink-0"
+          title="Ver detalle"
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+        </button>
         {alreadyBanned ? (
           <div className="flex-1 text-center py-3 rounded-2xl bg-gray-50 dark:bg-gray-900 text-gray-400 dark:text-gray-500 font-black text-xs uppercase tracking-wider">
             Ya baneado
@@ -269,6 +440,8 @@ export default function AdminPanel() {
   const queryClient = useQueryClient();
   const { approveReport, rejectReport, banComment, approveComentarioModeration, rechazarComentarioModeration } = useReview();
   const [activeTab, setActiveTab] = useState("pendientes");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedReview, setSelectedReview] = useState(null);
 
   const invalidateAllSections = () => {
     queryClient.invalidateQueries({ queryKey: ["reviewsForSection"] });
@@ -404,6 +577,28 @@ export default function AdminPanel() {
   const reviewsList = reviewsData.data || [];
   const totalPages = reviewsData.meta?.totalPages || 1;
 
+  const q = searchQuery.toLowerCase().trim();
+  const filteredReviews = q
+    ? reviewsList.filter((r) =>
+        [r.alumno?.nombre, r.curso?.seccion?.materia?.nombre, r.curso?.seccion?.docente?.nombre, r.comentario?.texto]
+          .some((field) => field?.toLowerCase().includes(q))
+      )
+    : reviewsList;
+
+  const filteredPending = q
+    ? (pendingData.data || []).filter((r) =>
+        [r.alumno?.nombre, r.curso?.seccion?.materia?.nombre, r.curso?.seccion?.docente?.nombre, r.comentario?.texto]
+          .some((field) => field?.toLowerCase().includes(q))
+      )
+    : (pendingData.data || []);
+
+  const filteredReports = q
+    ? reports.filter((r) =>
+        [r.Comentario?.ReviewCab?.Alumno?.nombre, r.Comentario?.texto, r.Reporter?.nombre, r.reason_type, r.reason_detail]
+          .some((field) => field?.toLowerCase().includes(q))
+      )
+    : reports;
+
   return (
     <div className="min-h-screen pb-16 bg-[#F8FAFC] dark:bg-gray-950">
       <Toast toast={toast} onClose={() => setToast(null)} />
@@ -466,6 +661,45 @@ export default function AdminPanel() {
               label="Baneos Directos"
             />
           </div>
+
+          {/* Search + Refresh */}
+          <div className="flex items-center gap-3 mt-6">
+            <div className="relative flex-1">
+              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Buscar por autor, materia, docente o texto..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-2xl text-sm font-bold text-navy dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-blue-300 dark:focus:border-indigo-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-indigo-500/20 transition-all"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+            <button
+              onClick={() => {
+                if (activeTab === "pendientes") refetchPending();
+                else if (activeTab === "reportes") refetchReports();
+                else refetchReviews();
+              }}
+              className="w-11 h-11 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-2xl flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-navy dark:hover:text-white transition-all active:scale-95 shrink-0"
+              title="Actualizar"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Tab: Pendientes */}
@@ -473,20 +707,20 @@ export default function AdminPanel() {
           <>
             {pendingLoading ? (
               <LoadingState />
-            ) : pendingData.data?.length === 0 ? (
+            ) : filteredPending.length === 0 ? (
               <EmptyState
                 icon={
                   <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 }
-                title="¡Todo al día!"
-                message="No hay comentarios pendientes de aprobación."
+                title={q ? "Sin resultados" : "¡Todo al día!"}
+                message={q ? "No hay pendientes que coincidan con tu búsqueda." : "No hay comentarios pendientes de aprobación."}
               />
             ) : (
               <>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {pendingData.data.map((review) => {
+                  {filteredPending.map((review) => {
                     const authorName = review.alumno?.nombre || "Anónimo";
                     const courseName = review.curso?.seccion?.materia?.nombre || "Materia";
                     const teacherName = review.curso?.seccion?.docente?.nombre || "Docente";
@@ -580,19 +814,19 @@ export default function AdminPanel() {
           <>
             {reportsLoading ? (
               <LoadingState />
-            ) : reports.length === 0 ? (
+            ) : filteredReports.length === 0 ? (
               <EmptyState
                 icon={
                   <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 }
-                title="¡Todo al día!"
-                message="No hay reportes pendientes de revisión en este momento."
+                title={q ? "Sin resultados" : "¡Todo al día!"}
+                message={q ? "No hay reportes que coincidan con tu búsqueda." : "No hay reportes pendientes de revisión en este momento."}
               />
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {reports.map((report) => (
+                {filteredReports.map((report) => (
                   <ReportCard
                     key={report.id}
                     report={report}
@@ -614,7 +848,7 @@ export default function AdminPanel() {
             ) : (
               <>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {reviewsList.length === 0 ? (
+                  {filteredReviews.length === 0 ? (
                     <div className="col-span-full">
                       <EmptyState
                         icon={
@@ -622,17 +856,18 @@ export default function AdminPanel() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                           </svg>
                         }
-                        title="Sin reseñas"
-                        message="No se encontraron reseñas escritas."
+                        title={q ? "Sin resultados" : "Sin reseñas"}
+                        message={q ? "No hay reseñas que coincidan con tu búsqueda." : "No se encontraron reseñas escritas."}
                       />
                     </div>
                   ) : (
-                    reviewsList.map((review) => (
+                    filteredReviews.map((review) => (
                       <ReviewCard
                         key={review.id}
                         review={review}
                         onBan={handleBanComment}
                         isProcessing={processing === `${review.comentario?.id}-${review.id}`}
+                        onViewDetail={setSelectedReview}
                       />
                     ))
                   )}
@@ -665,6 +900,8 @@ export default function AdminPanel() {
           </>
         )}
       </div>
+
+      <ReviewDetailModal review={selectedReview} onClose={() => setSelectedReview(null)} />
     </div>
   );
 }

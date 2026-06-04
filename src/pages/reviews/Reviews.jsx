@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSubject } from "../../hooks/useSubject";
@@ -30,6 +30,7 @@ export default function Reviews() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedCareer, setSelectedCareer] = useState(null);
   const [profileLoaded, setProfileLoaded] = useState(false);
+  const dialogRef = useRef(null);
 
   const subjectName = location.state?.subjectName || "Materia";
 
@@ -112,7 +113,7 @@ export default function Reviews() {
 
   const handleOpenDialog = () => {
     if (!selectedSection) {
-      alert("Por favor selecciona una sección primero");
+      dialogRef.current?.showModal();
       return;
     }
     setVisible(true);
@@ -205,6 +206,28 @@ export default function Reviews() {
 
   return (
     <div className="min-h-screen pb-12 bg-[#F3F4F6] dark:bg-gray-950">
+      {/* Native Dialog */}
+      <dialog
+        ref={dialogRef}
+        className="rounded-2xl shadow-2xl border-0 p-8 backdrop:bg-black/40 max-w-sm w-full text-center bg-white dark:bg-gray-800 dark:text-gray-100 fixed inset-0 m-auto h-fit"
+        onClick={(e) => { if (e.target === e.currentTarget) dialogRef.current?.close(); }}
+      >
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-14 h-14 rounded-full bg-red-50 dark:bg-red-950/30 flex items-center justify-center">
+            <svg className="w-7 h-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <p className="text-lg font-bold text-gray-800 dark:text-gray-100">Selecciona una sección</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Por favor elige una sección de la lista antes de continuar.</p>
+          <button
+            onClick={() => dialogRef.current?.close()}
+            className="mt-2 px-8 py-3 bg-navy text-white rounded-2xl font-bold hover:bg-dark-navy transition-colors"
+          >
+            Entendido
+          </button>
+        </div>
+      </dialog>
       {/* Header Premium Flotante */}
       <div className="max-w-[1600px] mx-auto px-2 md:px-4 lg:px-8 pt-6">
         <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-200/50 dark:shadow-none p-6 md:p-8 mb-8">

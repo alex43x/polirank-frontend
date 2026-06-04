@@ -5,14 +5,19 @@ import { useAuth } from "../../hooks/useAuth";
 import api from "../../api/api";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import ReportCommentModal from "./ReportCommentModal";
+import { getBadge, getBadgeStyles } from "../../constants/badges";
 
 export default function CommentsSection({ sectionId }) {
-  const { user } = useAuth();
+  const { user, profileData } = useAuth();
   const { voteComentario, deleteVoteComentario, deleteComentario } = useReview();
+  const userContributions = (profileData?.reviews?.rows?.length || 0) + (profileData?.tries?.rows?.length || 0);
+  const userBadge = getBadge(userContributions);
+  const userBadgeStyle = getBadgeStyles(userBadge.color);
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState("popular"); // recent, popular
   const [reportModalReview, setReportModalReview] = useState(null);
   const [reportedComments, setReportedComments] = useState(new Set());
+  const [voteMessage, setVoteMessage] = useState(null);
 
   // Fetch courses for section
   const { data: courses = [], isLoading: coursesLoading } = useQuery({
@@ -50,16 +55,26 @@ export default function CommentsSection({ sectionId }) {
     return filtered;
   }, [allReviews, filter]);
 
+  const showVoteMessage = (text, type = "error") => {
+    setVoteMessage({ text, type });
+    setTimeout(() => setVoteMessage(null), 3000);
+  };
+
   const handleVote = async (review, valor) => {
     if (user?.rol?.nombre === "GUEST" || !user) {
-      alert("Debes iniciar sesión para votar");
+      showVoteMessage("Debés iniciar sesión para votar");
+      return;
+    }
+    const isOwner = review.alumno?.id != null && user?.id != null && Number(review.alumno.id) === Number(user.id);
+    if (isOwner) {
+      showVoteMessage("No podés votar tu propio comentario");
       return;
     }
     try {
       await voteComentario(review.id, valor);
       queryClient.invalidateQueries(["reviewsForSection", sectionId]);
     } catch (error) {
-      alert("Error al registrar voto");
+      showVoteMessage("Error al registrar voto");
     }
   };
 
@@ -175,7 +190,15 @@ export default function CommentsSection({ sectionId }) {
                       {authorName.charAt(0)}
                     </div>
                     <div>
-                      <h5 className="font-black text-navy dark:text-gray-100">{authorName}</h5>
+                      <h5 className="font-black text-navy dark:text-gray-100 flex items-center gap-2">
+                        {authorName}
+                        {isOwner && (
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider ${userBadgeStyle.container}`}>
+                            {userBadge.icon("w-2.5 h-2.5")}
+                            {userBadge.name}
+                          </span>
+                        )}
+                      </h5>
                       <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">{dateStr} • {review.curso?.year} - {review.curso?.periodo}S</p>
                     </div>
                   </div>
@@ -215,6 +238,19 @@ export default function CommentsSection({ sectionId }) {
                   </p>
                 )}
                 
+                {voteMessage && (
+                  <div className={`mt-3 p-3 rounded-2xl text-xs font-bold flex items-center gap-2.5 animate-in fade-in ${
+                    voteMessage.type === "error"
+                      ? "bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400"
+                      : "bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400"
+                  }`}>
+                    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={voteMessage.type === "error" ? "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" : "M5 13l4 4L19 7"} />
+                    </svg>
+                    {voteMessage.text}
+                  </div>
+                )}
+
                 {!review.comentario.bajo_moderacion && (
                   <div className="mt-5 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">

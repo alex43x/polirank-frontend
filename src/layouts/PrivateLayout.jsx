@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../context/theme/useTheme";
-import { getBadge, getBadgeStyles, getBadgeLabel } from "../constants/badges";
+import { BADGES, getBadge, getBadgeStyles, getBadgeLabel } from "../constants/badges";
 
 export default function PrivateLayout() {
   const { logout, user, isGuest, profileData, getProfile } = useAuth();
@@ -202,14 +202,47 @@ export default function PrivateLayout() {
                         </div>
 
                         {/* Nivel de Aportación (Rango) */}
-                        <div className={`flex items-center justify-between px-3 py-2 border rounded-2xl ${rankColor} transition-all duration-300`}>
-                          <div className="flex items-center gap-1.5">
-                            {rankIcon}
-                            <span className="text-[9px] font-black uppercase tracking-widest leading-none">{rankName}</span>
+                        <div className="relative group">
+                          <div className={`flex items-center justify-between px-3 py-2 border rounded-2xl ${rankColor} transition-all duration-300 cursor-default`}>
+                            <div className="flex items-center gap-1.5">
+                              {rankIcon}
+                              <span className="text-[9px] font-black uppercase tracking-widest leading-none">{rankName}</span>
+                            </div>
+                            <span className="text-[9px] font-bold opacity-80 uppercase px-1.5 py-0.5 rounded-lg border border-current bg-white/50 dark:bg-black/20">
+                              {getBadgeLabel(badge, totalContributions)}
+                            </span>
                           </div>
-                          <span className="text-[9px] font-bold opacity-80 uppercase px-1.5 py-0.5 rounded-lg border border-current bg-white/50 dark:bg-black/20">
-                            {getBadgeLabel(badge, totalContributions)}
-                          </span>
+
+                          {/* Hover Progression Popover */}
+                          <div className="absolute top-full left-0 right-0 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none">
+                            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-2xl shadow-black/10 p-3 space-y-1.5 max-h-72 overflow-y-auto">
+                              {BADGES.map((b, i) => {
+                                const unlocked = totalContributions >= b.min;
+                                const isCurrent = b.id === badge.id;
+                                const nextBadge = BADGES[i + 1];
+                                const rangeEnd = nextBadge ? nextBadge.min - 1 : "∞";
+                                const color = getBadgeStyles(b.color);
+                                return (
+                                  <div
+                                    key={b.id}
+                                    className={`flex items-center justify-between px-2.5 py-1.5 rounded-xl ${
+                                      unlocked ? color.container : "opacity-40 bg-gray-50 dark:bg-gray-900"
+                                    } ${isCurrent ? "ring-2 ring-offset-1 ring-offset-white dark:ring-offset-gray-800" : ""}`}
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {b.icon("w-3.5 h-3.5")}
+                                      <span className={`text-[9px] font-black uppercase tracking-wider ${unlocked ? "text-white" : "text-gray-500 dark:text-gray-400"}`}>
+                                        {b.name}
+                                      </span>
+                                    </div>
+                                    <span className={`text-[8px] font-bold ${unlocked ? "text-white/80" : "text-gray-400 dark:text-gray-500"}`}>
+                                      {b.min} {rangeEnd === "∞" ? "+" : `— ${rangeEnd}`} aportes
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
                         </div>
 
                       </div>

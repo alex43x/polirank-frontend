@@ -145,7 +145,7 @@ export default function Login() {
     try {
       setErrorMsg("");
       await register(tokenData.token, form.nombre, form.password, form.carreras);
-      navigate("/dashboard");
+      navigate("/tutorial");
     } catch (error) {
       setErrorMsg(error.response?.data?.error?.message || "Error al crear la cuenta");
     }
@@ -165,7 +165,7 @@ export default function Login() {
                   Poli<span className="text-gray-400 dark:text-gray-500">Rank</span>
                 </h1>
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-300 dark:text-gray-600 mt-2">
-                  {view === VIEWS.LOGIN && "Acceso Institucional"}
+                  {view === VIEWS.LOGIN && "Acceso al Sistema"}
                   {view === VIEWS.FORGOT && "Recuperación de Cuenta"}
                   {view === VIEWS.REGISTER && "Registro de Nuevo Alumno"}
                   {view === VIEWS.RESET && "Establecer nueva clave"}
@@ -407,12 +407,12 @@ export default function Login() {
 
                 <div className="space-y-3">
                   <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Selecciona tu(s) carrera(s) (Máx 2)</label>
-                  <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto pr-2 scrollbar-hide">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-48 overflow-y-auto pr-2 scrollbar-hide">
                     {availableCareers.map(c => (
                       <button
                         key={c.id}
                         onClick={() => handleCareerToggle(c.id)}
-                        className={`text-left p-3 rounded-xl border-2 transition-all text-xs font-bold ${
+                        className={`text-left p-3 rounded-xl border-2 transition-all text-xs font-bold leading-tight ${
                           form.carreras.includes(c.id) 
                           ? "border-navy dark:border-indigo-500 bg-navy/5 dark:bg-indigo-500/10 text-navy dark:text-indigo-300" 
                           : "border-gray-50 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-gray-400 dark:text-gray-500 hover:border-gray-200 dark:hover:border-gray-600"

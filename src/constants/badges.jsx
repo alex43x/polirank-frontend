@@ -6,7 +6,10 @@ export const BADGES = [
     color: "slate",
     icon: (className) => (
       <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        <text x="14" y="14" fontSize="8" fontWeight="bold" strokeWidth="1.5">Z</text>
+        <text x="16.5" y="11" fontSize="6" fontWeight="bold" strokeWidth="1.5">Z</text>
+        <text x="18.5" y="8.5" fontSize="4" fontWeight="bold" strokeWidth="1" className="opacity-70">Z</text>
       </svg>
     ),
   },
@@ -17,7 +20,11 @@ export const BADGES = [
     color: "emerald",
     icon: (className) => (
       <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8a4 4 0 00-4 4v1a4 4 0 008 0v-1a4 4 0 00-4-4z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12H6a3 3 0 00-3 3v1a2 2 0 002 2h1" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12h2a3 3 0 013 3v1a2 2 0 01-2 2h-1" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 16v4" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 4l2 2 2-2" />
       </svg>
     ),
   },
@@ -27,8 +34,8 @@ export const BADGES = [
     min: 10,
     color: "amber",
     icon: (className) => (
-      <svg className={className} fill="currentColor" viewBox="0 0 20 20">
-        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.961 0 1.36 1.243.58 1.8l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+      <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
       </svg>
     ),
   },
@@ -38,32 +45,38 @@ export const BADGES = [
     min: 15,
     color: "purple",
     icon: (className) => (
-      <svg className={className} fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M5 2a1 1 0 011.1-.1l3.9 2.22 3.9-2.22a1 1 0 011.1.1l3.9 2.22c.4.2.6.6.6 1.1v9c0 .5-.2.9-.6 1.1l-3.9 2.22a1 1 0 01-1.1-.1l-3.9-2.22-3.9 2.22a1 1 0 01-1.1-.1L1.1 14.3c-.4-.2-.6-.6-.6-1.1v-9c0-.5.2-.9.6-1.1L5 2zm2.5 4.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm5 0a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" clipRule="evenodd" />
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 18h6" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v2" />
       </svg>
     ),
   },
   {
     id: "polisaurio",
     name: "Polisaurio",
-    min: 20,
+    min: 25,
     color: "orange",
     icon: (className) => (
-      <svg className={className} fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" />
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11a5 5 0 1110 0v2a5 5 0 11-10 0v-2z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13a7 7 0 0014 0" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 18l-1 3" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 18l1 3" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18v3" />
       </svg>
     ),
   },
   {
     id: "inge_licen",
     name: "Inge/Licen",
-    min: 30,
+    min: 40,
     color: "navy",
     icon: (className) => (
       <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
       </svg>
     ),
   },
@@ -134,8 +147,9 @@ export function getBadgeStyles(color) {
   return COLOR_STYLES[color] || COLOR_STYLES.slate;
 }
 
-export function getBadgeLabel(badge, contributions) {
-  if (badge.min === 0) return "0 aportes";
-  if (badge.id === "inge_licen") return "30+ aportes";
-  return `${badge.min} aportes`;
+export function getBadgeLabel(badge) {
+  const idx = BADGES.findIndex(b => b.id === badge.id);
+  const next = BADGES[idx + 1];
+  if (!next) return `${badge.min}+ aportes`;
+  return `${badge.min} - ${next.min - 1} aportes`;
 }
