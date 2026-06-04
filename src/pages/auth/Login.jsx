@@ -25,6 +25,8 @@ export default function Login() {
   const [errorMsg, setErrorMsg] = useState("");
   const [showTerms, setShowTerms] = useState(false);
 
+  const [showPassword, setShowPassword] = useState(false);
+
   // Datos del Formulario
   const [form, setForm] = useState({
     correo: "",
@@ -234,25 +236,43 @@ export default function Login() {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center px-1">
-                    <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Contraseña</label>
-                    <button 
-                      onClick={() => setView(VIEWS.FORGOT)}
-                      className="text-[10px] font-black text-navy dark:text-indigo-400 uppercase tracking-widest hover:underline"
-                    >
-                      ¿Olvidaste tu clave?
-                    </button>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center px-1">
+                      <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Contraseña</label>
+                      <button 
+                        onClick={() => setView(VIEWS.FORGOT)}
+                        className="text-[10px] font-black text-navy dark:text-indigo-400 uppercase tracking-widest hover:underline"
+                      >
+                        ¿Olvidaste tu clave?
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        placeholder="••••••••••••"
+                        className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-50 dark:border-gray-800 focus:border-navy dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-gray-900 rounded-2xl py-4 px-6 pr-14 text-navy dark:text-gray-100 font-bold transition-all outline-none text-sm"
+                        value={form.password}
+                        onChange={handleChange}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((p) => !p)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-navy dark:hover:text-indigo-400 transition-colors"
+                      >
+                        {showPassword ? (
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                          </svg>
+                        ) : (
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
                   </div>
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="••••••••••••"
-                    className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-50 dark:border-gray-800 focus:border-navy dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-gray-900 rounded-2xl py-4 px-6 text-navy dark:text-gray-100 font-bold transition-all outline-none text-sm"
-                    value={form.password}
-                    onChange={handleChange}
-                  />
-                </div>
                 <button
                   onClick={handleLogin}
                   disabled={actionLoading}
@@ -485,23 +505,78 @@ export default function Login() {
 
             <div className="p-10 overflow-y-auto space-y-10 scrollbar-hide">
               <section className="space-y-4">
-                <h3 className="font-black text-navy dark:text-white uppercase text-xs tracking-widest">1. Naturaleza</h3>
+                <h3 className="font-black text-navy dark:text-white uppercase text-xs tracking-widest">1. Naturaleza de la Plataforma</h3>
                 <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed font-bold">
-                  PoliRank es una plataforma educativa para estudiantes de la Facultad Politécnica (FPUNA).
+                  PoliRank es una plataforma educativa desarrollada exclusivamente con fines de aprendizaje, orientación académica y guía para estudiantes de la Facultad Politécnica de la Universidad Nacional de Asunción.
                 </p>
               </section>
+
               <section className="space-y-4">
-                <h3 className="font-black text-navy dark:text-white uppercase text-xs tracking-widest">2. Responsabilidad</h3>
+                <h3 className="font-black text-navy dark:text-white uppercase text-xs tracking-widest">2. Contenido Generado por Usuarios</h3>
                 <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed font-bold">
-                  El contenido es generado por usuarios. PoliRank no se hace responsable de las opiniones vertidas por los alumnos.
+                  Todo el contenido publicado en PoliRank (reseñas, comentarios, calificaciones) es generado por los propios usuarios de la plataforma. PoliRank actúa únicamente como facilitador de comunicación entre estudiantes y no verifica, edita ni respalda el contenido compartido.
                 </p>
               </section>
+
               <section className="space-y-4">
-                <h3 className="font-black text-navy dark:text-white uppercase text-xs tracking-widest">3. Privacidad</h3>
+                <h3 className="font-black text-navy dark:text-white uppercase text-xs tracking-widest">3. Responsabilidad del Contenido</h3>
+                <div className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed font-bold space-y-2">
+                  <p>PoliRank se desvincula completamente de:</p>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li>Cualquier mensaje, comentario o contenido malintencionado, ofensivo, difamatorio o inexacto publicado por usuarios.</li>
+                    <li>El uso indebido de la información compartida en la plataforma.</li>
+                    <li>Decisiones académicas tomadas en base a la información disponible en PoliRank.</li>
+                    <li>Conflictos o controversias que puedan surgir entre usuarios o con terceros.</li>
+                  </ul>
+                </div>
+              </section>
+
+              <section className="space-y-4">
+                <h3 className="font-black text-navy dark:text-white uppercase text-xs tracking-widest">4. Uso Responsable</h3>
+                <div className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed font-bold space-y-2">
+                  <p>Al utilizar PoliRank, los usuarios se comprometen a:</p>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li>Proporcionar información veraz, constructiva y respetuosa.</li>
+                    <li>No publicar contenido ofensivo, discriminatorio, difamatorio o que viole derechos de terceros.</li>
+                    <li>Utilizar la plataforma exclusivamente con fines educativos y de orientación académica.</li>
+                    <li>Respetar la privacidad y dignidad de profesores, estudiantes y personal de la institución.</li>
+                  </ul>
+                </div>
+              </section>
+
+              <section className="space-y-4">
+                <h3 className="font-black text-navy dark:text-white uppercase text-xs tracking-widest">5. Limitación de Responsabilidad</h3>
                 <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed font-bold">
-                  Tus datos son utilizados exclusivamente para la funcionalidad de la plataforma. Tu identidad es protegida en las reseñas públicas.
+                  PoliRank no se hace responsable por daños directos, indirectos, incidentales o consecuentes que puedan derivarse del uso o imposibilidad de uso de la plataforma, incluyendo pero no limitándose a decisiones académicas basadas en la información disponible.
                 </p>
               </section>
+
+              <section className="space-y-4">
+                <h3 className="font-black text-navy dark:text-white uppercase text-xs tracking-widest">6. Privacidad y Datos</h3>
+                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed font-bold">
+                  PoliRank se compromete a proteger la privacidad de sus usuarios. Los datos personales recopilados se utilizan exclusivamente para el funcionamiento de la plataforma y no se compartirán con terceros sin consentimiento expreso del usuario.
+                </p>
+              </section>
+
+              <section className="space-y-4">
+                <h3 className="font-black text-navy dark:text-white uppercase text-xs tracking-widest">7. Moderación de Contenido</h3>
+                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed font-bold">
+                  PoliRank se reserva el derecho de eliminar contenido que viole estos términos y condiciones, sin previo aviso, y de suspender o cancelar cuentas de usuarios que incumplan repetidamente estas normas.
+                </p>
+              </section>
+
+              <section className="space-y-4">
+                <h3 className="font-black text-navy dark:text-white uppercase text-xs tracking-widest">8. Modificaciones</h3>
+                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed font-bold">
+                  PoliRank se reserva el derecho de modificar estos términos y condiciones en cualquier momento. Los cambios serán notificados a los usuarios y entrarán en vigor inmediatamente después de su publicación.
+                </p>
+              </section>
+
+              <div className="pt-4 border-t border-gray-100 dark:border-gray-800">
+                <p className="text-[10px] text-gray-400 dark:text-gray-600 font-black uppercase tracking-widest text-center">
+                  Última actualización: 19 de junio del 2026
+                </p>
+              </div>
             </div>
           </div>
         </div>
