@@ -216,7 +216,7 @@ export default function CommentsSection({ sectionId }) {
                   )}
                 </div>
                 
-                {review.comentario.bajo_moderacion && isOwner && (
+                {review.comentario.status === 'en_revision' && isOwner && (
                   <div className="mb-4 p-4 bg-amber-50/80 dark:bg-indigo-500/10 border border-amber-200 dark:border-indigo-500/30 text-amber-800 dark:text-indigo-300 dark:glow-sm rounded-2xl text-xs font-semibold flex items-center gap-2.5">
                     <svg className="w-4.5 h-4.5 text-amber-600 dark:text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -225,7 +225,7 @@ export default function CommentsSection({ sectionId }) {
                   </div>
                 )}
 
-                {review.comentario.bajo_moderacion && !isOwner && !isAdmin ? (
+                {review.comentario.status === 'en_revision' && !isOwner && !isAdmin ? (
                   <p className="text-gray-400 dark:text-gray-500 italic leading-relaxed font-bold bg-gray-50/50 dark:bg-gray-900/50 p-5 rounded-2xl border border-gray-100 dark:border-gray-700 border-dashed flex items-center gap-3">
                     <svg className="w-5 h-5 text-gray-400 dark:text-gray-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -251,7 +251,7 @@ export default function CommentsSection({ sectionId }) {
                   </div>
                 )}
 
-                {!review.comentario.bajo_moderacion && (
+                {review.comentario.status !== 'en_revision' && (
                   <div className="mt-5 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
                       {user && !isOwner && (
