@@ -1,10 +1,9 @@
-export default function TeacherCard({ 
-  teacher, 
+export default function TeacherSubjectCard({ 
+  subject, 
   selected, 
   reviews="-", 
   score=0, 
-  position=0, 
-  subjectName="", 
+  position=0,
   sectionNumber 
 }) {
   const getInitials = (name) => {
@@ -16,7 +15,7 @@ export default function TeacherCard({
       .join("");
   };
 
-  const avatarText = `${getInitials(subjectName)}${sectionNumber || position}`;
+  const avatarText = `${getInitials(subject?.nombre)}${sectionNumber || position}`;
 
   return (
     <div
@@ -34,7 +33,7 @@ export default function TeacherCard({
         </div>
       )}
 
-      <div className="flex items-start gap-3">
+      <div className="flex items-center gap-3">
         <div className={`
           flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center font-black text-[10px] tracking-tighter
           ${selected ? "bg-white/10 text-white" : "bg-blue-50 dark:bg-gray-700 text-navy dark:text-gray-100"}
@@ -43,11 +42,7 @@ export default function TeacherCard({
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className={`text-sm font-black leading-tight mb-1.5 truncate ${selected ? "text-white" : "text-navy dark:text-gray-100"}`}>
-            {teacher.nombre}
-          </h3>
-          
-          <div className="flex items-center justify-between gap-2 mb-1.5">
+          <div className="flex items-center justify-between gap-2 mb-0.5">
             <span className={`text-[8px] font-black uppercase tracking-tighter ${selected ? "text-blue-200" : "text-gray-400 dark:text-gray-500"}`}>
               {reviews} RESEÑAS
             </span>
@@ -55,6 +50,10 @@ export default function TeacherCard({
               <span className={selected ? "text-white" : "text-navy dark:text-gray-100"}>{score.toFixed(2)}</span>
             </div>
           </div>
+          
+          <h3 className={`text-base font-black leading-tight mb-1 truncate ${selected ? "text-white" : "text-navy dark:text-gray-100"}`}>
+            {subject?.nombre || "Materia"}
+          </h3>
           
           <div className="flex items-center gap-0.5">
             {[1, 2, 3, 4, 5].map((star) => (

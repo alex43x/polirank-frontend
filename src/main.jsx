@@ -5,9 +5,9 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import AppRouter from "./routes/AppRouter";
 import "./index.css";
 import { AuthProvider } from "./context/auth/AuthProvider";
+import { ThemeProvider } from "./context/theme/ThemeProvider";
 import { PrimeReactProvider } from "primereact/api";
 
-// Configuración del QueryClient
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -24,9 +24,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <PrimeReactProvider>
-        <AuthProvider>
-          <AppRouter />
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <AppRouter />
+          </AuthProvider>
+        </ThemeProvider>
       </PrimeReactProvider>
       {/* DevTools solo en desarrollo - ayuda a ver el cache */}
       <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />

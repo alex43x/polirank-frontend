@@ -24,6 +24,7 @@ const ReviewForm = ({
     trato: null,
     disponibilidad: null,
     material: null,
+    texto: "",
   });
   const { createReview, updateReview, deleteReview } = useReview();
   const { getCoursesBySection } = useCourse();
@@ -34,6 +35,7 @@ const ReviewForm = ({
   const [existingReview, setExistingReview] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [step, setStep] = useState(0);
 
   useEffect(() => {
     const loadCourses = async () => {
@@ -64,7 +66,7 @@ const ReviewForm = ({
         return;
       }
       const review = profileData.reviews.rows.find(
-        (r) => r.curso === formData.selectedCourseId
+        (r) => r.curso?.id === formData.selectedCourseId
       );
       if (review) {
         setExistingReview(review);
@@ -73,6 +75,11 @@ const ReviewForm = ({
       } else {
         setExistingReview(null);
         setIsEditMode(false);
+        setFormData(prev => ({
+          ...prev,
+          facilidad: null, dominio: null, claridad: null, flexibilidad: null,
+          evaluacion: null, puntualidad: null, trato: null, disponibilidad: null, material: null, texto: ""
+        }));
       }
     };
     checkExistingReview();
@@ -83,11 +90,18 @@ const ReviewForm = ({
       1: "dominio", 2: "claridad", 3: "flexibilidad", 4: "evaluacion",
       5: "puntualidad", 6: "trato", 7: "disponibilidad", 8: "material", 9: "facilidad",
     };
-    const newFormData = { ...formData };
-    review.ReviewConts.forEach((aspecto) => {
-      const key = aspectoMap[aspecto.aspecto];
+    
+    const newFormData = { 
+      ...formData,
+      facilidad: null, dominio: null, claridad: null, flexibilidad: null,
+      evaluacion: null, puntualidad: null, trato: null, disponibilidad: null, material: null, texto: ""
+    };
+
+    review.detalles.forEach((aspecto) => {
+      const key = aspectoMap[aspecto.aspecto?.id];
       if (key) newFormData[key] = aspecto.valor;
     });
+    newFormData.texto = review.comentario?.texto || "";
     setFormData(newFormData);
   };
 
@@ -135,7 +149,7 @@ const ReviewForm = ({
     {
       key: "flexibilidad",
       label: "Flexibilidad",
-      description: "Mide la capacidad del docente para adaptarse a las necesidades de los estudiantes y ser flexible con plazos y métodos de enseñanza.",
+      description: "Mide la capacidad del docente para adaptarse a las necesidades de los estudiantes.",
     },
     {
       key: "evaluacion",
@@ -186,7 +200,7 @@ const ReviewForm = ({
       aspecto: aspectoMap[cat.key],
       valor: formData[cat.key],
     }));
-    const reviewData = { curso: formData.selectedCourseId, aspectos: aspectos };
+    const reviewData = { curso: formData.selectedCourseId, aspectos: aspectos, texto: formData.texto };
 
     try {
       setIsSubmitting(true);
@@ -211,7 +225,7 @@ const ReviewForm = ({
           type="button"
           onClick={() => handleRatingClick(category, star)}
           className={`transition-all duration-200 transform hover:scale-125 ${
-            star <= value ? "text-yellow-400" : "text-gray-200 hover:text-yellow-200"
+            star <= value ? "text-yellow-400" : "text-gray-200 dark:text-gray-600 hover:text-yellow-200"
           }`}
         >
           <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
@@ -225,6 +239,7 @@ const ReviewForm = ({
   const handleDelete = () => {
     if (!existingReview) return;
     confirmDialog({
+      group: "reviewForm",
       message: "¿Estás seguro de que deseas eliminar esta reseña permanentemente?",
       header: "Confirmar Eliminación",
       icon: "pi pi-exclamation-triangle",
@@ -246,13 +261,8 @@ const ReviewForm = ({
   };
 
   const handleSubmit = () => {
-    const isComplete = categories.every((cat) => formData[cat.key] !== null);
-    if (!isComplete) {
-      alert("Por favor completa todas las calificaciones");
-      return;
-    }
-
     confirmDialog({
+      group: "reviewForm",
       message: isEditMode 
         ? "¿Estás seguro de que deseas actualizar esta reseña?" 
         : "¿Estás seguro de que deseas enviar esta reseña?",
@@ -264,17 +274,22 @@ const ReviewForm = ({
     });
   };
 
+  const currentCategory = categories[step - 1];
+  const totalSteps = categories.length + 2; // period + 9 categories + comment
+  const progress = ((step + 1) / totalSteps) * 100;
+
   return (
-    <div className="bg-[#F8FAFC] max-h-[90vh] overflow-y-auto rounded-[3rem]">
+    <div className="bg-[#F8FAFC] dark:bg-gray-900 max-h-[90vh] overflow-y-auto rounded-[3rem]">
       <ConfirmDialog 
+        group="reviewForm"
         className="rounded-[2.5rem] overflow-hidden" 
         pt={{
-          root: { className: "bg-white shadow-2xl border-0 overflow-hidden" },
+          root: { className: "bg-white dark:bg-gray-800 shadow-2xl border-0 overflow-hidden" },
           header: { className: "bg-navy text-white p-8 flex justify-center" },
-          content: { className: "bg-white p-10 text-xl font-medium leading-relaxed text-navy text-center" },
-          footer: { className: "bg-gray-50 p-8 gap-4 flex justify-center items-center" },
+          content: { className: "bg-white dark:bg-gray-800 p-10 text-xl font-medium leading-relaxed text-navy dark:text-gray-100 text-center" },
+          footer: { className: "bg-gray-50 dark:bg-gray-800 p-8 gap-4 flex justify-center items-center" },
           acceptButton: { className: "bg-navy px-10 py-4 rounded-2xl border-0 font-bold text-white hover:bg-dark-navy transition-colors" },
-          rejectButton: { className: "bg-gray-200 text-gray-700 px-10 py-4 rounded-2xl border-0 font-bold hover:bg-gray-300 transition-colors" }
+          rejectButton: { className: "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-10 py-4 rounded-2xl border-0 font-bold hover:bg-gray-300 transition-colors" }
         }}
       />
 
@@ -305,121 +320,264 @@ const ReviewForm = ({
         <p className="text-blue-100 text-lg font-bold">
           {subjectName} • <span className="text-white">{teacherName}</span>
         </p>
+
+        {/* Progress Bar */}
+        <div className="mt-6 bg-white/10 rounded-full h-1.5 overflow-hidden">
+          <div className="bg-white h-full rounded-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
+        </div>
       </div>
 
-      <div className="p-4 md:p-10 lg:p-14 space-y-12">
-        {/* Selección de Periodo */}
-        <section className="space-y-6">
-          <div className="flex items-center gap-3">
-             <div className="w-1.5 h-6 bg-navy rounded-full"></div>
-             <h4 className="text-xl font-black text-navy uppercase tracking-tight">Periodo Lectivo</h4>
-          </div>
-
-          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-3">
-              <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Año de cursado</label>
-              <Dropdown
-                value={formData.year}
-                onChange={(e) => setFormData((prev) => ({ ...prev, year: e.value, period: "", selectedCourseId: null }))}
-                options={availableYears}
-                placeholder="Escoge el año..."
-                className="w-full h-16 border-2 border-gray-100 bg-gray-50/50 rounded-2xl transition-all font-bold text-navy"
-                pt={{
-                  input: { className: "px-8 py-5" },
-                  trigger: { className: "w-16" },
-                  panel: { className: "bg-white shadow-2xl rounded-2xl mt-4 border-0 overflow-hidden ring-1 ring-black/5" },
-                  item: { className: "p-5 font-bold text-gray-500 hover:bg-navy hover:text-white transition-colors" }
-                }}
-              />
+      <div className="p-4 md:p-10 lg:p-14 space-y-8">
+        {isEditMode ? (
+          <>
+            {/* Edit Mode: Compact single-column view */}
+            <div className="flex items-center gap-3">
+              <div className="w-1.5 h-6 bg-navy rounded-full"></div>
+              <h4 className="text-xl font-black text-navy dark:text-gray-100 uppercase tracking-tight">Calificaciones</h4>
             </div>
 
-            <div className="space-y-3">
-              <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Semestre</label>
-              <div className="flex gap-4">
-                {[1, 2].map((p) => (
-                  <button
-                    key={p}
-                    onClick={() => handlePeriodClick(p.toString())}
-                    disabled={!formData.year || !availablePeriods.includes(p.toString())}
-                    className={`flex-1 h-16 rounded-2xl font-black transition-all ${
-                      formData.period === p.toString()
-                        ? "bg-navy text-white shadow-lg"
-                        : availablePeriods.includes(p.toString())
-                          ? "bg-gray-50 text-navy hover:bg-navy hover:text-white"
-                          : "bg-gray-50 text-gray-200 cursor-not-allowed"
-                    }`}
-                  >
-                    {p}° Semestre
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Calificaciones */}
-        <section className={`space-y-8 transition-opacity duration-500 ${!formData.selectedCourseId ? "opacity-20 pointer-events-none" : "opacity-100"}`}>
-          <div className="flex items-center gap-3">
-             <div className="w-1.5 h-6 bg-navy rounded-full"></div>
-             <h4 className="text-xl font-black text-navy uppercase tracking-tight">Calificación Detallada</h4>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {categories.map((category) => (
-              <div 
-                key={category.key}
-                className={`p-8 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm transition-all duration-300 hover:shadow-xl ${
-                  formData[category.key] ? "border-navy/10" : "hover:border-navy/20"
-                }`}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-navy/5 text-navy rounded-xl">
-                      {getCategoryIcon(category.key)}
-                    </div>
-                    <div>
-                      <h5 className="font-black text-navy leading-none mb-1">{category.label}</h5>
-                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{category.description}</span>
-                    </div>
+            <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm divide-y divide-gray-100 dark:divide-gray-700 overflow-hidden">
+              {categories.map((cat, idx) => (
+                <div key={cat.key} className="flex items-center gap-4 px-6 py-5">
+                  <div className="p-2.5 bg-navy/5 dark:bg-gray-700 text-navy dark:text-gray-100 rounded-xl shrink-0">
+                    {getCategoryIcon(cat.key)}
                   </div>
-                  {formData[category.key] && (
-                    <span className="bg-navy/10 text-navy text-xs font-black px-3 py-1 rounded-full">
-                      {formData[category.key]}/5
-                    </span>
+                  <span className="text-sm font-black text-navy dark:text-gray-100 w-28 shrink-0">{cat.label}</span>
+                  <div className="flex-1 flex justify-center">
+                    <StarRating category={cat.key} value={formData[cat.key]} />
+                  </div>
+                  {formData[cat.key] && (
+                    <span className="text-xs font-black text-gray-400 dark:text-gray-500 w-8 text-right">{formData[cat.key]}/5</span>
                   )}
                 </div>
-                <StarRating category={category.key} value={formData[category.key]} />
+              ))}
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm">
+              <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1 block mb-3">
+                Comentario Adicional <span className="text-gray-400 dark:text-gray-500 font-bold text-sm tracking-normal">(Opcional)</span>
+              </label>
+              <textarea
+                value={formData.texto}
+                onChange={(e) => setFormData((prev) => ({ ...prev, texto: e.target.value }))}
+                placeholder="¿Qué más te gustaría compartir sobre tu experiencia con este docente?"
+                className="w-full h-32 p-6 border-2 border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900 rounded-2xl transition-all font-medium text-navy dark:text-gray-100 resize-none focus:border-navy/30 focus:bg-white dark:focus:bg-gray-800 focus:outline-none focus:ring-4 focus:ring-navy/5"
+                maxLength={1000}
+              />
+              <div className="text-right mt-2 text-xs font-bold text-gray-400 dark:text-gray-500">
+                {formData.texto.length}/1000
               </div>
-            ))}
-          </div>
-        </section>
+            </div>
 
-        {/* Acciones */}
-        <div className={`flex flex-col md:flex-row gap-4 pt-4 transition-all duration-500 ${!formData.selectedCourseId ? "translate-y-10 opacity-0" : "translate-y-0 opacity-100"}`}>
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting || !categories.every(c => formData[c.key])}
-            className="flex-1 bg-navy text-white h-20 rounded-[2rem] font-black uppercase tracking-widest text-sm shadow-xl shadow-navy/20 hover:bg-dark-navy hover:-translate-y-1 transition-all disabled:opacity-20 active:scale-95 flex items-center justify-center gap-4"
-          >
-            {isSubmitting ? (
-              <div className="animate-spin rounded-full h-6 w-6 border-3 border-white/20 border-t-white"></div>
-            ) : (
-              <>
-                <span>{isEditMode ? "Actualizar Mi Reseña" : "Publicar Mi Reseña"}</span>
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-              </>
+            <div className="flex justify-between">
+              <button
+                onClick={handleDelete}
+                className="px-10 h-16 bg-red-50 dark:bg-red-950/30 text-red-500 dark:text-red-400 rounded-2xl font-bold uppercase tracking-wider text-xs hover:bg-red-500 hover:text-white transition-all active:scale-95"
+              >
+                Borrar
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="bg-navy text-white px-10 h-16 rounded-2xl font-black uppercase tracking-wider text-sm shadow-xl shadow-navy/20 hover:bg-dark-navy hover:-translate-y-0.5 transition-all disabled:opacity-20 active:scale-95 flex items-center justify-center gap-3"
+              >
+                {isSubmitting ? (
+                  <div className="animate-spin rounded-full h-6 w-6 border-3 border-white/20 border-t-white"></div>
+                ) : (
+                  <>
+                    <span>Actualizar</span>
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  </>
+                )}
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Step 0: Period Selection */}
+            {step === 0 && (
+              <section className="space-y-6">
+                <div className="flex items-center gap-3">
+                   <div className="w-1.5 h-6 bg-navy rounded-full"></div>
+                   <div>
+                     <h4 className="text-xl font-black text-navy dark:text-gray-100 uppercase tracking-tight">Periodo Lectivo</h4>
+                     <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-1">Paso 1 de {totalSteps - 1}</p>
+                   </div>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Año de cursado</label>
+                    <Dropdown
+                      value={formData.year}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, year: e.value, period: "", selectedCourseId: null }))}
+                      options={availableYears}
+                      placeholder="Escoge el año..."
+                      className="w-full h-16 border-2 border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900 rounded-2xl transition-all font-bold text-navy dark:text-gray-100"
+                      pt={{
+                        root: { className: "bg-gray-50/50 dark:bg-gray-900" },
+                        input: { className: "px-8 py-5" },
+                        trigger: { className: "w-16 text-gray-400 dark:text-gray-500" },
+                        panel: { className: "bg-white dark:bg-gray-800 shadow-2xl rounded-2xl mt-4 border-0 overflow-hidden ring-1 ring-black/5" },
+                        list: { className: "bg-white dark:bg-gray-800" },
+                        item: { className: "p-5 font-bold text-gray-500 dark:text-gray-300 hover:bg-navy hover:text-white transition-colors dark:hover:bg-gray-700" }
+                      }}
+                    />
+                  </div>
+
+                  <div className="space-y-3">
+                    <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Semestre</label>
+                    <div className="flex gap-4">
+                      {[1, 2].map((p) => (
+                        <button
+                          key={p}
+                          onClick={() => handlePeriodClick(p.toString())}
+                          disabled={!formData.year || !availablePeriods.includes(p.toString())}
+                          className={`flex-1 h-16 rounded-2xl font-black transition-all ${
+                            formData.period === p.toString()
+                              ? "bg-navy text-white shadow-lg"
+                              : availablePeriods.includes(p.toString())
+                                ? "bg-gray-50 dark:bg-gray-900 text-navy dark:text-gray-100 hover:bg-navy hover:text-white"
+                                : "bg-gray-50 dark:bg-gray-900 text-gray-200 dark:text-gray-600 cursor-not-allowed"
+                          }`}
+                        >
+                          {p}° Semestre
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => setStep(1)}
+                    disabled={!formData.selectedCourseId}
+                    className="bg-navy text-white px-10 h-16 rounded-2xl font-black uppercase tracking-wider text-sm shadow-xl shadow-navy/20 hover:bg-dark-navy hover:-translate-y-0.5 transition-all disabled:opacity-20 active:scale-95"
+                  >
+                    Siguiente
+                  </button>
+                </div>
+              </section>
             )}
-          </button>
 
-          {isEditMode && (
-            <button
-               onClick={handleDelete}
-               className="md:w-auto px-10 h-20 bg-red-50 text-red-500 rounded-[2rem] font-bold uppercase tracking-widest text-xs hover:bg-red-500 hover:text-white transition-all active:scale-95"
-            >
-              Borrar
-            </button>
-          )}
-        </div>
+            {/* Steps 1-9: Categories one at a time */}
+            {step >= 1 && step <= categories.length && (
+              <section className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-6 bg-navy rounded-full"></div>
+                    <div>
+                      <h4 className="text-xl font-black text-navy dark:text-gray-100 uppercase tracking-tight">{currentCategory.label}</h4>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-1">Paso {step + 1} de {totalSteps - 1}</p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 px-3 py-1.5 rounded-xl">
+                    {step} de {categories.length}
+                  </span>
+                </div>
+
+                <div className="p-8 bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm transition-all duration-300">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="p-3 bg-navy/5 dark:bg-gray-700 text-navy dark:text-gray-100 rounded-xl">
+                      {getCategoryIcon(currentCategory.key)}
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 font-medium leading-relaxed">{currentCategory.description}</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-center py-6">
+                    <StarRating category={currentCategory.key} value={formData[currentCategory.key]} />
+                  </div>
+                  {formData[currentCategory.key] && (
+                    <div className="text-center mt-2">
+                      <span className="inline-block bg-navy/10 dark:bg-gray-700 text-navy dark:text-gray-100 text-lg font-black px-5 py-2 rounded-full">
+                        {formData[currentCategory.key]}/5
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex justify-between">
+                  <button
+                    onClick={() => setStep(step - 1)}
+                    className="px-10 h-16 rounded-2xl font-black uppercase tracking-wider text-sm bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all active:scale-95"
+                  >
+                    Anterior
+                  </button>
+                  <button
+                    onClick={() => setStep(step + 1)}
+                    disabled={!formData[currentCategory.key]}
+                    className="bg-navy text-white px-10 h-16 rounded-2xl font-black uppercase tracking-wider text-sm shadow-xl shadow-navy/20 hover:bg-dark-navy hover:-translate-y-0.5 transition-all disabled:opacity-20 active:scale-95"
+                  >
+                    Siguiente
+                  </button>
+                </div>
+              </section>
+            )}
+
+            {/* Step 10: Comment + Submit */}
+            {step === categories.length + 1 && (
+              <section className="space-y-6">
+                <div className="flex items-center gap-3">
+                   <div className="w-1.5 h-6 bg-navy rounded-full"></div>
+                   <div>
+                     <h4 className="text-xl font-black text-navy dark:text-gray-100 uppercase tracking-tight">Comentario Adicional <span className="text-gray-400 dark:text-gray-500 font-bold text-sm tracking-normal">(Opcional)</span></h4>
+                     <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-1">Paso {step + 1} de {totalSteps - 1}</p>
+                   </div>
+                </div>
+
+                {/* Summary */}
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm">
+                  <span className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Resumen de calificaciones</span>
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mt-4">
+                    {categories.map((cat) => (
+                      <div key={cat.key} className="flex flex-col items-center p-3 bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700">
+                        <span className="text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">{cat.label}</span>
+                        <span className="text-sm font-black text-navy dark:text-gray-100">{formData[cat.key]}/5</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm">
+                  <textarea
+                    value={formData.texto}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, texto: e.target.value }))}
+                    placeholder="¿Qué más te gustaría compartir sobre tu experiencia con este docente?"
+                    className="w-full h-32 p-6 border-2 border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900 rounded-2xl transition-all font-medium text-navy dark:text-gray-100 resize-none focus:border-navy/30 focus:bg-white dark:focus:bg-gray-800 focus:outline-none focus:ring-4 focus:ring-navy/5"
+                    maxLength={1000}
+                  />
+                  <div className="text-right mt-2 text-xs font-bold text-gray-400 dark:text-gray-500">
+                    {formData.texto.length}/1000
+                  </div>
+                </div>
+
+                <div className="flex justify-between">
+                  <button
+                    onClick={() => setStep(categories.length)}
+                    className="px-10 h-16 rounded-2xl font-black uppercase tracking-wider text-sm bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all active:scale-95"
+                  >
+                    Anterior
+                  </button>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className="bg-navy text-white px-10 h-16 rounded-2xl font-black uppercase tracking-wider text-sm shadow-xl shadow-navy/20 hover:bg-dark-navy hover:-translate-y-0.5 transition-all disabled:opacity-20 active:scale-95 flex items-center justify-center gap-3"
+                  >
+                    {isSubmitting ? (
+                      <div className="animate-spin rounded-full h-6 w-6 border-3 border-white/20 border-t-white"></div>
+                    ) : (
+                      <>
+                        <span>Publicar Reseña</span>
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </section>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
