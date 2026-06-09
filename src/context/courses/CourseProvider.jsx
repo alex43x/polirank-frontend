@@ -17,7 +17,7 @@ export const CourseProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get(`/sections/${id}/cursos`);
-      return data;
+      return data.data;
     } catch (error) {
       throw error;
     } finally {
@@ -30,10 +30,10 @@ export const CourseProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get("/cursos", { params });
-      setCourses(data.courses || []);
-      setPage(data.currentPage || 1);
-      setLimit(data.limit || 10);
-      setTotalPages(data.totalPages || 0);
+      setCourses(data.data?.courses || []);
+      setPage(data.data?.currentPage || 1);
+      setLimit(data.data?.limit || 10);
+      setTotalPages(data.data?.totalPages || 0);
       setError(null);
     } catch (error) {
       setCourses([]);
@@ -51,7 +51,7 @@ export const CourseProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get(`/cursos/${id}`);
-      return data;
+      return data.data;
     } catch (error) {
       throw error;
     } finally {
@@ -64,8 +64,8 @@ export const CourseProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.post("/cursos", courseData);
-      setCourses((prevCourses) => [...prevCourses, data]);
-      return data;
+      setCourses((prevCourses) => [...prevCourses, data.data]);
+      return data.data;
     } catch (error) {
       throw error;
     } finally {
@@ -78,7 +78,7 @@ export const CourseProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get(`/cursos/${id}/reviews`);
-      setReviews(data.reviews || []);
+      setReviews(data.data?.reviews || []);
     } catch (error) {
       throw error;
     } finally {
@@ -91,8 +91,8 @@ export const CourseProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.post(`/cursos/${id}/reviews`, reviewData);
-      setReviews((prevReviews) => [...prevReviews, data]);
-      return data;
+      setReviews((prevReviews) => [...prevReviews, data.data]);
+      return data.data;
     } catch (error) {
       throw error;
     } finally {
@@ -105,7 +105,7 @@ export const CourseProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get(`/cursos/${courseId}/reviews/${reviewId}`);
-      return data;
+      return data.data;
     } catch (error) {
       throw error;
     } finally {
@@ -122,9 +122,9 @@ export const CourseProvider = ({ children }) => {
         reviewData
       );
       setReviews((prevReviews) =>
-        prevReviews.map((review) => (review.id === reviewId ? data : review))
+        prevReviews.map((review) => (review.id === reviewId ? data.data : review))
       );
-      return data;
+      return data.data;
     } catch (error) {
       throw error;
     } finally {
@@ -150,16 +150,17 @@ export const CourseProvider = ({ children }) => {
     try {
       // Endpoint correcto: /sections/:id/last
       const { data } = await api.get(`/sections/${sectionId}/last`, { params });
+      const payload = data.data;
 
       // Mapear los datos al formato que espera el UI
       const mappedData = {
-        totalAverage: data.promedioGeneral || 0,
-        totalReviews: data.totalReviews || 0,
+        totalAverage: payload?.promedioGeneral || 0,
+        totalReviews: payload?.totalReviews || 0,
         averageRatings: {}
       };
 
-      if (data.stats && Array.isArray(data.stats)) {
-        data.stats.forEach(row => {
+      if (payload?.stats && Array.isArray(payload.stats)) {
+        payload.stats.forEach(row => {
           if (row.aspect && row.aspect.nombre) {
             mappedData.averageRatings[row.aspect.nombre] = parseFloat(row.promedio);
           }
@@ -180,13 +181,14 @@ export const CourseProvider = ({ children }) => {
     try {
       // Endpoint correcto: /sections/:id/history
       const { data } = await api.get(`/sections/${sectionId}/history`, { params });
+      const payload = data.data;
       // Mapear los datos al formato que espera el UI
       const mappedHistory = {
         history: []
       };
 
-      if (data.courseStats && Array.isArray(data.courseStats)) {
-        mappedHistory.history = data.courseStats.map(stat => {
+      if (payload?.courseStats && Array.isArray(payload.courseStats)) {
+        mappedHistory.history = payload.courseStats.map(stat => {
           const averageRatings = {};
 
           if (stat.stats?.rows && Array.isArray(stat.stats.rows)) {

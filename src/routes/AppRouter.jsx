@@ -3,6 +3,7 @@ import Login from "../pages/auth/Login";
 import ChangePassword from "../pages/auth/ChangePassword";
 import Dashboard from "../pages/dashboard/Dashboard";
 import AdminPanel from "../pages/admin/AdminPanel";
+import Tutorial from "../pages/tutorial/Tutorial";
 import Reviews from "../pages/reviews/Reviews";
 import ProtectedRoute from "./ProtectedRoute";
 import PrivateLayout from "../layouts/PrivateLayout";
@@ -14,6 +15,8 @@ import { CourseProvider } from "../context/courses/CourseProvider";
 import { SubjectProvider } from "../context/subjects/SubjectProvider";
 import { ReviewProvider } from "../context/reviews/ReviewProvider";
 import TryProvider from "../context/tries/TryProvider";
+import { TeacherProvider } from "../context/teachers/TeacherProvider";
+import TeacherReviews from "../pages/teachers/TeacherReviews";
 
 const AppRouter = () => {
   const isMaintenanceMode = import.meta.env.VITE_MAINTENANCE_MODE === 'true';
@@ -26,6 +29,7 @@ const AppRouter = () => {
       <Routes>
         {/* Públicas */}
         <Route path="/" element={<Login />} />
+        <Route path="/auth/verify" element={<Login />} />
         <Route path="/change-password" element={<ChangePassword />} />
 
         {/* Rutas protegidas */}
@@ -40,10 +44,18 @@ const AppRouter = () => {
           <Route
             path="/dashboard"
             element={
-              <SubjectProvider>
-                <Dashboard />
-              </SubjectProvider>
+              <TeacherProvider>
+                <SubjectProvider>
+                  <Dashboard />
+                </SubjectProvider>
+              </TeacherProvider>
             }
+          />
+
+          {/* Tutorial */}
+          <Route
+            path="/tutorial"
+            element={<Tutorial />}
           />
 
           {/* Reviews: Student + Subject + Course + Review */}
@@ -64,9 +76,36 @@ const AppRouter = () => {
             }
           />
 
+          {/* Teacher Reviews: Student + Subject + Course + Review + Teacher */}
+          <Route
+            path="/profesor/:teacherId"
+            element={
+              <StudentProvider>
+                <SubjectProvider>
+                  <TeacherProvider>
+                    <TryProvider>
+                      <CourseProvider>
+                        <ReviewProvider>
+                          <TeacherReviews />
+                        </ReviewProvider>
+                      </CourseProvider>
+                    </TryProvider>
+                  </TeacherProvider>
+                </SubjectProvider>
+              </StudentProvider>
+            }
+          />
+
           {/* Solo ADMIN */}
           <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]} />}>
-            <Route path="/admin" element={<AdminPanel />} />
+            <Route
+              path="/admin"
+              element={
+                <ReviewProvider>
+                  <AdminPanel />
+                </ReviewProvider>
+              }
+            />
           </Route>
         </Route>
 

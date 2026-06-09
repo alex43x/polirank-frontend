@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { ProgressBar } from "primereact/progressbar";
 import { Chart } from "primereact/chart";
 
@@ -6,12 +7,70 @@ export default function LastSemesterData({
   lastSemesterData,
   teacherName = "Profesor/a",
 }) {
+  const [tooltip, setTooltip] = useState({ text: "", x: 0, y: 0, show: false });
+  const showTooltip = (text, e) => setTooltip({ text, x: e.clientX, y: e.clientY, show: true });
+  const hideTooltip = () => setTooltip((prev) => ({ ...prev, show: false }));
+  const tooltipEl = tooltip.show && createPortal(
+    <div className="fixed pointer-events-none z-[9999]" style={{ left: tooltip.x + 16, top: tooltip.y - 10 }}>
+      <div className="bg-navy dark:bg-indigo-600 text-white text-[10px] font-bold leading-relaxed p-3 rounded-2xl shadow-xl text-center whitespace-nowrap">
+        {tooltip.text}
+      </div>
+    </div>,
+    document.body,
+  );
+
   // Función para obtener las iniciales
   const getInitials = (text) => {
     return text
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase())
       .join("");
+  };
+
+  // Función para obtener un icono según el nombre del aspecto
+  const getAspectIcon = (name) => {
+    const lowerName = name.toLowerCase();
+    if (lowerName.includes("explicación") || lowerName.includes("explica")) {
+      return (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+        </svg>
+      );
+    }
+    if (lowerName.includes("puntualidad") || lowerName.includes("hora")) {
+      return (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      );
+    }
+    if (lowerName.includes("responsabilidad") || lowerName.includes("cumplimiento")) {
+      return (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      );
+    }
+    if (lowerName.includes("trato") || lowerName.includes("amabilidad")) {
+      return (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      );
+    }
+    if (lowerName.includes("conocimiento") || lowerName.includes("dominio")) {
+      return (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      );
+    }
+    // Default icon
+    return (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+      </svg>
+    );
   };
 
   // Convertir el objeto averageRatings a un array de entries
@@ -47,13 +106,14 @@ export default function LastSemesterData({
         {
           label: "Calificación",
           data: values,
-          backgroundColor: "rgba(25, 50, 100, 0.2)",
-          borderColor: "rgb(25, 50, 100)",
-          borderWidth: 2,
-          pointBackgroundColor: "rgb(25, 50, 100)",
+          backgroundColor: "rgba(54, 80, 125, 0.2)",
+          borderColor: "rgba(54, 80, 125, 1)",
+          borderWidth: 3,
+          pointBackgroundColor: "rgba(54, 80, 125, 1)",
           pointBorderColor: "#fff",
           pointHoverBackgroundColor: "#fff",
-          pointHoverBorderColor: "rgb(25, 50, 100)",
+          pointHoverBorderColor: "rgba(54, 80, 125, 1)",
+          pointRadius: 4,
         },
       ],
     };
@@ -65,21 +125,22 @@ export default function LastSemesterData({
           max: 5,
           ticks: {
             stepSize: 1,
-            display: true,
+            display: false,
           },
           grid: {
-            color: "rgba(0, 0, 0, 0.1)",
-            circular: false,
+            color: "rgba(0, 0, 0, 0.05)",
+            circular: true,
           },
           angleLines: {
-            color: "rgba(0, 0, 0, 0.1)",
+            color: "rgba(0, 0, 0, 0.05)",
           },
           pointLabels: {
             font: {
-              size: 14,
-              weight: "bold",
+              size: 11,
+              weight: "700",
             },
-            color: "rgb(25, 50, 100)",
+            color: "#36507D",
+            padding: 20,
           },
         },
       },
@@ -88,6 +149,9 @@ export default function LastSemesterData({
           display: false,
         },
         tooltip: {
+          backgroundColor: "rgba(54, 80, 125, 0.9)",
+          padding: 10,
+          displayColors: false,
           callbacks: {
             label: function (context) {
               const fullLabels = ratingsArray.map(([criterio]) => criterio);
@@ -113,171 +177,232 @@ export default function LastSemesterData({
 
     for (let i = 0; i < 5; i++) {
       if (i < fullStars) {
-        // Estrella completa
         stars.push(
-          <svg
-            key={i}
-            className="w-8 h-8 text-navy"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+          <svg key={i} className="w-8 h-8 text-navy dark:text-gray-100" fill="currentColor" viewBox="0 0 20 20">
             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
           </svg>,
         );
       } else if (i === fullStars && decimal > 0) {
-        // Estrella parcial
         stars.push(
           <div key={i} className="relative w-8 h-8">
-            <svg
-              className="w-8 h-8 text-gray-300 absolute"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
+            <svg className="w-8 h-8 text-gray-200 dark:text-gray-600 absolute" fill="currentColor" viewBox="0 0 20 20">
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
             </svg>
-            <div
-              className="absolute top-0 left-0 overflow-hidden"
-              style={{ width: `${decimal * 100}%` }}
-            >
-              <svg
-                className="w-8 h-8 text-navy"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+            <div className="absolute top-0 left-0 overflow-hidden" style={{ width: `${decimal * 100}%` }}>
+              <svg className="w-8 h-8 text-navy dark:text-gray-100" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
             </div>
           </div>,
         );
       } else {
-        // Estrella vacía
         stars.push(
-          <svg
-            key={i}
-            className="w-8 h-8 text-gray-300"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+          <svg key={i} className="w-8 h-8 text-gray-200 dark:text-gray-600" fill="currentColor" viewBox="0 0 20 20">
             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
           </svg>,
         );
       }
     }
 
-    return <div className="flex gap-1">{stars}</div>;
+      return <div className="flex gap-1">{stars}</div>;
+  };
+
+  const getAspectDescription = (name) => {
+    const descMap = [
+      ["conocimiento", "dominio", "Eval\u00FAa qu\u00E9 tan bien el docente conoce y maneja los temas de la materia."],
+      ["explicaci\u00F3n", "claridad", "Valora qu\u00E9 tan claro y comprensible es el docente al explicar los conceptos."],
+      ["flexibilidad", "Mide la capacidad del docente para adaptarse a las necesidades de los estudiantes."],
+      ["examen", "evaluaci\u00F3n", "Eval\u00FAa si los ex\u00E1menes y evaluaciones son justos y acordes a lo ense\u00F1ado."],
+      ["puntualidad", "hora", "Valora la puntualidad del docente en clases y entrega de calificaciones."],
+      ["respeto", "amabilidad", "trato", "Mide el respeto, la cordialidad y la disposici\u00F3n del docente hacia los estudiantes."],
+      ["accesible", "disponibilidad", "Eval\u00FAa qu\u00E9 tan accesible es el docente fuera de clase para consultas y apoyo."],
+      ["material", "Valora la calidad y utilidad del material proporcionado por el docente."],
+      ["facilidad", "Eval\u00FAa qu\u00E9 tan f\u00E1cil o dif\u00EDcil es aprobar la materia con este docente."],
+    ];
+    const key = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    for (const row of descMap) {
+      const desc = row[row.length - 1];
+      for (let i = 0; i < row.length - 1; i++) {
+        const k = row[i].normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        if (key.includes(k) || k.includes(key)) return desc;
+      }
+    }
+    return "Descripci\u00F3n no disponible";
+  };
+
+  const renderAspectName = (name) => {
+    const parts = name.split("/");
+    return parts.map((part, i) => (
+      <span key={i} className={i > 0 ? "block" : ""}>
+        {part.trim()}
+      </span>
+    ));
   };
 
   return (
-    <div className="space-y-4 lg:p-6 p-3">
+    <div className="space-y-2 lg:p-4 p-4">
       {lastSemesterData && Object.keys(lastSemesterData).length > 0 ? (
         <>
           {/* Header con información general */}
-          <div className="mb-6">
-            <h2 className="text-4xl font-bold text-navy mb-2">{teacherName}</h2>
-
-            {/* Grid con información general y facilidad */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Columna izquierda - Info general */}
-              <div className="space-y-2">
-                <h3 className="text-lg text-neutral-800 font-medium mb-4">
-                  Datos del Último Año
-                </h3>
-                <p className="text-neutral-600">
-                  Puntuación General:{" "}
-                  <span className="font-semibold">
-                    {lastSemesterData.totalAverage.toFixed(2) || "No data"}
-                  </span>
-                </p>
-                <p className="text-neutral-600">
-                  Total de reseñas:{" "}
-                  <span className="font-semibold">
-                    {lastSemesterData.totalReviews || 0}
-                  </span>
-                </p>
+          <div className="border-b border-solid border-gray-100 dark:border-gray-700 p-6">
+            <div className="space-y-4">
+              <div className="min-w-0">
+                <span className="text-gray-400 dark:text-gray-500 text-[10px] font-black uppercase tracking-widest mb-1 block">Docente</span>
+                <h2 className="text-2xl md:text-3xl font-black text-navy dark:text-gray-100 leading-tight break-words">
+                  {teacherName}
+                </h2>
               </div>
+              <div className="flex items-center justify-around md:justify-start gap-2 md:gap-8 bg-gray-50/50 dark:bg-gray-900/50 p-4 md:px-10 md:py-6 rounded-[2rem] md:rounded-[3rem] border border-gray-100 dark:border-gray-700 w-full shadow-inner">
+                <div className="flex-1 md:flex-none text-center md:text-left min-w-0">
+                  <span className="block text-xl md:text-3xl lg:text-4xl font-black text-navy dark:text-gray-100 leading-none mb-1">{lastSemesterData.totalAverage.toFixed(2)}</span>
+                  <span className="text-[8px] md:text-[11px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-tight md:whitespace-nowrap leading-tight">Puntaje General</span>
+                </div>
+                <div className="h-8 md:h-12 w-[1px] bg-gray-200 dark:bg-gray-700 flex-shrink-0 mx-1"></div>
+                <div className="flex-1 md:flex-none text-center md:text-left min-w-0">
+                  <span className="block text-xl md:text-3xl lg:text-4xl font-black text-navy dark:text-gray-100 leading-none mb-1">{lastSemesterData.totalReviews || 0}</span>
+                  <span className="text-[8px] md:text-[11px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-tight md:whitespace-nowrap leading-tight">Reseñas Totales</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-              {/* Columna derecha - Facilidad para aprobar */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 items-start">
+            {/* Columna Izquierda: Valores por Aspecto */}
+            <div className="space-y-6 order-2 xl:order-1">
+               <div className="bg-gray-50/50 dark:bg-gray-900/50 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 mb-2">
+                  <h3 className="text-xl font-black text-navy dark:text-gray-100 uppercase tracking-tight flex items-center gap-3">
+                    <div className="w-1.5 h-6 bg-navy rounded-full"></div>
+                    Detalle por Aspecto
+                  </h3>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-2">Puntajes individuales de cada categoría</p>
+               </div>
+
+                {otherRatings.filter(([, v]) => v >= 4).length > 0 && (
+                  <div className="bg-emerald-50/50 dark:bg-indigo-500/10 border border-emerald-200 dark:border-indigo-500/30 dark:glow-sm p-4 md:p-5 rounded-[1.5rem]">
+                    <span className="text-[10px] font-black text-emerald-700 dark:text-indigo-300 uppercase tracking-widest mb-2.5 block">Fortalezas Destacadas</span>
+                    <div className="flex flex-wrap gap-2">
+                      {otherRatings
+                        .filter(([, v]) => v >= 4)
+                        .map(([criterio, valor], i) => (
+                          <div key={i} className="inline-flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-emerald-200 dark:border-indigo-500/30 px-3 py-1.5 rounded-full shadow-sm">
+                            <span className="text-[11px] font-black text-navy dark:text-gray-100 leading-tight">{criterio}</span>
+                            <span className="text-[10px] font-black text-emerald-600 dark:text-indigo-400">{valor.toFixed(1)}</span>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+
+               <div className="space-y-4">
+                {otherRatings.length > 0 ? (
+                  otherRatings.map(([criterio, valor], index) => {
+                    const color = valor >= 4 ? "navy" : valor >= 3 ? "blue-600" : "slate-400";
+                    return (
+                      <div key={index} className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-6 rounded-[2rem] shadow-sm hover:border-navy/20 transition-all group hover:shadow-md relative"
+                           onMouseMove={(e) => showTooltip(getAspectDescription(criterio), e)}
+                           onMouseLeave={hideTooltip}>
+                        <div className="flex items-start gap-4 mb-5">
+                           <div className="p-3 bg-navy/5 dark:bg-gray-700 text-navy dark:text-gray-100 rounded-2xl group-hover:bg-navy group-hover:text-white transition-all duration-300">
+                              {getAspectIcon(criterio)}
+                           </div>
+                           <div className="flex-1 min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 md:gap-4 mb-3">
+                                <h4 className="text-sm md:text-base font-black text-navy dark:text-gray-100 leading-tight break-words">{renderAspectName(criterio)}</h4>
+                               <div className="bg-navy text-white px-3 py-1 rounded-xl text-[11px] font-black tracking-widest shadow-sm self-start">
+                                 {valor.toFixed(2)}
+                               </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                               <ProgressBar 
+                                  value={(valor / 5) * 100} 
+                                  showValue={false} 
+                                  className="h-2 flex-1"
+                                  pt={{
+                                    root: { className: "bg-gray-50 dark:bg-gray-900 rounded-full h-2 overflow-hidden border border-gray-100 dark:border-gray-700" },
+                                    value: { className: "bg-navy rounded-full transition-all duration-500" },
+                                  }}
+                               />
+                               <span className="text-[10px] font-black text-navy/30 dark:text-gray-500 uppercase">/ 5.0</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="text-center py-20 bg-gray-50 dark:bg-gray-900 rounded-[2.5rem] border-2 border-dashed border-gray-200 dark:border-gray-700">
+                    <p className="text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">No hay detalles disponibles</p>
+                  </div>
+                )}
+               </div>
+            </div>
+
+            {/* Columna Derecha: Visualizaciones */}
+            <div className="space-y-8 order-1 xl:order-2">
+              {/* Facilidad para aprobar destacada vertical */}
               {facilidadRating && (
-                <div className="p-4 bg-blue-50 border-2 border-navy rounded-lg">
-                  <h4 className="text-lg font-bold text-navy mb-2 flex items-center gap-2">
-                     Facilidad para Aprobar
-                  </h4>
-                  <div className="flex items-center gap-3">
-                    <CustomStarRating value={facilidadRating[1]} />
-                    <span className="text-2xl font-bold text-navy">
-                      {facilidadRating[1].toFixed(2)}
-                    </span>
+                <div className="bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-gray-800 dark:to-gray-800 p-8 md:p-10 rounded-[2.5rem] border border-blue-100 dark:border-gray-700 shadow-sm flex flex-col items-center text-center gap-8 relative group"
+                     onMouseMove={(e) => showTooltip(getAspectDescription("Facilidad"), e)}
+                     onMouseLeave={hideTooltip}>
+                  <div className="flex flex-col items-center gap-4">
+                      <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm text-navy dark:text-gray-100 relative">
+                        <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                      </div>
+                     <div>
+                      <h4 className="text-2xl font-black text-navy dark:text-gray-100 leading-tight">Facilidad para Aprobar</h4>
+                      <p className="text-gray-500 dark:text-gray-400 text-[11px] uppercase font-bold tracking-widest leading-relaxed mt-2 mx-auto max-w-xs">Percepción de dificultad basada en reseñas de alumnos</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-center gap-2 w-full">
+                    <div className="my-2">
+                      <CustomStarRating value={facilidadRating[1]} />
+                    </div>
+                    <div className="flex items-baseline gap-1 mt-2">
+                      <span className="text-4xl md:text-5xl font-black text-navy dark:text-gray-100 leading-none">
+                        {facilidadRating[1].toFixed(2)}
+                      </span>
+                      <span className="text-base font-black text-navy/30 dark:text-gray-500">/5</span>
+                    </div>
                   </div>
                 </div>
               )}
-            </div>
-          </div>
 
-          {/* Mapeo de las calificaciones con ProgressBar */}
-          <div className="space-y-4">
-            {otherRatings.length > 0 ? (
-              otherRatings.map(([criterio, valor], index) => (
-                <div key={index}>
-                  <div className="flex justify-between items-center mb-2">
-                    <div>
-                      <h4 className="text-lg font-semibold text-navy">
-                        {criterio}{" "}
-                        <span className="text-sm text-neutral-600">
-                          {getInitials(criterio)}
-                        </span>
-                      </h4>
-                    </div>
-                    <span className="text-xl font-bold text-navy">
-                      {valor.toFixed(2)} / 5
-                    </span>
-                  </div>
-                  <ProgressBar
-                    value={(valor / 5) * 100}
-                    showValue={false}
-                    className="h-3"
-                    pt={{
-                      root: {
-                        className:
-                          "bg-gray-200 rounded-full overflow-hidden h-4",
-                      },
-                      value: {
-                        className: "bg-navy",
-                      },
-                    }}
-                  />
+              {/* Gráfico de Radar Card */}
+              <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-8 md:p-10 rounded-[2.5rem] shadow-sm">
+                <div className="mb-8">
+                  <h3 className="text-2xl font-black text-navy dark:text-gray-100 mb-2">Perfil de Desempeño</h3>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">Equilibrio de aptitudes evaluadas</p>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-neutral-500">
-                  No hay calificaciones disponibles
-                </p>
-              </div>
-            )}
-          </div>
-          {/* Gráfico Radar */}
-          {ratingsArray.length > 0 && (
-            <div className="mt-8">
-              <h2 className="text-3xl font-bold text-navy mb-2">
-                Gráfica de aspectos
-              </h2>
-
-              <div className="mb-8 flex justify-center">
-                <div className="w-full max-w-md">
+                <div className="aspect-square w-full max-w-md mx-auto">
                   <Chart type="radar" data={chartData} options={chartOptions} />
                 </div>
+                {/* Leyenda del Radar Chart */}
+                <div className="mt-10 space-y-3">
+                  {ratingsArray.map(([criterio], i) => (
+                    <div key={i} className="flex items-center gap-3 text-[12px]">
+                      <span className="font-black text-navy dark:text-gray-100 min-w-[36px] bg-blue-50 dark:bg-gray-700 px-2 py-1 rounded-lg text-center shadow-sm flex-shrink-0">{getInitials(criterio)}</span>
+                      <span className="text-gray-600 dark:text-gray-300 font-extrabold leading-tight break-words min-w-0">{renderAspectName(criterio)}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          )}
+          </div>
+
+          {tooltipEl}
         </>
       ) : (
-        <div className="text-center py-12">
-          <p className="text-xl text-neutral-500">
-            Selecciona un docente para ver sus evaluaciones
+        <div className="flex flex-col items-center justify-center py-24 bg-gray-50 dark:bg-gray-900 rounded-[3rem] border-2 border-dashed border-gray-200 dark:border-gray-700 text-center">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-full shadow-lg mb-8 text-gray-200 dark:text-gray-600 animate-pulse">
+            <svg className="w-20 h-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
+          <h3 className="text-3xl font-black text-navy dark:text-gray-100 mb-3">Sin Docente Seleccionado</h3>
+          <p className="text-gray-400 dark:text-gray-500 max-w-sm mx-auto font-medium">
+            Por favor, elige una de las secciones del lateral para desbloquear el análisis profundo.
           </p>
         </div>
       )}

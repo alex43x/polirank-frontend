@@ -33,11 +33,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await api.post("/auth/login", credentials);
       
-      const data = response.data;
-      
-      
-      const jwt = data.token;
-      const student = data.data.student;
+      const { token: jwt, student } = response.data.data;
 
       if (!jwt || !student) {
         throw new Error("Respuesta inválida del servidor");
@@ -63,9 +59,9 @@ export const AuthProvider = ({ children }) => {
       setProfileData(profileData);
 
       // Setear el header de carrera si existe
-      if (student?.Matriculacions?.[0]?.Carrera?.id) {
-        setCareerHeader(student.Matriculacions[0].Carrera.id);
-        localStorage.setItem("careerId", student.Matriculacions[0].Carrera.id);
+      if (student?.matriculaciones?.[0]?.carrera?.id) {
+        setCareerHeader(student.matriculaciones[0].carrera.id);
+        localStorage.setItem("careerId", student.matriculaciones[0].carrera.id);
       }
 
       return student;
@@ -82,12 +78,25 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("user");
     localStorage.removeItem("profileData");
     localStorage.removeItem("careerId");
-    localStorage.removeItem("selectedCareer"); // Limpiar también selectedCareer
+    localStorage.removeItem("selectedCareer");
+    localStorage.removeItem("isGuest");
     setAuthHeader(null);
     setCareerHeader(null);
     setUser(null);
     setToken(null);
     setProfileData(null);
+  };
+
+  const continueAsGuest = () => {
+    localStorage.setItem("isGuest", "true");
+    const guestUser = { 
+      id: "guest",
+      nombre: "Invitado", 
+      rol: { nombre: "GUEST" },
+      matriculaciones: [] 
+    };
+    setUser(guestUser);
+    localStorage.setItem("user", JSON.stringify(guestUser));
   };
 
   /* ===========================
@@ -99,33 +108,34 @@ export const AuthProvider = ({ children }) => {
     }
     
     const { data } = await api.get("/auth/profile");
+    const profile = data.data;
     
     // Verificar si las carreras tienen el campo semestres
-    const hasCompleteCareers = data.student?.Matriculacions?.every(
-      m => m.Carrera.semestres !== undefined
+    const hasCompleteCareers = profile.student?.matriculaciones?.every(
+      m => m.carrera.semestres !== undefined
     );
     
     
     // Si el API no devuelve semestres, intentar obtenerlos de otra fuente
-    if (!hasCompleteCareers && data.student?.Matriculacions) {
+    if (!hasCompleteCareers && profile.student?.matriculaciones) {
       
       // Intentar obtener de localStorage si existe
       const savedUser = localStorage.getItem("user");
       if (savedUser) {
         try {
           const parsedUser = JSON.parse(savedUser);
-          if (parsedUser.Matriculacions) {
+          if (parsedUser.matriculaciones) {
             // Enriquecer con datos de localStorage
-            data.student.Matriculacions = data.student.Matriculacions.map(matriculacion => {
-              const saved = parsedUser.Matriculacions.find(
-                m => m.Carrera.id === matriculacion.Carrera.id
+            profile.student.matriculaciones = profile.student.matriculaciones.map(matriculacion => {
+              const saved = parsedUser.matriculaciones.find(
+                m => m.carrera.id === matriculacion.carrera.id
               );
-              if (saved && saved.Carrera.semestres) {
+              if (saved && saved.carrera.semestres) {
                 return {
                   ...matriculacion,
-                  Carrera: {
-                    ...matriculacion.Carrera,
-                    semestres: saved.Carrera.semestres
+                  carrera: {
+                    ...matriculacion.carrera,
+                    semestres: saved.carrera.semestres
                   }
                 };
               }
@@ -139,9 +149,9 @@ export const AuthProvider = ({ children }) => {
     }
     
     return {
-      student: data.student,
-      reviews: data.reviews,
-      tries: data.tries || [],
+      student: profile.student,
+      reviews: profile.reviews,
+      tries: profile.tries || [],
     };
   };
 
@@ -160,10 +170,10 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("profileData", JSON.stringify(profile));
       
       // Setear el header de carrera si existe
-      if (profile.student?.Matriculacions?.length > 0) {
+      if (profile.student?.matriculaciones?.length > 0) {
         const storedCareerId = localStorage.getItem("careerId");
-        const isValid = storedCareerId && profile.student.Matriculacions.some(m => m.Carrera.id.toString() === storedCareerId.toString());
-        const careerIdToSet = isValid ? storedCareerId : profile.student.Matriculacions[0].Carrera.id;
+        const isValid = storedCareerId && profile.student.matriculaciones.some(m => m.carrera.id.toString() === storedCareerId.toString());
+        const careerIdToSet = isValid ? storedCareerId : profile.student.matriculaciones[0].carrera.id;
         
         setCareerHeader(careerIdToSet);
         localStorage.setItem("careerId", careerIdToSet);
@@ -213,6 +223,73 @@ export const AuthProvider = ({ children }) => {
   };
 
   /* ===========================
+     REQUEST ACCESS (Register/Reset)
+     =========================== */
+  const requestAccess = async (correo) => {
+    setActionLoading(true);
+    try {
+      const { data } = await api.post("/auth/request-access", { correo });
+      return data;
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  /* ===========================
+     VERIFY TOKEN
+     =========================== */
+  const verifyToken = async (token) => {
+    try {
+      const { data } = await api.get(`/auth/verify-token?token=${token}`);
+      return data.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  /* ===========================
+     RESET PASSWORD
+     =========================== */
+  const resetPassword = async (token, newPassword) => {
+    setActionLoading(true);
+    try {
+      const response = await api.post("/auth/reset-password", { token, newPassword });
+      const { token: jwt, student } = response.data.data;
+
+      localStorage.setItem("token", jwt);
+      setAuthHeader(jwt);
+      setToken(jwt);
+      localStorage.setItem("user", JSON.stringify(student));
+      setUser(student);
+
+      return student;
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  /* ===========================
+     REGISTER
+     =========================== */
+  const register = async (token, nombre, password, carreras) => {
+    setActionLoading(true);
+    try {
+      const response = await api.post("/auth/register", { token, nombre, password, carreras });
+      const { token: jwt, student } = response.data;
+
+      localStorage.setItem("token", jwt);
+      setAuthHeader(jwt);
+      setToken(jwt);
+      localStorage.setItem("user", JSON.stringify(student));
+      setUser(student);
+
+      return student;
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  /* ===========================
      INIT + EXP CHECK
      =========================== */
   useEffect(() => {
@@ -220,6 +297,14 @@ export const AuthProvider = ({ children }) => {
       const storedToken = localStorage.getItem("token");
 
       if (!storedToken) {
+        // Por defecto, si no hay token, el usuario es un Invitado (GUEST)
+        const guestUser = { 
+          id: "guest",
+          nombre: "Invitado", 
+          rol: { nombre: "GUEST" },
+          matriculaciones: [] 
+        };
+        setUser(guestUser);
         setLoading(false);
         return;
       }
@@ -252,10 +337,10 @@ export const AuthProvider = ({ children }) => {
         setProfileData(profile);
         
         // Setear el header de carrera si existe
-        if (profile.student?.Matriculacions?.length > 0) {
+        if (profile.student?.matriculaciones?.length > 0) {
           const storedCareerId = localStorage.getItem("careerId");
-          const isValid = storedCareerId && profile.student.Matriculacions.some(m => m.Carrera.id.toString() === storedCareerId.toString());
-          const careerIdToSet = isValid ? storedCareerId : profile.student.Matriculacions[0].Carrera.id;
+          const isValid = storedCareerId && profile.student.matriculaciones.some(m => m.carrera.id.toString() === storedCareerId.toString());
+          const careerIdToSet = isValid ? storedCareerId : profile.student.matriculaciones[0].carrera.id;
           
           setCareerHeader(careerIdToSet);
           localStorage.setItem("careerId", careerIdToSet);
@@ -282,7 +367,13 @@ export const AuthProvider = ({ children }) => {
         getProfile,
         createPassword,
         changePassword,
+        continueAsGuest,
+        requestAccess,
+        verifyToken,
+        resetPassword,
+        register,
         isAuthenticated: !!token,
+        isGuest: user?.rol?.nombre === "GUEST",
         loading, // Estado de inicialización
         actionLoading, // Estado de acciones
       }}

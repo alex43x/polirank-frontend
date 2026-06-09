@@ -1,25 +1,26 @@
-import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTeacher } from "../../hooks/useTeacher";
 import { useSubject } from "../../hooks/useSubject";
 import { useAuth } from "../../hooks/useAuth";
 import { useCourse } from "../../hooks/useCourse";
 import { useTry } from "../../hooks/useTry";
 
-import TeacherCard from "../../components/reviews.jsx/TeacherCard";
+import TeacherSubjectCard from "../../components/teachers/TeacherSubjectCard";
 import LastSemesterData from "../../components/reviews.jsx/LastSemesterData";
 import HistoricalData from "../../components/reviews.jsx/HistoricalData";
-import ReviewForm from "./ReviewForm";
-import TriesModule from "../../components/reviews.jsx/TriesModule";
 import CommentsSection from "../../components/reviews.jsx/CommentsSection";
+import ReviewForm from "../reviews/ReviewForm";
+import TriesModule from "../../components/reviews.jsx/TriesModule";
 import { Dialog } from "primereact/dialog";
 
-export default function Reviews() {
-  const { subjectId } = useParams();
+export default function TeacherReviews() {
+  const { teacherId } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
-  const { user, getProfile, profileData } = useAuth();
-  const { fetchSectionsBySubjectId, fetchAttemptsBySubjectId } = useSubject();
+  const { user, getProfile, profileData, isGuest } = useAuth();
+  const { fetchTeacherById, fetchSectionsByTeacherId } = useTeacher();
+  const { fetchAttemptsBySubjectId } = useSubject();
   const { fetchLastSemesterData, fetchHistoricalData } = useCourse();
   const { createTry, updateTry, deleteTry } = useTry();
   const queryClient = useQueryClient();
@@ -30,9 +31,6 @@ export default function Reviews() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedCareer, setSelectedCareer] = useState(null);
   const [profileLoaded, setProfileLoaded] = useState(false);
-  const dialogRef = useRef(null);
-
-  const subjectName = location.state?.subjectName || "Materia";
 
   // Seleccionar la primera carrera por defecto
   useEffect(() => {
@@ -49,33 +47,42 @@ export default function Reviews() {
     }
   }, [user, profileLoaded]);
 
-  // Query para obtener las secciones
+  // Query para obtener los datos del docente
+  const { data: teacherData, isLoading: teacherLoading } = useQuery({
+    queryKey: ["teacher", teacherId],
+    queryFn: () => fetchTeacherById(teacherId),
+    enabled: !!teacherId,
+  });
+
+  // Query para obtener las secciones/materias del docente
   const {
-    data: sections = [],
+    data: sectionsData = {},
     isLoading: sectionsLoading,
-    error: sectionsError,
   } = useQuery({
-    queryKey: ["sections", subjectId],
+    queryKey: ["teacherSections", teacherId],
     queryFn: async () => {
-      const data = await fetchSectionsBySubjectId(subjectId);
-      return Array.isArray(data) ? data : [];
+      const data = await fetchSectionsByTeacherId(teacherId);
+      return data || { secciones: [] };
     },
-    enabled: !!subjectId && !!user,
+    enabled: !!teacherId,
     staleTime: 1000 * 60 * 10,
   });
 
-  // Query para obtener intentos de la materia
+  const sections = sectionsData.secciones || [];
+
+  // Query para obtener intentos de la materia seleccionada
   const {
     data: attemptsData = {},
     isLoading: attemptsLoading,
     refetch: refetchAttempts,
   } = useQuery({
-    queryKey: ["attempts", subjectId],
+    queryKey: ["attempts", selectedSection?.materia?.id],
     queryFn: async () => {
-      const data = await fetchAttemptsBySubjectId(subjectId);
+      if (!selectedSection?.materia?.id) return {};
+      const data = await fetchAttemptsBySubjectId(selectedSection.materia.id);
       return data || {};
     },
-    enabled: !!subjectId,
+    enabled: !!selectedSection?.materia?.id,
     staleTime: 1000 * 60 * 5,
   });
 
@@ -108,49 +115,40 @@ export default function Reviews() {
   });
 
   const handleSectionSelect = (sectionData) => {
-    setSelectedSection(sectionData.section);
+    setSelectedSection(sectionData);
   };
 
   const handleOpenDialog = () => {
     if (!selectedSection) {
-      dialogRef.current?.showModal();
+      alert("Por favor selecciona una materia primero");
       return;
     }
     setVisible(true);
   };
 
   const handleOpenTriesDialog = () => {
+    if (!selectedSection) {
+        alert("Por favor selecciona una materia primero");
+        return;
+      }
     setVisibleTries(true);
   };
 
   const handleReviewSuccess = async () => {
     setVisible(false);
-
-    await queryClient.invalidateQueries({
-      queryKey: ["sections", subjectId],
-    });
-    await queryClient.invalidateQueries({
-      queryKey: ["coursesBySection", selectedSection?.id],
-    });
-    await queryClient.invalidateQueries({
-      queryKey: ["reviewsForSection", selectedSection?.id],
-    });
-    await queryClient.invalidateQueries({
-      queryKey: ["lastSemester", selectedSection?.id],
-    });
-    await queryClient.invalidateQueries({
-      queryKey: ["historical", selectedSection?.id],
-    });
-
+    await queryClient.invalidateQueries({ queryKey: ["teacherSections", teacherId] });
+    await queryClient.invalidateQueries({ queryKey: ["coursesBySection", selectedSection?.id] });
+    await queryClient.invalidateQueries({ queryKey: ["reviewsForSection", selectedSection?.id] });
+    await queryClient.invalidateQueries({ queryKey: ["lastSemester", selectedSection?.id] });
+    await queryClient.invalidateQueries({ queryKey: ["historical", selectedSection?.id] });
     await getProfile();
   };
 
   const handleSubmitTry = async (selectedTryValue, existingTry) => {
     try {
       setIsSubmitting(true);
-
       const tryData = {
-        asignatura: parseInt(subjectId),
+        asignatura: parseInt(selectedSection.materia.id),
         valor: selectedTryValue,
       };
 
@@ -160,16 +158,8 @@ export default function Reviews() {
         await createTry(tryData);
       }
 
-      await Promise.all([
-        refetchAttempts(),
-        getProfile()
-      ]);
-
-      alert(
-        existingTry
-          ? "Intentos actualizados correctamente"
-          : "Intentos registrados correctamente"
-      );
+      await Promise.all([refetchAttempts(), getProfile()]);
+      alert(existingTry ? "Intentos actualizados correctamente" : "Intentos registrados correctamente");
     } catch (error) {
       alert("Error al guardar los intentos. Por favor intenta de nuevo.");
     } finally {
@@ -181,12 +171,7 @@ export default function Reviews() {
     try {
       setIsSubmitting(true);
       await deleteTry(existingTry.id);
-
-      await Promise.all([
-        refetchAttempts(),
-        getProfile()
-      ]);
-
+      await Promise.all([refetchAttempts(), getProfile()]);
       alert("Registro eliminado correctamente");
     } catch (error) {
       alert("Error al eliminar el registro. Por favor intenta de nuevo.");
@@ -195,40 +180,34 @@ export default function Reviews() {
     }
   };
 
-  if (sectionsLoading && sections.length === 0) {
+  if (teacherLoading || (sectionsLoading && sections.length === 0)) {
     return (
       <div className="flex flex-col justify-center items-center h-screen bg-gray-50 dark:bg-gray-950">
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-navy"></div>
-        <p className="mt-4 text-navy dark:text-gray-100 font-bold animate-pulse">Cargando análisis académico...</p>
+        <p className="mt-4 text-navy dark:text-gray-100 font-bold animate-pulse">Cargando perfil del docente...</p>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen pb-12 bg-[#F3F4F6] dark:bg-gray-950">
-      {/* Native Dialog */}
-      <dialog
-        ref={dialogRef}
-        className="rounded-2xl shadow-2xl border-0 p-8 backdrop:bg-black/40 max-w-sm w-full text-center bg-white dark:bg-gray-800 dark:text-gray-100 fixed inset-0 m-auto h-fit"
-        onClick={(e) => { if (e.target === e.currentTarget) dialogRef.current?.close(); }}
-      >
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-red-50 dark:bg-red-950/30 flex items-center justify-center">
-            <svg className="w-7 h-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
+      {/* Banner de Invitado */}
+      {isGuest && (
+        <div className="bg-navy p-3 flex items-center justify-between gap-4 sticky top-0 z-50 shadow-lg dark:shadow-indigo-500/10">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p className="text-white text-xs md:text-sm font-bold flex-1 text-center md:text-left">
+              Estás en modo lectura. <span className="hidden md:inline font-normal opacity-80">Inicia sesión para ver estadísticas detalladas y publicar reseñas.</span>
+            </p>
           </div>
-          <p className="text-lg font-bold text-gray-800 dark:text-gray-100">Selecciona una sección</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Por favor elige una sección de la lista antes de continuar.</p>
-          <button
-            onClick={() => dialogRef.current?.close()}
-            className="mt-2 px-8 py-3 bg-navy text-white rounded-2xl font-bold hover:bg-dark-navy transition-colors"
-          >
-            Entendido
-          </button>
         </div>
-      </dialog>
-      {/* Header Premium Flotante */}
+      )}
+
+      {/* Header Profile Section */}
       <div className="max-w-[1600px] mx-auto px-2 md:px-4 lg:px-8 pt-6">
         <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-200/50 dark:shadow-none p-6 md:p-8 mb-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-8">
@@ -236,7 +215,7 @@ export default function Reviews() {
                 <button
                   onClick={() => navigate(-1)}
                   className="group flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-navy hover:border-navy transition-all duration-300 shadow-sm flex-shrink-0"
-                  title="Volver al Dashboard"
+                  title="Volver"
                 >
                   <svg className="w-5 h-5 text-navy group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
@@ -245,29 +224,29 @@ export default function Reviews() {
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="px-2 py-0.5 bg-blue-50 dark:bg-gray-700 text-navy dark:text-gray-100 text-[9px] font-black rounded uppercase tracking-widest">Materia</span>
-                    <div className="h-1 w-1 bg-gray-300 rounded-full"></div>
-                    <span className="text-gray-400 dark:text-gray-500 text-[9px] font-bold uppercase tracking-widest break-words leading-tight">{selectedCareer?.nombre}</span>
+                    <span className="px-2 py-0.5 bg-blue-50 dark:bg-gray-700 text-navy dark:text-gray-100 text-[9px] font-black rounded uppercase tracking-widest">Docente</span>
                   </div>
                   <h1 className="text-2xl md:text-3xl lg:text-5xl font-black text-navy dark:text-gray-100 tracking-tight leading-tight break-words">
-                    {subjectName}
+                    {teacherData?.nombre || "Docente"}
                   </h1>
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-center md:justify-end border-t md:border-t-0 pt-6 md:pt-0 border-gray-100 dark:border-gray-700">
-                <button
-                  onClick={handleOpenTriesDialog}
-                  className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border-2 border-navy dark:border-navy text-navy dark:text-gray-100 px-6 py-3 rounded-2xl hover:bg-navy hover:text-white transition-all duration-300 font-bold shadow-sm group"
-                  type="button"
-                >
-                  <svg className="w-5 h-5 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                  Chipitómetro
-                </button>
+                {!isGuest && selectedSection && (
+                  <button
+                    onClick={handleOpenTriesDialog}
+                    className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border-2 border-navy text-navy dark:text-gray-100 px-6 py-3 rounded-2xl hover:bg-navy hover:text-white transition-all duration-300 font-bold shadow-sm group"
+                    type="button"
+                  >
+                    <svg className="w-5 h-5 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    Chipitómetro
+                  </button>
+                )}
                 
-                {user?.rol?.nombre !== "GUEST" && (
+                {user?.rol?.nombre !== "GUEST" && selectedSection && (
                   <button
                     className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-navy text-white px-8 py-3 rounded-2xl hover:bg-dark-navy hover:shadow-navy/40 transition-all duration-300 font-bold shadow-lg shadow-navy/20 active:scale-95"
                     onClick={handleOpenDialog}
@@ -312,35 +291,34 @@ export default function Reviews() {
           </div>
         )}
 
-        {/* Secciones — horizontal scrollable */}
+        {/* Materias — horizontal scrollable */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg md:text-xl font-black text-navy dark:text-gray-100 uppercase tracking-tight flex items-center gap-2">
               <div className="w-2 h-6 bg-navy rounded-full"></div>
-              Secciones ({sections.length})
+              Materias ({sections.length})
             </h2>
           </div>
           
           {sections.length === 0 ? (
             <div className="bg-white dark:bg-gray-800 border-2 border-dashed border-gray-100 dark:border-gray-700 rounded-3xl p-10 text-center">
-              <p className="text-gray-400 dark:text-gray-500 font-bold">No hay secciones registradas</p>
+              <p className="text-gray-400 dark:text-gray-500 font-bold">No hay materias registradas</p>
             </div>
           ) : (
             <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
               {sections.map((sectionData, index) => (
                 <div
-                  key={sectionData.section.id}
-                  onClick={() => handleSectionSelect(sectionData)}
+                  key={sectionData?.id || index}
+                  onClick={() => sectionData && handleSectionSelect(sectionData)}
                   className="min-w-[280px] flex-shrink-0"
                 >
-                  <TeacherCard
-                    teacher={sectionData.section.Docente}
-                    selected={selectedSection?.id === sectionData.section.id}
-                    reviews={sectionData.totalReviews}
-                    score={sectionData.promedioGeneral}
+                  <TeacherSubjectCard
+                    subject={sectionData?.materia}
+                    selected={selectedSection?.id === sectionData?.id}
+                    reviews={sectionData?.totalReviews}
+                    score={sectionData?.promedioGeneral}
                     position={index + 1}
-                    subjectName={subjectName}
-                    sectionNumber={sectionData.section.numero}
+                    sectionNumber={sectionData?.numero}
                   />
                 </div>
               ))}
@@ -352,7 +330,17 @@ export default function Reviews() {
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="flex-1 min-w-0 scroll-mt-16" id="metricas">
             <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-200/50 dark:shadow-none overflow-hidden min-h-[400px]">
-              {lastSemesterLoading ? (
+              {!selectedSection ? (
+                <div className="flex flex-col items-center justify-center h-full min-h-[600px] text-center p-12">
+                   <div className="w-24 h-24 bg-blue-50 dark:bg-gray-700 rounded-full flex items-center justify-center mb-6">
+                      <svg className="w-12 h-12 text-navy dark:text-gray-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                   </div>
+                   <h3 className="text-2xl font-black text-navy dark:text-gray-100 mb-2">Selecciona una materia</h3>
+                   <p className="text-gray-400 dark:text-gray-500 max-w-sm">Elige una de las materias de arriba para ver las estadísticas y desempeño de este docente.</p>
+                </div>
+              ) : lastSemesterLoading ? (
                 <div className="flex flex-col justify-center items-center h-96">
                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-navy"></div>
                    <p className="mt-4 text-gray-400 dark:text-gray-500 font-medium italic">Analizando reportes de curso...</p>
@@ -360,7 +348,7 @@ export default function Reviews() {
               ) : (
                 <LastSemesterData
                   lastSemesterData={lastSemesterData}
-                  teacherName={selectedSection?.Docente?.nombre}
+                  teacherName={teacherData?.nombre}
                 />
               )}
             </div>
@@ -385,7 +373,7 @@ export default function Reviews() {
         )}
       </div>
 
-      {/* Dialogs con Estilos Mejorados */}
+      {/* Dialogs */}
       <Dialog
         visible={visible}
         style={{ width: "95vw", maxWidth: "900px" }}
@@ -397,8 +385,8 @@ export default function Reviews() {
         maskStyle={{ backgroundColor: "rgba(0, 0, 0, 0.7)", backdropFilter: "blur(8px)" }}
       >
         <ReviewForm
-          subjectName={subjectName}
-          teacherName={selectedSection?.Docente?.nombre || "Docente"}
+          subjectName={selectedSection?.materia?.nombre || "Materia"}
+          teacherName={teacherData?.nombre || "Docente"}
           sectionId={selectedSection?.id}
           onSuccess={handleReviewSuccess}
         />
@@ -411,7 +399,7 @@ export default function Reviews() {
         dismissableMask={true}
         modal={true}
         header="Estadísticas de Intentos (Chipitómetro)"
-        contentClassName="p-0 overflow-y-auto bg-gray-50 dark:bg-gray-900"
+        contentClassName="p-0 overflow-y-auto"
         maskStyle={{ backgroundColor: "rgba(0, 0, 0, 0.7)", backdropFilter: "blur(8px)" }}
         pt={{
           root: { className: "rounded-[2rem] overflow-hidden border-0" },
@@ -425,8 +413,8 @@ export default function Reviews() {
         }}
       >
         <TriesModule
-          subjectId={subjectId}
-          subjectName={subjectName}
+          subjectId={selectedSection?.materia?.id}
+          subjectName={selectedSection?.materia?.nombre}
           attemptsData={attemptsData}
           attemptsLoading={attemptsLoading}
           profileData={profileData}

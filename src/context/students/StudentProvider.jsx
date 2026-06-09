@@ -15,11 +15,11 @@ export const StudentProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get("/alumnos", { params });
-      setStudents(data.students || []);
-      setTotal(data.total || 0);
-      setPage(data.currentPage || 1);
-      setLimit(data.limit || 10);
-      setTotalPages(data.totalPages || 0);
+      setStudents(data.data?.students || []);
+      setTotal(data.data?.total || 0);
+      setPage(data.data?.currentPage || 1);
+      setLimit(data.data?.limit || 10);
+      setTotalPages(data.data?.totalPages || 0);
     } catch (error) {
       setStudents([]);
       setTotal(0);
@@ -36,7 +36,7 @@ export const StudentProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.get(`/alumnos/${id}`);
-      return data;
+      return data.data;
     } catch (error) {
       throw error;
     } finally {
@@ -49,7 +49,7 @@ export const StudentProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.post("/alumnos", studentData);
-      return data;
+      return data.data;
     } catch (error) {
       throw error;
     } finally {
@@ -62,7 +62,7 @@ export const StudentProvider = ({ children }) => {
     setLoading(true);
     try{
       const { data } = await api.put(`/alumnos/${id}`, studentData);
-      return data;
+      return data.data;
     } catch (error) {
       throw error;
     } finally {

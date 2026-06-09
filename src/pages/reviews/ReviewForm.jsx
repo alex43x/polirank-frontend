@@ -24,6 +24,7 @@ const ReviewForm = ({
     trato: null,
     disponibilidad: null,
     material: null,
+    texto: "",
   });
   const { createReview, updateReview, deleteReview } = useReview();
   const { getCoursesBySection } = useCourse();
@@ -34,8 +35,8 @@ const ReviewForm = ({
   const [existingReview, setExistingReview] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [step, setStep] = useState(0);
 
-  // Cargar cursos disponibles cuando se abre el formulario
   useEffect(() => {
     const loadCourses = async () => {
       if (!sectionId) {
@@ -49,16 +50,14 @@ const ReviewForm = ({
           setAvailableCourses(response.cursos);
         }
       } catch (error) {
-        throw error
+        console.error(error);
       } finally {
         setLoading(false);
       }
     };
-
     loadCourses();
   }, [sectionId]);
 
-  // Verificar si existe una reseña cuando se selecciona año y período
   useEffect(() => {
     const checkExistingReview = () => {
       if (!formData.selectedCourseId || !profileData?.reviews?.rows) {
@@ -66,278 +65,194 @@ const ReviewForm = ({
         setIsEditMode(false);
         return;
       }
-
-      // Buscar si existe una reseña para el curso seleccionado
       const review = profileData.reviews.rows.find(
-        (r) => r.curso === formData.selectedCourseId
+        (r) => r.curso?.id === formData.selectedCourseId
       );
-
       if (review) {
         setExistingReview(review);
         setIsEditMode(true);
-        // Cargar los valores de la reseña existente en el formulario
         loadReviewData(review);
       } else {
         setExistingReview(null);
         setIsEditMode(false);
-        // NO limpiar las calificaciones si no hay reseña existente
-        // clearRatings();
+        setFormData(prev => ({
+          ...prev,
+          facilidad: null, dominio: null, claridad: null, flexibilidad: null,
+          evaluacion: null, puntualidad: null, trato: null, disponibilidad: null, material: null, texto: ""
+        }));
       }
     };
-
     checkExistingReview();
   }, [formData.selectedCourseId, profileData]);
 
-  // Cargar datos de una reseña existente
   const loadReviewData = (review) => {
     const aspectoMap = {
-      1: "dominio",
-      2: "claridad",
-      3: "flexibilidad",
-      4: "evaluacion",
-      5: "puntualidad",
-      6: "trato",
-      7: "disponibilidad",
-      8: "material",
-      9: "facilidad",
+      1: "dominio", 2: "claridad", 3: "flexibilidad", 4: "evaluacion",
+      5: "puntualidad", 6: "trato", 7: "disponibilidad", 8: "material", 9: "facilidad",
+    };
+    
+    const newFormData = { 
+      ...formData,
+      facilidad: null, dominio: null, claridad: null, flexibilidad: null,
+      evaluacion: null, puntualidad: null, trato: null, disponibilidad: null, material: null, texto: ""
     };
 
-    const newFormData = { ...formData };
-
-    // Los aspectos están en ReviewConts
-    review.ReviewConts.forEach((aspecto) => {
-      const key = aspectoMap[aspecto.aspecto];
-      if (key) {
-        newFormData[key] = aspecto.valor;
-      }
+    review.detalles.forEach((aspecto) => {
+      const key = aspectoMap[aspecto.aspecto?.id];
+      if (key) newFormData[key] = aspecto.valor;
     });
-
+    newFormData.texto = review.comentario?.texto || "";
     setFormData(newFormData);
   };
 
-  // Limpiar calificaciones
-  const clearRatings = () => {
-    setFormData((prev) => ({
-      ...prev,
-      facilidad: null,
-      dominio: null,
-      claridad: null,
-      flexibilidad: null,
-      evaluacion: null,
-      puntualidad: null,
-      trato: null,
-      disponibilidad: null,
-      material: null,
-    }));
-  };
-
-  // Filtrar años disponibles basado en los cursos
-  const availableYears = [
-    ...new Set(availableCourses.map((c) => c.year.toString())),
-  ]
+  const availableYears = [...new Set(availableCourses.map((c) => c.year.toString()))]
     .map((year) => ({ label: year, value: year }))
     .sort((a, b) => b.value - a.value);
 
-  // Filtrar períodos disponibles basado en el año seleccionado
   const availablePeriods = formData.year
     ? availableCourses
       .filter((c) => c.year.toString() === formData.year)
       .map((c) => c.periodo.toString())
     : [];
 
+  const getCategoryIcon = (key) => {
+    switch (key) {
+      case "facilidad": return <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>;
+      case "dominio": return <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>;
+      case "claridad": return <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>;
+      case "flexibilidad": return <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>;
+      case "evaluacion": return <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>;
+      case "puntualidad": return <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+      case "trato": return <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+      case "disponibilidad": return <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>;
+      case "material": return <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9l-2-2H5a2 2 0 01-2 2v10a2 2 0 012 2z" /></svg>;
+      default: return null;
+    }
+  };
+
   const categories = [
     {
       key: "facilidad",
-      label: "Facilidad para Aprobar",
-      description:
-        "Evalúa qué tan fácil o difícil es aprobar la materia con este docente.",
-      highlighted: true,
+      label: "Facilidad",
+      description: "Evalúa qué tan fácil o difícil es aprobar la materia con este docente.",
     },
     {
       key: "dominio",
-      label: "Dominio de la Materia",
-      description:
-        "Evalúa qué tan bien el docente conoce y maneja los temas de la materia.",
+      label: "Dominio",
+      description: "Evalúa qué tan bien el docente conoce y maneja los temas de la materia.",
     },
     {
       key: "claridad",
-      label: "Claridad al Explicar",
-      description:
-        "Valora qué tan claro y comprensible es el docente al explicar los conceptos.",
+      label: "Claridad",
+      description: "Valora qué tan claro y comprensible es el docente al explicar los conceptos.",
     },
     {
       key: "flexibilidad",
       label: "Flexibilidad",
-      description:
-        "Mide la capacidad del docente para adaptarse a las necesidades de los estudiantes y ser flexible con plazos y métodos de enseñanza.",
+      description: "Mide la capacidad del docente para adaptarse a las necesidades de los estudiantes.",
     },
     {
       key: "evaluacion",
-      label: "Evaluación Justa",
-      description:
-        "Evalúa si los exámenes y evaluaciones son justos y acordes a lo enseñado.",
+      label: "Evaluación",
+      description: "Evalúa si los exámenes y evaluaciones son justos y acordes a lo enseñado.",
     },
     {
       key: "puntualidad",
       label: "Puntualidad",
-      description:
-        "Valora la puntualidad del docente en clases y entrega de calificaciones.",
+      description: "Valora la puntualidad del docente en clases y entrega de calificaciones.",
     },
     {
       key: "trato",
-      label: "Trato al Alumno",
-      description:
-        "Mide el respeto, la cordialidad y la disposición del docente hacia los estudiantes.",
+      label: "Trato",
+      description: "Mide el respeto, la cordialidad y la disposición del docente hacia los estudiantes.",
     },
     {
       key: "disponibilidad",
-      label: "Disponibilidad/Apoyo",
-      description:
-        "Evalúa qué tan accesible es el docente fuera de clase para consultas y apoyo.",
+      label: "Disponibilidad",
+      description: "Evalúa qué tan accesible es el docente fuera de clase para consultas y apoyo.",
     },
     {
       key: "material",
-      label: "Material Didáctico",
-      description:
-        "Valora la calidad y utilidad del material proporcionado por el docente.",
+      label: "Material",
+      description: "Valora la calidad y utilidad del material proporcionado por el docente.",
     },
   ];
 
   const handleRatingClick = (category, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [category]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [category]: value }));
   };
 
   const handlePeriodClick = (period) => {
-    // Encontrar el curso correspondiente al año y período seleccionado
     const course = availableCourses.find(
-      (c) =>
-        c.year.toString() === formData.year && c.periodo.toString() === period
+      (c) => c.year.toString() === formData.year && c.periodo.toString() === period
     );
-
     if (course) {
-      setFormData((prev) => ({
-        ...prev,
-        selectedCourseId: course.id,
-        period: period,
-      }));
+      setFormData((prev) => ({ ...prev, selectedCourseId: course.id, period: period }));
     }
   };
 
   const submitReview = async () => {
-    // Mapear las categorías a IDs de aspectos
     const aspectoMap = {
-      dominio: 1,
-      claridad: 2,
-      flexibilidad: 3,
-      evaluacion: 4,
-      puntualidad: 5,
-      trato: 6,
-      disponibilidad: 7,
-      material: 8,
-      facilidad: 9,
+      dominio: 1, claridad: 2, flexibilidad: 3, evaluacion: 4,
+      puntualidad: 5, trato: 6, disponibilidad: 7, material: 8, facilidad: 9,
     };
-
-    // Construir el array de aspectos
     const aspectos = categories.map((cat) => ({
       aspecto: aspectoMap[cat.key],
       valor: formData[cat.key],
     }));
-
-    // Preparar el payload
-    const reviewData = {
-      curso: formData.selectedCourseId,
-      aspectos: aspectos,
-    };
+    const reviewData = { curso: formData.selectedCourseId, aspectos: aspectos, texto: formData.texto };
 
     try {
       setIsSubmitting(true);
       if (isEditMode && existingReview) {
-        // Actualizar reseña existente
         await updateReview(existingReview.id, reviewData);
-        alert("Reseña actualizada correctamente");
       } else {
-        // Crear nueva reseña
         await createReview(reviewData);
-        alert("Reseña enviada correctamente");
       }
-
-      // Limpiar el formulario después de enviar
-      setFormData({
-        year: "",
-        period: "",
-        selectedCourseId: null,
-        facilidad: null,
-        dominio: null,
-        claridad: null,
-        flexibilidad: null,
-        evaluacion: null,
-        puntualidad: null,
-        trato: null,
-        disponibilidad: null,
-        material: null,
-      });
-
-      setExistingReview(null);
-      setIsEditMode(false);
-
-      // IMPORTANTE: Llamar a onSuccess para cerrar el diálogo e invalidar cache
-      if (onSuccess) {
-        onSuccess();
-      }
+      if (onSuccess) onSuccess();
     } catch (error) {
-      alert(
-        `Error al ${isEditMode ? "actualizar" : "enviar"} la reseña. Por favor intenta de nuevo.`
-      );
+      console.error(error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const StarRating = ({ category, value }) => (
+    <div className="flex gap-1.5">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          onClick={() => handleRatingClick(category, star)}
+          className={`transition-all duration-200 transform hover:scale-125 ${
+            star <= value ? "text-yellow-400" : "text-gray-200 dark:text-gray-600 hover:text-yellow-200"
+          }`}
+        >
+          <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+        </button>
+      ))}
+    </div>
+  );
+
   const handleDelete = () => {
     if (!existingReview) return;
-
     confirmDialog({
-      message: "¿Estás seguro de que deseas eliminar esta reseña?",
+      group: "reviewForm",
+      message: "¿Estás seguro de que deseas eliminar esta reseña permanentemente?",
       header: "Confirmar Eliminación",
       icon: "pi pi-exclamation-triangle",
       acceptLabel: "Sí, eliminar",
       rejectLabel: "Cancelar",
-      acceptClassName: "p-button-danger",
+      acceptClassName: "bg-red-500 border-0",
       accept: async () => {
         try {
           setIsSubmitting(true);
           await deleteReview(existingReview.id);
-          alert("Reseña eliminada correctamente");
-
-          // Limpiar el formulario
-          setFormData({
-            year: "",
-            period: "",
-            selectedCourseId: null,
-            facilidad: null,
-            dominio: null,
-            claridad: null,
-            flexibilidad: null,
-            evaluacion: null,
-            puntualidad: null,
-            trato: null,
-            disponibilidad: null,
-            material: null,
-          });
-
-          setExistingReview(null);
-          setIsEditMode(false);
-
-          // IMPORTANTE: Cerrar el diálogo e invalidar cache
-          if (onSuccess) {
-            onSuccess();
-          }
+          if (onSuccess) onSuccess();
         } catch (error) {
-          e.error("Error al eliminar la reseña:", error);
-          alert("Error al eliminar la reseña. Por favor intenta de nuevo.");
+          console.error(error);
         } finally {
           setIsSubmitting(false);
         }
@@ -346,365 +261,323 @@ const ReviewForm = ({
   };
 
   const handleSubmit = () => {
-    const isComplete =
-      formData.year &&
-      formData.period &&
-      categories.every((cat) => formData[cat.key] !== null);
-
-    if (!isComplete) {
-      alert("Por favor completa todos los campos");
-      return;
-    }
-
-    if (!formData.selectedCourseId) {
-      alert("Error: No se ha seleccionado un curso válido");
-      return;
-    }
-
-    const message = isEditMode
-      ? "¿Estás seguro de que deseas actualizar esta reseña?"
-      : "¿Estás seguro de que deseas enviar esta reseña?";
-
-    const header = isEditMode ? "Confirmar Actualización" : "Confirmar Envío";
-
     confirmDialog({
-      message: message,
-      header: header,
-      icon: "pi pi-exclamation-triangle",
-      acceptLabel: isEditMode ? "Sí, actualizar" : "Sí, enviar",
+      group: "reviewForm",
+      message: isEditMode 
+        ? "¿Estás seguro de que deseas actualizar esta reseña?" 
+        : "¿Estás seguro de que deseas enviar esta reseña?",
+      header: isEditMode ? "Confirmar Actualización" : "Confirmar Envío",
+      icon: "pi pi-info-circle",
+      acceptLabel: isEditMode ? "Actualizar" : "Enviar",
       rejectLabel: "Cancelar",
       accept: submitReview,
     });
   };
 
-  const RatingButtons = ({ category, value, highlighted }) => (
-    <div className="flex gap-2 justify-start flex-wrap sm:flex-nowrap">
-      {[1, 2, 3, 4, 5].map((rating) => (
-        <button
-          key={rating}
-          onClick={() => handleRatingClick(category, rating)}
-          className={`${highlighted ? "w-12 h-12 text-lg" : "w-10 h-10"} rounded-md font-medium transition-all ${
-            value === rating
-              ? "bg-dark-navy text-white shadow-md"
-              : "bg-gray-200 text-dark-navy hover:bg-blue-100"
-            }`}
-        >
-          {rating}
-        </button>
-      ))}
-    </div>
-  );
+  const currentCategory = categories[step - 1];
+  const totalSteps = categories.length + 2; // period + 9 categories + comment
+  const progress = ((step + 1) / totalSteps) * 100;
 
   return (
-    <div className="bg-greige rounded-lg w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto relative">
-      <ConfirmDialog
+    <div className="bg-[#F8FAFC] dark:bg-gray-900 max-h-[90vh] overflow-y-auto rounded-[3rem]">
+      <ConfirmDialog 
+        group="reviewForm"
+        className="rounded-[2.5rem] overflow-hidden" 
         pt={{
-          root: {
-            className: "bg-white rounded-lg shadow-xl border border-gray-200",
-          },
-          header: {
-            className: "bg-navy text-white px-6 py-4 rounded-t-lg",
-          },
-          content: { className: "px-6 py-4 text-gray-700" },
-          footer: {
-            className:
-              "px-6 py-4 bg-gray-50 rounded-b-lg flex gap-3 justify-end",
-          },
-          acceptButton: {
-            className:
-              "bg-navy hover:bg-dark-navy text-white px-6 py-2 rounded-md transition-colors font-medium shadow-md",
-          },
-          rejectButton: {
-            className:
-              "bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md transition-colors font-medium",
-          },
-          icon: { className: "text-navy text-3xl mr-3" },
+          root: { className: "bg-white dark:bg-gray-800 shadow-2xl border-0 overflow-hidden" },
+          header: { className: "bg-navy text-white p-8 flex justify-center" },
+          content: { className: "bg-white dark:bg-gray-800 p-10 text-xl font-medium leading-relaxed text-navy dark:text-gray-100 text-center" },
+          footer: { className: "bg-gray-50 dark:bg-gray-800 p-8 gap-4 flex justify-center items-center" },
+          acceptButton: { className: "bg-navy px-10 py-4 rounded-2xl border-0 font-bold text-white hover:bg-dark-navy transition-colors" },
+          rejectButton: { className: "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-10 py-4 rounded-2xl border-0 font-bold hover:bg-gray-300 transition-colors" }
         }}
       />
 
-      {/* Botón de cerrar */}
-      <button
-        onClick={onSuccess}
-        className="absolute top-4 right-4 text-navy hover:text-dark-navy transition-colors"
-        aria-label="Cerrar"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M6 18L18 6M6 6l12 12"
-          />
-        </svg>
-      </button>
-
-      {/* Título */}
-      <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2 pr-8">
-        {isEditMode ? "Editar Reseña" : "Reseñar Docente"}
-      </h2>
-      <h3 className="text-lg sm:text-xl text-navy font-semibold mb-4 sm:mb-6">
-        {subjectName} - {teacherName}
-      </h3>
-
-      {/* Mensaje de modo edición */}
-      {isEditMode && (
-        <div className="mb-4 p-3 bg-blue-50 border border-greige rounded-md">
-          <p className="text-navy font-medium">
-            Estás editando una reseña existente
-          </p>
+      {/* Hero Section */}
+      <div className="bg-navy p-6 md:p-10 lg:p-14 relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-10 opacity-10">
+          <svg className="w-40 h-40 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+            <path fillRule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 110 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clipRule="evenodd" />
+          </svg>
         </div>
-      )}
 
-      <div>
-        {/* Datos del Año-Período */}
-        <div className="mb-6">
-          <h4 className="font-semibold text-neutral-800 mb-3 text-xl">
-            Datos del Año-Período
-          </h4>
+        <button 
+          onClick={onSuccess}
+          className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors"
+        >
+          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
 
-          {loading ? (
-            <div className="text-center py-4 text-gray-500">
-              Cargando períodos disponibles...
+        <span className="inline-block px-3 py-1 bg-white/10 text-white text-[10px] font-black uppercase tracking-widest rounded-full mb-4">
+          {isEditMode ? "Modificar" : "Nuevo Reporte"}
+        </span>
+        <h2 className="text-4xl lg:text-5xl font-black text-white leading-tight mb-2 tracking-tight">
+          {isEditMode ? "Actualizar Reseña" : "Evaluar Docente"}
+        </h2>
+        <p className="text-blue-100 text-lg font-bold">
+          {subjectName} • <span className="text-white">{teacherName}</span>
+        </p>
+
+        {/* Progress Bar */}
+        <div className="mt-6 bg-white/10 rounded-full h-1.5 overflow-hidden">
+          <div className="bg-white h-full rounded-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
+        </div>
+      </div>
+
+      <div className="p-4 md:p-10 lg:p-14 space-y-8">
+        {isEditMode ? (
+          <>
+            {/* Edit Mode: Compact single-column view */}
+            <div className="flex items-center gap-3">
+              <div className="w-1.5 h-6 bg-navy rounded-full"></div>
+              <h4 className="text-xl font-black text-navy dark:text-gray-100 uppercase tracking-tight">Calificaciones</h4>
             </div>
-          ) : availableCourses.length === 0 ? (
-            <div className="text-center py-4 text-gray-500">
-              No hay períodos disponibles para esta sección
+
+            <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm divide-y divide-gray-100 dark:divide-gray-700 overflow-hidden">
+              {categories.map((cat, idx) => (
+                <div key={cat.key} className="flex items-center gap-4 px-6 py-5">
+                  <div className="p-2.5 bg-navy/5 dark:bg-gray-700 text-navy dark:text-gray-100 rounded-xl shrink-0">
+                    {getCategoryIcon(cat.key)}
+                  </div>
+                  <span className="text-sm font-black text-navy dark:text-gray-100 w-28 shrink-0">{cat.label}</span>
+                  <div className="flex-1 flex justify-center">
+                    <StarRating category={cat.key} value={formData[cat.key]} />
+                  </div>
+                  {formData[cat.key] && (
+                    <span className="text-xs font-black text-gray-400 dark:text-gray-500 w-8 text-right">{formData[cat.key]}/5</span>
+                  )}
+                </div>
+              ))}
             </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-white p-4 rounded border border-greige shadow-md">
-              <div className="flex-1 w-full sm:w-auto">
-                <label className="block text-lg text-navy mb-1 font-bold">
-                  Año en el que cursaste:
-                </label>
-                <Dropdown
-                  value={formData.year}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      year: e.value,
-                      period: "",
-                      selectedCourseId: null,
-                    }))
-                  }
-                  options={availableYears}
-                  placeholder="Selecciona un año"
-                  className="w-72 border rounded-md border-[#e0e0e0] font-medium bg-neutral-50 pr-2 shadow-md"
-                  pt={{
-                    input: {
-                      className:
-                        "py-2 px-3 bg-neutral-50 text-neutral-500 rounded-md",
-                    },
-                    panel: {
-                      className:
-                        "bg-neutral-50 border border-[#e0e0e0] text-neutral-600  rounded-md",
-                    },
-                    item: {
-                      className: "text-neutral-900 hover:bg-blue-100 p-2",
-                    },
-                  }}
-                  disabled={availableYears.length === 0}
-                />
+
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm">
+              <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1 block mb-3">
+                Comentario Adicional <span className="text-gray-400 dark:text-gray-500 font-bold text-sm tracking-normal">(Opcional)</span>
+              </label>
+              <textarea
+                value={formData.texto}
+                onChange={(e) => setFormData((prev) => ({ ...prev, texto: e.target.value }))}
+                placeholder="¿Qué más te gustaría compartir sobre tu experiencia con este docente?"
+                className="w-full h-32 p-6 border-2 border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900 rounded-2xl transition-all font-medium text-navy dark:text-gray-100 resize-none focus:border-navy/30 focus:bg-white dark:focus:bg-gray-800 focus:outline-none focus:ring-4 focus:ring-navy/5"
+                maxLength={1000}
+              />
+              <div className="text-right mt-2 text-xs font-bold text-gray-400 dark:text-gray-500">
+                {formData.texto.length}/1000
               </div>
-              <div className="w-full sm:w-auto">
-                <label className="block text-lg text-navy mb-1 font-bold">
-                  Período:
-                </label>
-                <div className="flex gap-2">
+            </div>
+
+            <div className="flex justify-between">
+              <button
+                onClick={handleDelete}
+                className="px-10 h-16 bg-red-50 dark:bg-red-950/30 text-red-500 dark:text-red-400 rounded-2xl font-bold uppercase tracking-wider text-xs hover:bg-red-500 hover:text-white transition-all active:scale-95"
+              >
+                Borrar
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="bg-navy text-white px-10 h-16 rounded-2xl font-black uppercase tracking-wider text-sm shadow-xl shadow-navy/20 hover:bg-dark-navy hover:-translate-y-0.5 transition-all disabled:opacity-20 active:scale-95 flex items-center justify-center gap-3"
+              >
+                {isSubmitting ? (
+                  <div className="animate-spin rounded-full h-6 w-6 border-3 border-white/20 border-t-white"></div>
+                ) : (
+                  <>
+                    <span>Actualizar</span>
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  </>
+                )}
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Step 0: Period Selection */}
+            {step === 0 && (
+              <section className="space-y-6">
+                <div className="flex items-center gap-3">
+                   <div className="w-1.5 h-6 bg-navy rounded-full"></div>
+                   <div>
+                     <h4 className="text-xl font-black text-navy dark:text-gray-100 uppercase tracking-tight">Periodo Lectivo</h4>
+                     <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-1">Paso 1 de {totalSteps - 1}</p>
+                   </div>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Año de cursado</label>
+                    <Dropdown
+                      value={formData.year}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, year: e.value, period: "", selectedCourseId: null }))}
+                      options={availableYears}
+                      placeholder="Escoge el año..."
+                      className="w-full h-16 border-2 border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900 rounded-2xl transition-all font-bold text-navy dark:text-gray-100"
+                      pt={{
+                        root: { className: "bg-gray-50/50 dark:bg-gray-900" },
+                        input: { className: "px-8 py-5" },
+                        trigger: { className: "w-16 text-gray-400 dark:text-gray-500" },
+                        panel: { className: "bg-white dark:bg-gray-800 shadow-2xl rounded-2xl mt-4 border-0 overflow-hidden ring-1 ring-black/5" },
+                        list: { className: "bg-white dark:bg-gray-800" },
+                        item: { className: "p-5 font-bold text-gray-500 dark:text-gray-300 hover:bg-navy hover:text-white transition-colors dark:hover:bg-gray-700" }
+                      }}
+                    />
+                  </div>
+
+                  <div className="space-y-3">
+                    <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Semestre</label>
+                    <div className="flex gap-4">
+                      {[1, 2].map((p) => (
+                        <button
+                          key={p}
+                          onClick={() => handlePeriodClick(p.toString())}
+                          disabled={!formData.year || !availablePeriods.includes(p.toString())}
+                          className={`flex-1 h-16 rounded-2xl font-black transition-all ${
+                            formData.period === p.toString()
+                              ? "bg-navy text-white shadow-lg"
+                              : availablePeriods.includes(p.toString())
+                                ? "bg-gray-50 dark:bg-gray-900 text-navy dark:text-gray-100 hover:bg-navy hover:text-white"
+                                : "bg-gray-50 dark:bg-gray-900 text-gray-200 dark:text-gray-600 cursor-not-allowed"
+                          }`}
+                        >
+                          {p}° Semestre
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end">
                   <button
-                    onClick={() => handlePeriodClick("1")}
-                    disabled={
-                      !formData.year || !availablePeriods.includes("1")
-                    }
-                    className={`w-10 h-10 rounded-md font-medium transition-all ${formData.period === "1"
-                        ? "bg-dark-navy text-white"
-                        : availablePeriods.includes("1") && formData.year
-                          ? "bg-gray-200 text-dark-navy hover:bg-gray-300"
-                          : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                      }`}
+                    onClick={() => setStep(1)}
+                    disabled={!formData.selectedCourseId}
+                    className="bg-navy text-white px-10 h-16 rounded-2xl font-black uppercase tracking-wider text-sm shadow-xl shadow-navy/20 hover:bg-dark-navy hover:-translate-y-0.5 transition-all disabled:opacity-20 active:scale-95"
                   >
-                    1
-                  </button>
-                  <button
-                    onClick={() => handlePeriodClick("2")}
-                    disabled={
-                      !formData.year || !availablePeriods.includes("2")
-                    }
-                    className={`w-10 h-10 rounded-md font-medium transition-all ${formData.period === "2"
-                        ? "bg-dark-navy text-white"
-                        : availablePeriods.includes("2") && formData.year
-                          ? "bg-gray-200 text-dark-navy hover:bg-gray-300"
-                          : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                      }`}
-                  >
-                    2
+                    Siguiente
                   </button>
                 </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Calificaciones */}
-        <div>
-          <h4 className="font-semibold text-neutral-800 mb-3 text-xl">
-            Calificaciones
-          </h4>
-
-          {/* Contenedor con tooltip */}
-          <div className="flex flex-col lg:flex-row gap-4 bg-white p-4 rounded border border-greige shadow-md">
-            {/* Grid de calificaciones */}
-            <div className="flex-1 space-y-6">
-              {/* Aspecto destacado - Facilidad */}
-              {categories
-                .filter((cat) => cat.highlighted)
-                .map((category) => (
-                  <div
-                    key={category.key}
-                    className="p-4 bg-yellow-50 border-2 border-yellow-400 rounded-lg"
-                    onMouseEnter={() => setHoveredCategory(category)}
-                    onMouseLeave={() => setHoveredCategory(null)}
-                  >
-                    <label className="block text-xl text-navy mb-2 font-bold cursor-help">
-                      ⭐ {category.label}
-                    </label>
-                    <RatingButtons
-                      category={category.key}
-                      value={formData[category.key]}
-                      highlighted={true}
-                    />
-                    {/* Descripción móvil */}
-                    <p className="text-sm text-gray-600 lg:hidden mt-2">
-                      {category.description}
-                    </p>
-                  </div>
-                ))}
-
-              {/* Resto de aspectos */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {categories
-                  .filter((cat) => !cat.highlighted)
-                  .map((category) => (
-                    <div
-                      key={category.key}
-                      className="space-y-2"
-                      onMouseEnter={() => setHoveredCategory(category)}
-                      onMouseLeave={() => setHoveredCategory(null)}
-                    >
-                      <label className="block text-lg text-navy mb-1 font-bold cursor-help">
-                        {category.label}
-                      </label>
-                      <RatingButtons
-                        category={category.key}
-                        value={formData[category.key]}
-                      />
-                      {/* Descripción móvil */}
-                      <p className="text-xs text-gray-500 lg:hidden">
-                        {category.description}
-                      </p>
-                    </div>
-                  ))}
-              </div>
-            </div>
-
-            {/* Tooltip lateral - solo desktop */}
-            <div className="w-64 hidden lg:block">
-              <div className="sticky top-4 bg-neutral-100 border-l-4 border-slate-700 rounded-lg p-4 transition-all duration-200">
-                {hoveredCategory ? (
-                  <>
-                    <h5 className="font-semibold text-slate-800 mb-2">
-                      {hoveredCategory.label}
-                    </h5>
-                    <p className="text-sm text-gray-700">
-                      {hoveredCategory.description}
-                    </p>
-                  </>
-                ) : (
-                  <p className="text-sm text-gray-500 italic">
-                    Pasa el cursor sobre un aspecto para ver su descripción
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Botones de acción */}
-        <div className="flex justify-center gap-3 mt-4">
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="w-full sm:w-auto bg-navy text-white px-4 py-2 rounded-md hover:bg-dark-navy transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            {isSubmitting ? (
-              <>
-                <svg
-                  className="animate-spin h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                <span>Procesando...</span>
-              </>
-            ) : (
-              <span>{isEditMode ? "Actualizar Reseña" : "Enviar Reseña"}</span>
+              </section>
             )}
-          </button>
-          {isEditMode && (
-            <button
-              onClick={handleDelete}
-              disabled={isSubmitting}
-              className="w-full sm:w-auto bg-white text-dark-navy px-4 py-2 rounded-md hover:bg-dark-navy hover:text-white transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {isSubmitting ? (
-                <>
-                  <svg
-                    className="animate-spin h-5 w-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
+
+            {/* Steps 1-9: Categories one at a time */}
+            {step >= 1 && step <= categories.length && (
+              <section className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-6 bg-navy rounded-full"></div>
+                    <div>
+                      <h4 className="text-xl font-black text-navy dark:text-gray-100 uppercase tracking-tight">{currentCategory.label}</h4>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-1">Paso {step + 1} de {totalSteps - 1}</p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 px-3 py-1.5 rounded-xl">
+                    {step} de {categories.length}
+                  </span>
+                </div>
+
+                <div className="p-8 bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm transition-all duration-300">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="p-3 bg-navy/5 dark:bg-gray-700 text-navy dark:text-gray-100 rounded-xl">
+                      {getCategoryIcon(currentCategory.key)}
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 font-medium leading-relaxed">{currentCategory.description}</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-center py-6">
+                    <StarRating category={currentCategory.key} value={formData[currentCategory.key]} />
+                  </div>
+                  {formData[currentCategory.key] && (
+                    <div className="text-center mt-2">
+                      <span className="inline-block bg-navy/10 dark:bg-gray-700 text-navy dark:text-gray-100 text-lg font-black px-5 py-2 rounded-full">
+                        {formData[currentCategory.key]}/5
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex justify-between">
+                  <button
+                    onClick={() => setStep(step - 1)}
+                    className="px-10 h-16 rounded-2xl font-black uppercase tracking-wider text-sm bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all active:scale-95"
                   >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  <span>Procesando...</span>
-                </>
-              ) : (
-                <span>Eliminar Reseña</span>
-              )}
-            </button>
-          )}
-        </div>
+                    Anterior
+                  </button>
+                  <button
+                    onClick={() => setStep(step + 1)}
+                    disabled={!formData[currentCategory.key]}
+                    className="bg-navy text-white px-10 h-16 rounded-2xl font-black uppercase tracking-wider text-sm shadow-xl shadow-navy/20 hover:bg-dark-navy hover:-translate-y-0.5 transition-all disabled:opacity-20 active:scale-95"
+                  >
+                    Siguiente
+                  </button>
+                </div>
+              </section>
+            )}
+
+            {/* Step 10: Comment + Submit */}
+            {step === categories.length + 1 && (
+              <section className="space-y-6">
+                <div className="flex items-center gap-3">
+                   <div className="w-1.5 h-6 bg-navy rounded-full"></div>
+                   <div>
+                     <h4 className="text-xl font-black text-navy dark:text-gray-100 uppercase tracking-tight">Comentario Adicional <span className="text-gray-400 dark:text-gray-500 font-bold text-sm tracking-normal">(Opcional)</span></h4>
+                     <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-1">Paso {step + 1} de {totalSteps - 1}</p>
+                   </div>
+                </div>
+
+                {/* Summary */}
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm">
+                  <span className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Resumen de calificaciones</span>
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mt-4">
+                    {categories.map((cat) => (
+                      <div key={cat.key} className="flex flex-col items-center p-3 bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700">
+                        <span className="text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">{cat.label}</span>
+                        <span className="text-sm font-black text-navy dark:text-gray-100">{formData[cat.key]}/5</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm">
+                  <textarea
+                    value={formData.texto}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, texto: e.target.value }))}
+                    placeholder="¿Qué más te gustaría compartir sobre tu experiencia con este docente?"
+                    className="w-full h-32 p-6 border-2 border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900 rounded-2xl transition-all font-medium text-navy dark:text-gray-100 resize-none focus:border-navy/30 focus:bg-white dark:focus:bg-gray-800 focus:outline-none focus:ring-4 focus:ring-navy/5"
+                    maxLength={1000}
+                  />
+                  <div className="text-right mt-2 text-xs font-bold text-gray-400 dark:text-gray-500">
+                    {formData.texto.length}/1000
+                  </div>
+                </div>
+
+                <div className="flex justify-between">
+                  <button
+                    onClick={() => setStep(categories.length)}
+                    className="px-10 h-16 rounded-2xl font-black uppercase tracking-wider text-sm bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all active:scale-95"
+                  >
+                    Anterior
+                  </button>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className="bg-navy text-white px-10 h-16 rounded-2xl font-black uppercase tracking-wider text-sm shadow-xl shadow-navy/20 hover:bg-dark-navy hover:-translate-y-0.5 transition-all disabled:opacity-20 active:scale-95 flex items-center justify-center gap-3"
+                  >
+                    {isSubmitting ? (
+                      <div className="animate-spin rounded-full h-6 w-6 border-3 border-white/20 border-t-white"></div>
+                    ) : (
+                      <>
+                        <span>Publicar Reseña</span>
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </section>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
