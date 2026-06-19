@@ -66,7 +66,7 @@ function ReportCard({ report, onApprove, onReject, isProcessing }) {
   const commentAuthor = report.Comentario?.ReviewCab?.Alumno;
   const reporter = report.Reporter;
   const commentText = report.Comentario?.texto;
-  const isBanned = report.Comentario?.is_banned;
+  const isBanned = report.Comentario?.status === 'baneado';
   const createdDate = new Date(report.created_at).toLocaleDateString("es-ES", {
     year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit",
   });
@@ -278,8 +278,8 @@ function ReviewDetailModal({ review, onClose }) {
           {/* Comment */}
           <div>
             <span className="text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest block mb-2">Comentario</span>
-            <div className={`p-5 rounded-2xl border ${review.comentario?.is_banned ? "bg-gray-50 dark:bg-gray-900 border-gray-100 dark:border-gray-700" : "bg-blue-50/20 dark:bg-blue-950/20 border-blue-100/50 dark:border-blue-900/50"}`}>
-              {review.comentario?.is_banned ? (
+            <div className={`p-5 rounded-2xl border ${review.comentario?.status === 'baneado' ? "bg-gray-50 dark:bg-gray-900 border-gray-100 dark:border-gray-700" : "bg-blue-50/20 dark:bg-blue-950/20 border-blue-100/50 dark:border-blue-900/50"}`}>
+              {review.comentario?.status === 'baneado' ? (
                 <p className="text-gray-400 dark:text-gray-500 italic font-bold flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
@@ -313,17 +313,14 @@ function ReviewDetailModal({ review, onClose }) {
 
           {/* Status badges */}
           <div className="flex flex-wrap gap-2">
-            {review.comentario?.is_banned && (
+            {review.comentario?.status === 'baneado' && (
               <span className="px-3 py-1.5 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-xl font-black text-[10px] uppercase tracking-wider border border-rose-100 dark:border-rose-900/50">Baneado</span>
             )}
-            {review.comentario?.bajo_moderacion && (
+            {review.comentario?.status === 'en_revision' && (
               <span className="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 rounded-xl font-black text-[10px] uppercase tracking-wider border border-amber-100 dark:border-amber-900/50">En moderación</span>
             )}
-            {review.comentario?.aprobado && (
+            {review.comentario?.status === 'aprobado' && (
               <span className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 rounded-xl font-black text-[10px] uppercase tracking-wider border border-emerald-100 dark:border-emerald-900/50">Aprobado</span>
-            )}
-            {!review.comentario?.is_banned && !review.comentario?.bajo_moderacion && !review.comentario?.aprobado && (
-              <span className="px-3 py-1.5 bg-yellow-50 dark:bg-yellow-950/30 text-yellow-600 dark:text-yellow-400 rounded-xl font-black text-[10px] uppercase tracking-wider border border-yellow-100 dark:border-yellow-900/50">Sin estado</span>
             )}
           </div>
         </div>
@@ -340,7 +337,7 @@ function ReviewCard({ review, onBan, isProcessing, onViewDetail }) {
     year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit",
   });
   const comentario = review.comentario;
-  const alreadyBanned = comentario?.is_banned;
+  const alreadyBanned = comentario?.status === 'baneado';
 
   if (!comentario?.texto && !alreadyBanned) return null;
 
