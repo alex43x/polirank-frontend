@@ -338,16 +338,23 @@ const ReviewForm = ({
 
             <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm divide-y divide-gray-100 dark:divide-gray-700 overflow-hidden">
               {categories.map((cat, idx) => (
-                <div key={cat.key} className="flex items-center gap-4 px-6 py-5">
-                  <div className="p-2.5 bg-navy/5 dark:bg-gray-700 text-navy dark:text-gray-100 rounded-xl shrink-0">
-                    {getCategoryIcon(cat.key)}
+                <div key={cat.key} className="flex flex-col sm:flex-row items-center sm:gap-4 px-4 sm:px-6 py-5">
+                  <div className="flex items-center justify-between sm:justify-start w-full sm:w-auto mb-3 sm:mb-0">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-navy/5 dark:bg-gray-700 text-navy dark:text-gray-100 rounded-xl shrink-0">
+                        {getCategoryIcon(cat.key)}
+                      </div>
+                      <span className="text-sm font-black text-navy dark:text-gray-100 sm:w-28 shrink-0">{cat.label}</span>
+                    </div>
+                    {formData[cat.key] && (
+                      <span className="text-xs font-black text-gray-400 dark:text-gray-500 sm:hidden">{formData[cat.key]}/5</span>
+                    )}
                   </div>
-                  <span className="text-sm font-black text-navy dark:text-gray-100 w-28 shrink-0">{cat.label}</span>
-                  <div className="flex-1 flex justify-center">
+                  <div className="flex-1 flex justify-center w-full overflow-x-auto py-2">
                     <StarRating category={cat.key} value={formData[cat.key]} />
                   </div>
                   {formData[cat.key] && (
-                    <span className="text-xs font-black text-gray-400 dark:text-gray-500 w-8 text-right">{formData[cat.key]}/5</span>
+                    <span className="text-xs font-black text-gray-400 dark:text-gray-500 w-8 text-right hidden sm:block shrink-0">{formData[cat.key]}/5</span>
                   )}
                 </div>
               ))}
@@ -485,7 +492,7 @@ const ReviewForm = ({
                       <p className="text-sm text-gray-500 dark:text-gray-400 font-medium leading-relaxed">{currentCategory.description}</p>
                     </div>
                   </div>
-                  <div className="flex justify-center py-6">
+                  <div className="flex justify-center py-6 w-full overflow-x-auto">
                     <StarRating category={currentCategory.key} value={formData[currentCategory.key]} />
                   </div>
                   {formData[currentCategory.key] && (
