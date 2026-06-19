@@ -44,6 +44,14 @@ api.interceptors.response.use(
       }
     }
 
+    if (error.response?.status === 429) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      delete api.defaults.headers.common.Authorization;
+      
+      window.location.href = "/?error=429";
+    }
+
     return Promise.reject(error);
   }
 );

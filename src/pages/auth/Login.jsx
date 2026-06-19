@@ -40,13 +40,19 @@ export default function Login() {
   const [tokenData, setTokenData] = useState(null);
   const [availableCareers, setAvailableCareers] = useState([]);
 
-  // Detectar Token en URL al cargar
+  // Detectar Token o Errores en URL al cargar
   useEffect(() => {
     const query = new URLSearchParams(location.search);
     const token = query.get("token");
+    const errorParam = query.get("error");
 
     if (token) {
       handleVerifyToken(token);
+    }
+
+    if (errorParam === "429") {
+      setErrorMsg("Demasiadas peticiones. Por favor, inténtelo de nuevo más tarde.");
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [location]);
 
