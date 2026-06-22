@@ -26,6 +26,15 @@ export default function Login() {
   const [showTerms, setShowTerms] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    let timer;
+    if (cooldown > 0) {
+      timer = setInterval(() => setCooldown((c) => c - 1), 1000);
+    }
+    return () => clearInterval(timer);
+  }, [cooldown]);
 
   // Datos del Formulario
   const [form, setForm] = useState({
@@ -121,6 +130,7 @@ export default function Login() {
     try {
       setErrorMsg("");
       await requestAccess(form.correo);
+      setCooldown(60);
       setView(VIEWS.SUCCESS_EMAIL);
     } catch (error) {
       setErrorMsg(error.response?.data?.error?.message || "Error al enviar el correo");
@@ -316,10 +326,10 @@ export default function Login() {
                 </div>
                 <button
                   onClick={handleRequestAccess}
-                  disabled={actionLoading}
-                  className="w-full bg-navy dark:bg-indigo-600 text-white rounded-2xl h-16 font-black uppercase tracking-widest shadow-xl shadow-navy/20 dark:shadow-indigo-500/20 hover:bg-dark-navy dark:hover:bg-indigo-500 transition-all flex items-center justify-center gap-4 mt-2"
+                  disabled={actionLoading || cooldown > 0}
+                  className={`w-full bg-navy dark:bg-indigo-600 text-white rounded-2xl h-16 font-black uppercase tracking-widest shadow-xl shadow-navy/20 dark:shadow-indigo-500/20 transition-all flex items-center justify-center gap-4 mt-2 ${cooldown > 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-dark-navy dark:hover:bg-indigo-500"}`}
                 >
-                  {actionLoading ? <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/20 border-t-white"></div> : "Enviar Enlace"}
+                  {actionLoading ? <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/20 border-t-white"></div> : (cooldown > 0 ? `Reintentar en ${cooldown}s` : "Enviar Enlace")}
                 </button>
                 <button 
                   onClick={() => setView(VIEWS.LOGIN)}
@@ -344,12 +354,21 @@ export default function Login() {
                     Revisa tu bandeja de entrada (y spam) en <span className="text-navy dark:text-indigo-400">{form.correo}</span>.
                   </p>
                 </div>
-                <button 
-                  onClick={() => setView(VIEWS.LOGIN)}
-                  className="w-full bg-navy dark:bg-indigo-600 text-white rounded-2xl h-16 font-black uppercase tracking-widest transition-all"
-                >
-                  Volver al Login
-                </button>
+                <div className="space-y-3 w-full">
+                  <button 
+                    onClick={handleRequestAccess}
+                    disabled={actionLoading || cooldown > 0}
+                    className={`w-full bg-gray-100 dark:bg-gray-800 text-navy dark:text-white rounded-2xl h-16 font-black uppercase tracking-widest transition-all flex items-center justify-center gap-4 ${cooldown > 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-200 dark:hover:bg-gray-700"}`}
+                  >
+                    {actionLoading ? <div className="animate-spin rounded-full h-5 w-5 border-2 border-navy/20 border-t-navy dark:border-white/20 dark:border-t-white"></div> : (cooldown > 0 ? `Reenviar en ${cooldown}s` : "Reenviar correo")}
+                  </button>
+                  <button 
+                    onClick={() => setView(VIEWS.LOGIN)}
+                    className="w-full bg-navy dark:bg-indigo-600 text-white rounded-2xl h-16 font-black uppercase tracking-widest transition-all"
+                  >
+                    Volver al Login
+                  </button>
+                </div>
               </div>
             )}
 
