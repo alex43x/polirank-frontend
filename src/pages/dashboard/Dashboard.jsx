@@ -186,14 +186,14 @@ export default function Dashboard() {
   }, [teacherFilters, isChangingCareer, searchMode]);
 
   useEffect(() => {
-    if (user && selectedCareer && !isChangingCareer) {
+    if (selectedCareer && !isChangingCareer) {
       if (searchMode === 'subjects') {
         fetchSubjects({ ...searchParams, limit, page: currentPage });
       } else {
         fetchTeachers({ search: searchParams.search, limit, page: currentPage });
       }
     }
-  }, [searchParams, currentPage, selectedCareer, isChangingCareer, user, searchMode]);
+  }, [searchParams, currentPage, selectedCareer, isChangingCareer, searchMode]);
 
   const fetchTeachers = async (params) => {
     const data = await fetchTeachersApi(params);

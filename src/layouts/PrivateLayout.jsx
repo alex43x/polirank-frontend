@@ -19,13 +19,7 @@ export default function PrivateLayout() {
     }
   }, [user, isGuest, profileData, getProfile]);
 
-  // Refrescar perfil al abrir el menú
-  useEffect(() => {
-    if (isOpen && !isGuest && user) {
-      getProfile();
-    }
-  }, [isOpen]);
-
+  
   // Cierre con click outside
   useEffect(() => {
     function handleClickOutside(event) {
