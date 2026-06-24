@@ -48,11 +48,10 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("user", JSON.stringify(student));
       setUser(student);
       
-      // Crear profileData con los datos del login
       const profileData = {
         student: student,
-        reviews: [], // Se cargarán cuando sea necesario
-        tries: []    // Se cargarán cuando sea necesario
+        reviews: { rows: [] },
+        tries: { rows: [] },
       };
       
       localStorage.setItem("profileData", JSON.stringify(profileData));
@@ -63,6 +62,12 @@ export const AuthProvider = ({ children }) => {
         setCareerHeader(student.matriculaciones[0].carrera.id);
         localStorage.setItem("careerId", student.matriculaciones[0].carrera.id);
       }
+
+      // Cargar reseñas e intentos en background — el login no los devuelve
+      fetchProfile(jwt).then(full => {
+        setProfileData(full);
+        localStorage.setItem("profileData", JSON.stringify(full));
+      }).catch(() => {});
 
       return student;
     } finally {
